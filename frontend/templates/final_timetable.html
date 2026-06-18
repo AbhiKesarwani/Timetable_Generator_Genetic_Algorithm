@@ -1,0 +1,145 @@
+{% extends "layout.html" %}
+
+{% block title %}Results - TimetableGen{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('main.dashboard') }}" style="text-decoration: none; color: var(--text-muted);">Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">/</span>
+<a href="{{ url_for('generation.generate_setup') }}"
+    style="text-decoration: none; color: var(--text-muted);">Generate</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">/</span>
+<span style="color: var(--text-main); font-weight: 600;">Results</span>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+    <div>
+        <h1 style="font-family: 'Outfit', sans-serif; font-weight: 700; margin-bottom: 0.5rem;">Generated Timetable</h1>
+        <p style="color: var(--text-muted);">Schedule for <strong>{{ class_name }}</strong> (Semester {{ semester }})
+        </p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        {% if class_name and semester %}
+        <a href="{{ url_for('generation.regenerate_quick') }}" class="btn btn-secondary">
+            <i class="fas fa-redo"></i> Regenerate
+        </a>
+        {% endif %}
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Print PDF
+        </button>
+        <a href="/modify_timetable" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Edit Manually
+        </a>
+    </div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden; border: 2px solid var(--border);">
+    <div class="table-container" style="border: none; border-radius: 0; margin-top: 0;">
+        <table style="border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="background: var(--bg-main); width: 120px; border-right: 2px solid var(--border);">Time
+                        Slot</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in timeslots %}
+                <tr>
+                    {% if entry.type == 'break' %}
+                    <td
+                        style="font-weight: 700; background-color: var(--bg-main); border-right: 2px solid var(--border); color: var(--warning); text-align: center;">
+                        {{ entry.time[:5] }}
+                    </td>
+                    <td colspan="6"
+                        style="background-color: rgba(245, 158, 11, 0.05); text-align: center; vertical-align: middle;">
+                        <div
+                            style="display: flex; align-items: center; justify-content: center; gap: 1rem; color: var(--warning); font-weight: 800; letter-spacing: 0.3em; font-size: 0.75rem; text-transform: uppercase;">
+                            <hr style="flex: 1; border: none; border-top: 1px dashed var(--warning); opacity: 0.3;">
+                            <span>Break Period</span>
+                            <hr style="flex: 1; border: none; border-top: 1px dashed var(--warning); opacity: 0.3;">
+                        </div>
+                    </td>
+                    {% else %}
+                    <td
+                        style="font-weight: 600; background-color: var(--bg-main); border-right: 2px solid var(--border);">
+                        {{ entry.time[:5] }}
+                    </td>
+                    {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
+                    <td
+                        style="height: 100px; padding: 0.5rem; vertical-align: top; border-right: 1px solid var(--border); width: calc(100% / 7);">
+                        {% if timetable.get((day, entry.time)) %}
+                        <div
+                            style="padding: 0.75rem; background: rgba(99, 102, 241, 0.1); border-left: 3px solid var(--primary); border-radius: 0.5rem; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                            <span
+                                style="font-weight: 700; color: var(--primary); font-size: 0.875rem; display: block; overflow: hidden; text-overflow: ellipsis;">{{
+                                timetable[(day, entry.time)] }}</span>
+                            <!-- Mock teacher if needed or just styling -->
+                            <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">Live
+                                Session</span>
+                        </div>
+                        {% else %}
+                        <div
+                            style="height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0.2;">
+                            <i class="fas fa-minus" style="font-size: 0.75rem;"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    @media print {
+
+        .sidebar,
+        .top-bar,
+        .btn,
+        .breadcrumb,
+        footer {
+            display: none !important;
+        }
+
+        .main-wrapper {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .content-container {
+            padding: 0 !important;
+        }
+
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        table {
+            border: 1px solid #000 !important;
+        }
+
+        th,
+        td {
+            border: 1px solid #000 !important;
+            color: #000 !important;
+        }
+
+        .badge,
+        div[style*="background"] {
+            background: none !important;
+            border: 1px solid #ccc !important;
+            color: #000 !important;
+        }
+    }
+</style>
+{% endblock %}

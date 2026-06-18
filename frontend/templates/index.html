@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block title %}Welcome - Timetable Generator{% endblock %}
+
+{% block breadcrumb %}
+<span style="color: var(--text-muted);">Home</span>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto; text-align: center; padding: 4rem 1rem;">
+    <h1 class="hero-title">
+        The Smarter Way to <br> Build School Timetables
+    </h1>
+    <p class="hero-subtitle">
+        Automate your scheduling with genetic algorithms. Create conflict-free,
+        optimized plans for teachers and classes in seconds.
+    </p>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        {% if session.get('school_id') %}
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary"
+            style="padding: 1rem 2.5rem; font-size: 1.1rem;">
+            <i class="fas fa-columns"></i> Go to Dashboard
+        </a>
+        {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem;">
+            Get Started <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-secondary"
+            style="padding: 1rem 2.5rem; font-size: 1.1rem;">
+            Register School
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-3" style="margin-top: 6rem; text-align: left;">
+        <div class="card card-glass" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="icon-box" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h3 style="font-family: 'Outfit', sans-serif;">Instant Generation</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Our genetic algorithm finds the optimal schedule
+                for your school in seconds, not hours.</p>
+        </div>
+        <div class="card card-glass" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="icon-box" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 style="font-family: 'Outfit', sans-serif;">Zero Conflicts</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Automatically avoids teacher overlaps and room
+                double-bookings with strict constraint checking.</p>
+        </div>
+        <div class="card card-glass" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="icon-box" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                <i class="fas fa-cog"></i>
+            </div>
+            <h3 style="font-family: 'Outfit', sans-serif;">Fully Flexible</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Configure breaks, lecture durations, and school
+                hours to match your institution's needs.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

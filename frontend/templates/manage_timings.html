@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+
+{% block title %}School Timings - TimetableGen{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('main.dashboard') }}" style="text-decoration: none; color: var(--text-muted);">Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">/</span>
+<span style="color: var(--text-main); font-weight: 600;">Timings</span>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2.5rem;">
+    <h1 style="font-family: 'Outfit', sans-serif; font-weight: 700; margin-bottom: 0.5rem;">School Timings</h1>
+    <p style="color: var(--text-muted);">Configure your daily schedule, lecture duration, and break periods.</p>
+</div>
+
+<div class="grid grid-cols-2" style="align-items: flex-start;">
+    <!-- Config Form -->
+    <div class="card">
+        <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif;">Schedule Configuration</h3>
+
+        <form action="{{ url_for('management.manage_timings') }}" method="POST">
+            <div class="form-group">
+                <label>Day Start Time</label>
+                <div style="position: relative;">
+                    <i class="fas fa-sun"
+                        style="position: absolute; left: 1rem; top: 0.9rem; color: var(--text-muted);"></i>
+                    <input type="time" name="start_time" required
+                        value="{{ config['start_time'][:5] if config and config['start_time'] else '08:00' }}"
+                        style="padding-left: 2.5rem;">
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">When the first lecture
+                    begins.</p>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label>Lecture Duration (min)</label>
+                    <input type="number" name="lecture_duration" required min="15" max="180"
+                        value="{{ config['lecture_duration'] if config else 60 }}">
+                </div>
+                <div class="form-group">
+                    <label>Total Lectures per Day</label>
+                    <input type="number" name="num_lectures" required min="1" max="15"
+                        value="{{ config['num_lectures'] if config else 6 }}">
+                </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+            <h4
+                style="margin-bottom: 1rem; font-size: 0.875rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">
+                Break Details</h4>
+
+            <div class="grid grid-cols-2">
+                <div class="form-group">
+                    <label>Break After Lecture #</label>
+                    <input type="number" name="break_after" required min="0" max="10"
+                        value="{{ config['break_after'] if config else 3 }}">
+                </div>
+                <div class="form-group">
+                    <label>Break Duration (min)</label>
+                    <input type="number" name="break_duration" required min="0" max="120"
+                        value="{{ config['break_duration'] if config else 30 }}">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-check-double"></i> Save Schedule Config
+            </button>
+        </form>
+    </div>
+
+    <!-- Preview Card -->
+    <div class="card" style="background: var(--glass); backdrop-filter: blur(8px);">
+        <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif;">Live Preview</h3>
+
+        {% if config %}
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div
+                style="display: flex; justify-content: space-between; padding: 1rem; background: var(--bg-main); border-radius: 0.75rem;">
+                <span style="color: var(--text-muted);">Starts at</span>
+                <span style="font-weight: 700; color: var(--primary);">{{ config['start_time'] }}</span>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; padding: 1rem; background: var(--bg-main); border-radius: 0.75rem;">
+                <span style="color: var(--text-muted);">Ends at (approx)</span>
+                <span style="font-weight: 700; color: var(--primary);">{{ config['end_time'] }}</span>
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <p
+                    style="font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-muted); text-transform: uppercase;">
+                    Visual Timeline</p>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    {% for i in range(1, (config['num_lectures'] | int) + 1) %}
+                    <div
+                        style="padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center; background: var(--bg-card);">
+                        <span style="font-size: 0.875rem; font-weight: 500;">Lecture {{ i }}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">{{ config['lecture_duration'] }}
+                            min</span>
+                    </div>
+
+                    {% if i == (config['break_after'] | int) and (config['break_after'] | int) < (config['num_lectures']
+                        | int) %} <div
+                        style="padding: 0.5rem 1rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span
+                            style="font-size: 0.875rem; font-weight: 700; color: var(--warning); letter-spacing: 1px;">COFFEE
+                            BREAK</span>
+                        <span style="font-size: 0.75rem; color: var(--warning); font-weight: 600;">{{
+                            config['break_duration'] }} min</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+        <i class="fas fa-history" style="font-size: 2.5rem; display: block; margin-bottom: 1rem; opacity: 0.3;"></i>
+        Please save your initial configuration to see the timeline preview.
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

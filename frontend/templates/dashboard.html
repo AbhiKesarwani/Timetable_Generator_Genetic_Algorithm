@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - Timetable Generator{% endblock %}
+
+{% block breadcrumb %}
+<a href="/" style="text-decoration: none; color: var(--text-muted);">Home</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">/</span>
+<span style="color: var(--text-main); font-weight: 600;">Dashboard</span>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 3rem;">
+    <h1 style="font-family: 'Outfit', sans-serif; font-weight: 700; margin-bottom: 0.5rem;">School Dashboard</h1>
+    <p style="color: var(--text-muted);">Manage your data and generate schedules for <strong>{{ session['school_name']
+            }}</strong></p>
+</div>
+
+<div class="grid grid-cols-3">
+    <!-- Quick Stats - Mock for aesthetic -->
+    <div class="card"
+        style="display: flex; align-items: center; gap: 1.5rem; background: linear-gradient(135deg, var(--primary), #818cf8); color: white;">
+        <div
+            style="width: 56px; height: 56px; background: rgba(255, 255, 255, 0.2); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div>
+            <p style="opacity: 0.8; font-size: 0.875rem; font-weight: 500;">Active Classes</p>
+            <h2 style="font-size: 1.75rem; font-weight: 700;">{{ class_count }}</h2>
+        </div>
+    </div>
+
+    <div class="card" style="display: flex; align-items: center; gap: 1.5rem;">
+        <div
+            style="width: 56px; height: 56px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <div>
+            <p style="color: var(--text-muted); font-size: 0.875rem; font-weight: 500;">Staff Members</p>
+            <h2 style="font-size: 1.75rem; font-weight: 700;">{{ staff_count }}</h2>
+        </div>
+    </div>
+
+    <div class="card" style="display: flex; align-items: center; gap: 1.5rem;">
+        <div
+            style="width: 56px; height: 56px; background: rgba(245, 158, 11, 0.1); color: var(--warning); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div>
+            <p style="color: var(--text-muted); font-size: 0.875rem; font-weight: 500;">Saved Timetables</p>
+            <h2 style="font-size: 1.75rem; font-weight: 700;">{{ timetable_count }}</h2>
+        </div>
+    </div>
+</div>
+
+<h2 style="font-family: 'Outfit', sans-serif; font-weight: 700; margin: 3rem 0 1.5rem 0;">Management Functions</h2>
+
+<div class="grid grid-cols-2">
+    <a href="{{ url_for('management.manage_teachers') }}" class="card"
+        style="text-decoration: none; color: inherit; display: flex; gap: 1.5rem; transition: transform 0.2s;">
+        <div
+            style="width: 64px; height: 64px; background: var(--bg-main); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--primary);">
+            👨‍🏫
+        </div>
+        <div>
+            <h3 style="margin-bottom: 0.25rem;">Staff Directory</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Add, edit and manage teacher records and
+                availability.</p>
+        </div>
+    </a>
+
+    <a href="{{ url_for('management.manage_subjects') }}" class="card"
+        style="text-decoration: none; color: inherit; display: flex; gap: 1.5rem; transition: transform 0.2s;">
+        <div
+            style="width: 64px; height: 64px; background: var(--bg-main); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--info);">
+            📚
+        </div>
+        <div>
+            <h3 style="margin-bottom: 0.25rem;">Curriculum & Classes</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Define courses, assign subjects to classes, and set
+                credits.</p>
+        </div>
+    </a>
+
+    <a href="{{ url_for('management.manage_timings') }}" class="card"
+        style="text-decoration: none; color: inherit; display: flex; gap: 1.5rem; transition: transform 0.2s;">
+        <div
+            style="width: 64px; height: 64px; background: var(--bg-main); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--warning);">
+            ⏰
+        </div>
+        <div>
+            <h3 style="margin-bottom: 0.25rem;">Time Configuration</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Set school hours, lecture durations, and break
+                timings.</p>
+        </div>
+    </a>
+
+    <a href="{{ url_for('generation.generate_setup') }}" class="card"
+        style="text-decoration: none; color: inherit; border: 2px dashed var(--primary); background: rgba(99, 102, 241, 0.05); display: flex; gap: 1.5rem; transition: transform 0.2s;">
+        <div
+            style="width: 64px; height: 64px; background: var(--primary); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;">
+            🪄
+        </div>
+        <div>
+            <h3 style="margin-bottom: 0.25rem; color: var(--primary);">Magic Generator</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Run the genetic algorithm to create a new
+                conflict-free schedule.</p>
+        </div>
+    </a>
+</div>
+
+<div class="card"
+    style="margin-top: 3rem; border: 1px solid rgba(244, 63, 94, 0.2); background: rgba(244, 63, 94, 0.05); display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h3 style="color: var(--danger); margin-bottom: 0.25rem;">Danger Zone</h3>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">Permanently remove all school data and account access.
+        </p>
+    </div>
+    <button class="btn btn-danger"
+        onclick="if(confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) { document.getElementById('delete-account-form').submit(); }">
+        <i class="fas fa-trash-alt"></i> Delete Account
+    </button>
+</div>
+
+<form id="delete-account-form" action="{{ url_for('auth.delete_account') }}" method="POST" style="display: none;">
+</form>
+{% endblock %}

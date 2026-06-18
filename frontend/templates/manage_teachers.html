@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block title %}Manage Teachers - TimetableGen{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('main.dashboard') }}" style="text-decoration: none; color: var(--text-muted);">Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">/</span>
+<span style="color: var(--text-main); font-weight: 600;">Teachers</span>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+    <div>
+        <h1 style="font-family: 'Outfit', sans-serif; font-weight: 700; margin-bottom: 0.5rem;">Staff Directory</h1>
+        <p style="color: var(--text-muted);">View and manage all teachers registered in your school.</p>
+    </div>
+    <button class="btn btn-primary"
+        onclick="document.getElementById('add-teacher-form').scrollIntoView({behavior: 'smooth'})">
+        <i class="fas fa-plus"></i> Add New Teacher
+    </button>
+</div>
+
+<div class="grid grid-cols-3" style="align-items: flex-start;">
+    <!-- List Section -->
+    <div class="card" style="grid-column: span 2;">
+        <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif;">Active Staff</h3>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teacher in teachers %}
+                    <tr>
+                        <td style="color: var(--text-muted); font-weight: 600;">#{{ teacher.teacher_id }}</td>
+                        <td style="font-weight: 500;">{{ teacher.teacher_name }}</td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <a href="{{ url_for('management.manage_teachers', edit_id=teacher.teacher_id) }}"
+                                    class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;"
+                                    title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ url_for('management.manage_teachers') }}" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Deleting a teacher will also remove their assigned subjects. Proceed?')">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="teacher_id" value="{{ teacher.teacher_id }}">
+                                    <button type="submit" class="btn btn-secondary"
+                                        style="padding: 0.4rem 0.75rem; font-size: 0.8rem; color: var(--danger); border-color: rgba(244, 63, 94, 0.2);"
+                                        title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            <i class="fas fa-user-slash"
+                                style="font-size: 2rem; display: block; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            No teachers added yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="card" id="add-teacher-form">
+        <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif;">
+            {{ 'Edit Teacher' if edit_teacher else 'Add New Teacher' }}
+        </h3>
+
+        <form action="{{ url_for('management.manage_teachers') }}" method="POST">
+            {% if edit_teacher %}
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="teacher_id" value="{{ edit_teacher.teacher_id }}">
+            {% else %}
+            <input type="hidden" name="action" value="add">
+            {% endif %}
+
+            <div class="form-group">
+                <label for="teacher_name">Teacher Name</label>
+                <input type="text" id="teacher_name" name="teacher_name" required placeholder="e.g. John Doe"
+                    value="{{ edit_teacher.teacher_name if edit_teacher else '' }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-save"></i> {{ 'Save Changes' if edit_teacher else 'Add Staff Member' }}
+            </button>
+
+            {% if edit_teacher %}
+            <a href="{{ url_for('management.manage_teachers') }}" class="btn btn-secondary"
+                style="width: 100%; margin-top: 0.5rem;">
+                Cancel Edit
+            </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
