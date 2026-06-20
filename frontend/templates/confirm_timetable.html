@@ -1,18 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm Timetable</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style_prior.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h2>Your Generated Timetable 📅</h2>
+{% extends "layout.html" %}
+
+{% block title %}Confirm Timetable — Timetable Portal{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-current">Confirm Schedule</span>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header anim-fade-up">
+    <h1 class="page-title">
+        <i class="fas fa-calendar-check" style="color:var(--success); margin-right:0.5rem;"></i>
+        Your Generated Timetable 📅
+    </h1>
+    <p class="page-subtitle">Review the generated schedule below and choose to modify or finalize it.</p>
+</div>
+
+<!-- Timetable Table -->
+<div class="card anim-fade-up delay-100" style="padding:0; overflow:hidden; margin-bottom:1.5rem;">
+    <div class="table-container" style="border:none; border-radius:0; margin-top:0;">
         <table>
             <thead>
                 <tr>
-                    <th>Timeslot</th>
+                    <th style="background:linear-gradient(135deg,#0F172A,#1E293B); color:rgba(148,163,184,0.7); border-right:2px solid rgba(255,255,255,0.08);">Timeslot</th>
                     <th>Monday</th>
                     <th>Tuesday</th>
                     <th>Wednesday</th>
@@ -24,7 +36,7 @@
             <tbody>
                 {% for entry in timetable %}
                 <tr>
-                    <td>{{ entry.timeslot }}</td>
+                    <td class="timetable-time-cell">{{ entry.timeslot }}</td>
                     <td>{{ entry.subject if entry.day == "Monday" else "—" }}</td>
                     <td>{{ entry.subject if entry.day == "Tuesday" else "—" }}</td>
                     <td>{{ entry.subject if entry.day == "Wednesday" else "—" }}</td>
@@ -35,9 +47,23 @@
                 {% endfor %}
             </tbody>
         </table>
-        <p>Do you want to modify the timetable?</p>
-        <button onclick="window.location.href='/modify_timetable'">Yes, Modify</button>
-        <button onclick="window.location.href='/final_timetable'">No, Finalize</button>
     </div>
-</body>
-</html>
+</div>
+
+<!-- Action Buttons -->
+<div class="card anim-fade-up delay-200" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+    <p style="font-size:0.875rem; color:var(--text-muted);">
+        <i class="fas fa-question-circle" style="color:var(--accent);"></i>
+        Do you want to modify this timetable before finalizing?
+    </p>
+    <div style="display:flex; gap:0.75rem;">
+        <button onclick="window.location.href='/modify_timetable'" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Yes, Modify
+        </button>
+        <button onclick="window.location.href='/final_timetable'" class="btn btn-primary">
+            <i class="fas fa-check-double"></i> No, Finalize
+        </button>
+    </div>
+</div>
+
+{% endblock %}

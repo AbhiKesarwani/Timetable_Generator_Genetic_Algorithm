@@ -1,167 +1,210 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Timetable Generator{% endblock %}</title>
-    <!-- Google Fonts -->
+    <title>{% block title %}Academic Timetable Portal{% endblock %}</title>
+    <meta name="description" content="AI-Powered Academic Timetable Management System for Colleges and Universities">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-    <!-- Font Awesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Main CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     {% block head %}{% endblock %}
 </head>
-
 <body>
 
-    <aside class="sidebar">
-        <a href="/" class="sidebar-logo">
-            <i class="fas fa-calendar-alt"></i>
-            <span>TimetableGen</span>
-        </a>
+<!-- ======================== SIDEBAR ======================== -->
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Primary">
 
+    <a href="/" class="sidebar-brand" aria-label="Academic Portal Home">
+        <div class="sidebar-crest"><i class="fas fa-graduation-cap"></i></div>
+        <div class="sidebar-brand-text">
+            <span class="sidebar-brand-name">Academic Portal</span>
+            <span class="sidebar-brand-tagline">Timetable Management</span>
+        </div>
+    </a>
+
+    {% if session.get('school_id') %}
+    <div class="sidebar-profile">
+        <div class="sidebar-avatar">{{ session.get('school_name', 'A')[0] | upper }}</div>
+        <div class="sidebar-profile-info">
+            <span class="sidebar-profile-name">{{ session.get('school_name', 'Institution') }}</span>
+            <span class="sidebar-profile-role">Administrator</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <nav class="sidebar-nav">
         <div class="nav-group">
-            <p class="nav-label">Main</p>
-            <a href="/" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </a>
+            <span class="nav-label">Navigation</span>
             <a href="{{ url_for('timetable_view.view_timetable') }}" class="nav-item">
-                <i class="fas fa-search"></i>
-                <span>View Timetable</span>
+                <i class="fas fa-calendar-week nav-icon"></i><span>View Timetable</span>
             </a>
         </div>
 
         {% if session.get('school_id') %}
         <div class="nav-group">
-            <p class="nav-label">Management</p>
+            <span class="nav-label">Management</span>
             <a href="{{ url_for('main.dashboard') }}" class="nav-item">
-                <i class="fas fa-th-large"></i>
-                <span>Dashboard</span>
+                <i class="fas fa-home nav-icon"></i><span>Dashboard</span>
             </a>
             <a href="{{ url_for('management.manage_teachers') }}" class="nav-item">
-                <i class="fas fa-user-tie"></i>
-                <span>Teachers</span>
+                <i class="fas fa-user-tie nav-icon"></i><span>Faculty</span>
             </a>
             <a href="{{ url_for('management.manage_subjects') }}" class="nav-item">
-                <i class="fas fa-book"></i>
-                <span>Subjects & Classes</span>
+                <i class="fas fa-book-open nav-icon"></i><span>Curriculum</span>
             </a>
             <a href="{{ url_for('management.manage_timings') }}" class="nav-item">
-                <i class="fas fa-clock"></i>
-                <span>Timings</span>
+                <i class="fas fa-clock nav-icon"></i><span>Schedule Config</span>
             </a>
         </div>
 
         <div class="nav-group">
-            <p class="nav-label">Actions</p>
+            <span class="nav-label">Scheduling</span>
             <a href="{{ url_for('generation.generate_setup') }}" class="nav-item">
-                <i class="fas fa-magic"></i>
-                <span>Generate New</span>
+                <i class="fas fa-brain nav-icon"></i><span>AI Generator</span>
             </a>
         </div>
         {% endif %}
+    </nav>
 
-        <div style="margin-top: auto;">
-            {% if session.get('school_id') %}
-            <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color: var(--danger);">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
-            {% else %}
-            <a href="{{ url_for('auth.login') }}" class="nav-item">
-                <i class="fas fa-sign-in-alt"></i>
-                <span>Login</span>
-            </a>
-            <a href="{{ url_for('auth.register') }}" class="nav-item">
-                <i class="fas fa-user-plus"></i>
-                <span>Register</span>
-            </a>
+    <div class="sidebar-footer">
+        {% if session.get('school_id') %}
+        <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color:rgba(248,113,113,0.75);">
+            <i class="fas fa-sign-out-alt nav-icon"></i><span>Sign Out</span>
+        </a>
+        {% else %}
+        <a href="{{ url_for('auth.login') }}" class="nav-item">
+            <i class="fas fa-sign-in-alt nav-icon"></i><span>Sign In</span>
+        </a>
+        <a href="{{ url_for('auth.register') }}" class="nav-item">
+            <i class="fas fa-university nav-icon"></i><span>Register Institution</span>
+        </a>
+        {% endif %}
+        <div class="sidebar-semester-chip">AY 2025 – 2026</div>
+    </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ======================== MAIN ======================== -->
+<div class="main-wrapper" id="mainWrapper">
+
+    <header class="top-bar" role="banner">
+        <div class="flex items-center gap-2" style="flex:1; min-width:0;">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                {% block breadcrumb %}{% endblock %}
+            </nav>
+        </div>
+
+        <div class="topbar-actions">
+            <div class="topbar-chip" id="acYearChip">
+                <i class="fas fa-calendar-alt" style="font-size:0.65rem;"></i>
+                AY 2025–26
+            </div>
+            <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+            {% if session.get('school_name') %}
+            <div class="topbar-avatar" title="{{ session['school_name'] }}">
+                {{ session['school_name'][0] | upper }}
+            </div>
             {% endif %}
         </div>
-    </aside>
+    </header>
 
-    <div class="main-wrapper">
-        <header class="top-bar">
-            <div class="breadcrumb">
-                {% block breadcrumb %}{% endblock %}
-            </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
-                    <i class="fas fa-moon"></i>
-                </button>
-                {% if session.get('school_name') %}
-                <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
-                    <div
-                        style="width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
-                        {{ session['school_name'][0] | upper }}
-                    </div>
-                    <span>{{ session['school_name'] }}</span>
-                </div>
-                {% endif %}
-            </div>
-        </header>
-
-        <main class="content-container">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
+    <main class="content-container" role="main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container" role="alert" aria-live="polite">
             {% for category, message in messages %}
-            <div class="card"
-                style="margin-bottom: 1.5rem; border-left: 4px solid var(--{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }}); padding: 1rem;">
-                {{ message }}
+            <div class="flash-message {{ 'success' if category == 'success' else 'error' if category == 'error' else 'info' }}">
+                <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'error' %}fa-times-circle{% else %}fa-info-circle{% endif %}" style="flex-shrink:0;"></i>
+                <span>{{ message }}</span>
+                <button onclick="this.parentElement.remove()" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             {% endfor %}
-            {% endif %}
-            {% endwith %}
+        </div>
+        {% endif %}
+        {% endwith %}
 
-            {% block content %}{% endblock %}
-        </main>
+        {% block content %}{% endblock %}
+    </main>
 
-        <footer style="padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.875rem;">
-            <p>&copy; 2026 Timetable Generator Project. Built with ❤️ for educators.</p>
-        </footer>
-    </div>
+    <footer class="site-footer">
+        <span class="footer-brand">
+            <i class="fas fa-graduation-cap" style="margin-right:6px; color:var(--primary-light);"></i>
+            Academic Timetable Portal
+        </span>
+        <span>AI-Powered Scheduling · Genetic Algorithm Engine</span>
+        <span>&copy; 2026 All rights reserved</span>
+    </footer>
 
-    <script>
-        // Theme Management
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = themeToggle.querySelector('i');
-        const html = document.documentElement;
+</div><!-- /.main-wrapper -->
 
-        // Check for saved theme
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        html.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
+<script>
+// Theme
+const html = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon   = document.getElementById('themeIcon');
+(function() {
+    const t = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', t);
+    themeIcon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+})();
+themeToggle.addEventListener('click', function() {
+    const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    themeIcon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+});
 
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+// Sidebar mobile
+const sidebar     = document.getElementById('sidebar');
+const overlay     = document.getElementById('sidebarOverlay');
+const hamburger   = document.getElementById('hamburgerBtn');
+function openSidebar() {
+    sidebar.classList.add('mobile-open');
+    overlay.classList.add('active');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+    sidebar.classList.remove('mobile-open');
+    overlay.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+}
+hamburger.addEventListener('click', function() {
+    sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+});
+overlay.addEventListener('click', closeSidebar);
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
 
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
+// Active nav
+const path = window.location.pathname;
+document.querySelectorAll('.nav-item').forEach(function(el) {
+    const href = el.getAttribute('href');
+    if (!href) return;
+    if (href !== '/' && path.startsWith(href)) el.classList.add('active');
+    else if (href === '/' && path === '/') el.classList.add('active');
+});
 
-        function updateThemeIcon(theme) {
-            themeIcon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-        }
-
-        // Active Nav Link
-        const currentPath = window.location.pathname;
-        document.querySelectorAll('.nav-item').forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
-                link.classList.add('active');
-            }
-        });
-    </script>
-    {% block scripts %}{% endblock %}
-
+// Auto-dismiss flashes
+document.querySelectorAll('.flash-message').forEach(function(m) {
+    setTimeout(function() {
+        m.style.transition = 'opacity 0.3s';
+        m.style.opacity = '0';
+        setTimeout(function() { m.remove(); }, 300);
+    }, 5000);
+});
+</script>
+{% block scripts %}{% endblock %}
 </body>
-
 </html>

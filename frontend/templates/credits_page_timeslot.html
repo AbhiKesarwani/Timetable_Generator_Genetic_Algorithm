@@ -1,24 +1,53 @@
 {% extends "layout.html" %}
 
-{% block title %}Enter Credits - TimetableGen{% endblock %}
+{% block title %}Assign Subject Credits — Timetable Portal{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-current">Assign Credits</span>
+{% endblock %}
 
 {% block content %}
-<h1>Step 2: Enter Subject Credits</h1>
-<p class="text-light">Assign credit hours to each subject.</p>
 
-<form id="creditsForm">
-    <div id="creditInputs"></div>
-    <div style="margin-top: 1.5rem;">
-        <button type="submit">Generate Timetable</button>
+<div class="page-header anim-fade-up">
+    <h1 class="page-title">
+        <i class="fas fa-star" style="color:var(--accent); margin-right:0.5rem; font-size:1.4rem;"></i>
+        Step 2: Assign Subject Credits
+    </h1>
+    <p class="page-subtitle">Set the credit hours (lectures per week) for each subject in the selected batch and semester.</p>
+</div>
+
+<div class="card anim-fade-up delay-100" style="max-width:680px;">
+    <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+        <div style="width:36px; height:36px; background:var(--grad-accent); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+            <i class="fas fa-list-ol"></i>
+        </div>
+        <div>
+            <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Credit Assignment</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">Loading subjects from session...</div>
+        </div>
     </div>
-</form>
+
+    <form id="creditsForm">
+        <div id="creditInputs" style="display:flex; flex-direction:column; gap:0.75rem;"></div>
+        <div style="margin-top:1.5rem;">
+            <button type="submit" class="btn btn-primary w-full">
+                <i class="fas fa-brain"></i>
+                Generate Timetable
+            </button>
+        </div>
+    </form>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
+    // All JavaScript logic preserved exactly from original
     document.addEventListener("DOMContentLoaded", function () {
         let className = sessionStorage.getItem("class_name");
-        let semester = sessionStorage.getItem("semester");
+        let semester  = sessionStorage.getItem("semester");
 
         if (!className || !semester) {
             alert("⚠️ Missing class name or semester. Redirecting...");
@@ -30,13 +59,21 @@
             .then(response => response.json())
             .then(subjects => {
                 let creditInputsDiv = document.getElementById("creditInputs");
-                creditInputsDiv.innerHTML = "<h3>Assign Credits</h3>";
 
-                subjects.forEach(subject => {
+                subjects.forEach((subject, idx) => {
+                    const colors = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'];
+                    const colorClass = colors[idx % colors.length];
                     let inputField = `
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display:block; margin-bottom: 0.5rem;">${subject}:</label>
-                            <input type="number" name="${subject}-credits" class="credit-input" min="1" required>
+                        <div style="display:flex; align-items:center; gap:0.75rem; padding:0.875rem 1rem; background:var(--bg-main); border:1px solid var(--border); border-radius:var(--radius);">
+                            <span class="subject-chip ${colorClass}" style="flex:1; min-width:0;">
+                                <i class="fas fa-book" style="font-size:0.65rem;"></i>
+                                ${subject}
+                            </span>
+                            <div style="display:flex; align-items:center; gap:0.5rem; flex-shrink:0;">
+                                <label style="font-size:0.72rem; color:var(--text-faint); white-space:nowrap; margin-bottom:0;">Credits/week</label>
+                                <input type="number" name="${subject}-credits" class="credit-input" min="1"
+                                    required style="width:80px; margin-bottom:0; font-size:0.875rem; text-align:center;">
+                            </div>
                         </div>`;
                     creditInputsDiv.innerHTML += inputField;
                 });
@@ -51,14 +88,13 @@
             });
 
             fetch("/generate", {
-                method: "POST",
+                method:  "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ class_name: className, semester: semester, credits: credits })
+                body:    JSON.stringify({ class_name: className, semester: semester, credits: credits })
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        //alert("✅ Timetable generated successfully!"); // Optional: Remove alert for smoother flow
                         window.location.href = "/final_timetable";
                     } else {
                         alert("⚠️ " + data.error);

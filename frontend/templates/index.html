@@ -1,63 +1,164 @@
 {% extends "layout.html" %}
 
-{% block title %}Welcome - Timetable Generator{% endblock %}
+{% block title %}AI-Powered Academic Timetable System{% endblock %}
 
 {% block breadcrumb %}
-<span style="color: var(--text-muted);">Home</span>
+<span class="breadcrumb-current">Home</span>
 {% endblock %}
 
 {% block content %}
-<div style="max-width: 1000px; margin: 0 auto; text-align: center; padding: 4rem 1rem;">
-    <h1 class="hero-title">
-        The Smarter Way to <br> Build School Timetables
-    </h1>
-    <p class="hero-subtitle">
-        Automate your scheduling with genetic algorithms. Create conflict-free,
-        optimized plans for teachers and classes in seconds.
-    </p>
 
-    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+<!-- Landing Hero -->
+<div class="landing-hero anim-fade-up">
+    <div class="landing-hero-badge">
+        <i class="fas fa-brain" style="font-size:0.65rem;"></i>
+        Genetic Algorithm Powered
+    </div>
+    <h1 class="landing-title">
+        The Smarter Way to<br>Build Academic Timetables
+    </h1>
+    <p class="landing-subtitle">
+        Automate your college scheduling with AI. Generate conflict-free,
+        optimized timetables for all batches and faculties in seconds — not hours.
+    </p>
+    <div class="landing-cta">
         {% if session.get('school_id') %}
-        <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary"
-            style="padding: 1rem 2.5rem; font-size: 1.1rem;">
-            <i class="fas fa-columns"></i> Go to Dashboard
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-chart-bar"></i>
+            Go to Dashboard
+        </a>
+        <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-brain"></i>
+            Generate Timetable
         </a>
         {% else %}
-        <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem;">
-            Get Started <i class="fas fa-arrow-right"></i>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-sign-in-alt"></i>
+            Get Started
         </a>
-        <a href="{{ url_for('auth.register') }}" class="btn btn-secondary"
-            style="padding: 1rem 2.5rem; font-size: 1.1rem;">
-            Register School
+        <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-university"></i>
+            Register Institution
         </a>
         {% endif %}
     </div>
+</div>
 
-    <div class="grid grid-cols-3" style="margin-top: 6rem; text-align: left;">
-        <div class="card card-glass" style="display: flex; flex-direction: column; gap: 1rem;">
-            <div class="icon-box" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
-                <i class="fas fa-bolt"></i>
-            </div>
-            <h3 style="font-family: 'Outfit', sans-serif;">Instant Generation</h3>
-            <p style="color: var(--text-muted); font-size: 0.95rem;">Our genetic algorithm finds the optimal schedule
-                for your school in seconds, not hours.</p>
-        </div>
-        <div class="card card-glass" style="display: flex; flex-direction: column; gap: 1rem;">
-            <div class="icon-box" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h3 style="font-family: 'Outfit', sans-serif;">Zero Conflicts</h3>
-            <p style="color: var(--text-muted); font-size: 0.95rem;">Automatically avoids teacher overlaps and room
-                double-bookings with strict constraint checking.</p>
-        </div>
-        <div class="card card-glass" style="display: flex; flex-direction: column; gap: 1rem;">
-            <div class="icon-box" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
-                <i class="fas fa-cog"></i>
-            </div>
-            <h3 style="font-family: 'Outfit', sans-serif;">Fully Flexible</h3>
-            <p style="color: var(--text-muted); font-size: 0.95rem;">Configure breaks, lecture durations, and school
-                hours to match your institution's needs.</p>
-        </div>
+<!-- Stats Strip -->
+<div class="grid grid-cols-3 anim-fade-up delay-100" style="margin-bottom:var(--space-12); text-align:center;">
+    <div class="card" style="padding:1.5rem 1rem;">
+        <div style="font-family:'Outfit',sans-serif; font-size:2rem; font-weight:800; color:var(--primary-light); margin-bottom:0.25rem;">100%</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); font-weight:500;">Conflict Free</div>
+    </div>
+    <div class="card" style="padding:1.5rem 1rem;">
+        <div style="font-family:'Outfit',sans-serif; font-size:2rem; font-weight:800; color:var(--secondary); margin-bottom:0.25rem;">&lt; 10s</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); font-weight:500;">Generation Time</div>
+    </div>
+    <div class="card" style="padding:1.5rem 1rem;">
+        <div style="font-family:'Outfit',sans-serif; font-size:2rem; font-weight:800; color:var(--success); margin-bottom:0.25rem;">∞</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); font-weight:500;">Batches Supported</div>
     </div>
 </div>
+
+<!-- Feature Cards -->
+<div class="divider-label anim-fade-up delay-150">Core Capabilities</div>
+<div class="grid grid-cols-3 anim-fade-up delay-200">
+
+    <div class="card card-glass" style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="width:48px; height:48px; background:rgba(37,99,235,0.1); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--primary-light);">
+            <i class="fas fa-bolt"></i>
+        </div>
+        <div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; margin-bottom:0.5rem; font-size:1rem;">Instant Generation</h3>
+            <p style="color:var(--text-muted); font-size:0.875rem; line-height:1.6;">
+                Our Genetic Algorithm engine finds the optimal schedule for your institution in seconds, not hours.
+            </p>
+        </div>
+    </div>
+
+    <div class="card card-glass" style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="width:48px; height:48px; background:rgba(5,150,105,0.1); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--success);">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; margin-bottom:0.5rem; font-size:1rem;">Zero Conflicts</h3>
+            <p style="color:var(--text-muted); font-size:0.875rem; line-height:1.6;">
+                Automatically avoids faculty overlaps and double-bookings with strict constraint enforcement.
+            </p>
+        </div>
+    </div>
+
+    <div class="card card-glass" style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="width:48px; height:48px; background:rgba(217,119,6,0.1); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--accent);">
+            <i class="fas fa-sliders-h"></i>
+        </div>
+        <div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; margin-bottom:0.5rem; font-size:1rem;">Fully Configurable</h3>
+            <p style="color:var(--text-muted); font-size:0.875rem; line-height:1.6;">
+                Set break timings, lecture durations, and subject priorities to match your institution's academic calendar.
+            </p>
+        </div>
+    </div>
+
+    <div class="card card-glass" style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="width:48px; height:48px; background:rgba(79,70,229,0.1); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--secondary);">
+            <i class="fas fa-user-tie"></i>
+        </div>
+        <div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; margin-bottom:0.5rem; font-size:1rem;">Faculty Management</h3>
+            <p style="color:var(--text-muted); font-size:0.875rem; line-height:1.6;">
+                Manage your entire faculty directory and assign subjects across multiple batches effortlessly.
+            </p>
+        </div>
+    </div>
+
+    <div class="card card-glass" style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="width:48px; height:48px; background:rgba(37,99,235,0.1); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--primary-light);">
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; margin-bottom:0.5rem; font-size:1rem;">Semester-Wise View</h3>
+            <p style="color:var(--text-muted); font-size:0.875rem; line-height:1.6;">
+                Generate and view timetables by semester for any batch, accessible publicly for students and faculty.
+            </p>
+        </div>
+    </div>
+
+    <div class="card card-glass" style="display:flex; flex-direction:column; gap:1rem;">
+        <div style="width:48px; height:48px; background:rgba(5,150,105,0.1); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--success);">
+            <i class="fas fa-print"></i>
+        </div>
+        <div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; margin-bottom:0.5rem; font-size:1rem;">Print Ready</h3>
+            <p style="color:var(--text-muted); font-size:0.875rem; line-height:1.6;">
+                Export any generated timetable directly to PDF or print it in a clean, official academic format.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<!-- CTA Bottom -->
+<div class="page-hero anim-fade-up delay-300" style="text-align:center; margin-top:var(--space-12);">
+    <div class="hero-badge" style="display:inline-flex; margin-bottom:1rem;">
+        <i class="fas fa-graduation-cap" style="font-size:0.65rem;"></i>
+        Built for Colleges &amp; Universities
+    </div>
+    <h2 class="hero-title" style="font-size:1.75rem;">Ready to Automate Your Scheduling?</h2>
+    <p class="hero-subtitle" style="margin-bottom:1.5rem;">
+        Join institutions already using AI-powered timetable generation.
+    </p>
+    {% if not session.get('school_id') %}
+    <a href="{{ url_for('auth.register') }}" class="btn" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white; padding:0.875rem 2.5rem; font-size:1rem; position:relative; z-index:1;">
+        <i class="fas fa-university"></i>
+        Register Your Institution
+    </a>
+    {% else %}
+    <a href="{{ url_for('generation.generate_setup') }}" class="btn" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white; padding:0.875rem 2.5rem; font-size:1rem; position:relative; z-index:1;">
+        <i class="fas fa-brain"></i>
+        Generate New Timetable
+    </a>
+    {% endif %}
+</div>
+
 {% endblock %}

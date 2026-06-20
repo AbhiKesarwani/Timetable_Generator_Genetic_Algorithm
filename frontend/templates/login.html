@@ -1,56 +1,461 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — Academic Timetable Portal</title>
+    <meta name="description" content="Sign in to the Academic Timetable Management System">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-{% block title %}Login - TimetableGen{% endblock %}
+        :root {
+            --navy:       #0C1A35;
+            --navy-2:     #1E3A8A;
+            --navy-3:     #2252B8;
+            --white:      #FFFFFF;
+            --gray-50:    #F9FAFB;
+            --gray-100:   #F3F4F6;
+            --gray-200:   #E5E7EB;
+            --gray-300:   #D1D5DB;
+            --gray-400:   #9CA3AF;
+            --gray-500:   #6B7280;
+            --gray-700:   #374151;
+            --gray-900:   #111827;
+            --border:     #E5E7EB;
+            --focus-ring: rgba(34,82,184,0.2);
+            --danger:     #B91C1C;
+            --success:    #16A34A;
+        }
+        [data-theme="dark"] {
+            --white:   #161B22;
+            --gray-50: #0D1117;
+            --gray-100:#161B22;
+            --gray-200:#21262D;
+            --gray-300:#30363D;
+            --gray-400:#484F58;
+            --gray-500:#8B949E;
+            --gray-700:#CDD9E5;
+            --gray-900:#E6EDF3;
+            --border:  #30363D;
+            --focus-ring: rgba(56,139,253,0.25);
+        }
 
-{% block breadcrumb %}
-<a href="/" style="text-decoration: none; color: var(--text-muted);">Home</a>
-<span style="color: var(--text-muted); margin: 0 0.5rem;">/</span>
-<span style="color: var(--text-main); font-weight: 600;">Login</span>
-{% endblock %}
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            background: var(--gray-50);
+            -webkit-font-smoothing: antialiased;
+        }
 
-{% block content %}
-<div style="max-width: 480px; margin: 4rem auto;">
-    <div style="text-align: center; margin-bottom: 2.5rem;">
-        <div
-            style="width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 1.25rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.5rem auto; box-shadow: var(--shadow);">
-            <i class="fas fa-lock"></i>
-        </div>
-        <h1 style="font-family: 'Outfit', sans-serif; font-weight: 700; margin-bottom: 0.5rem;">Welcome Back</h1>
-        <p style="color: var(--text-muted);">Log in to manage your school's schedule.</p>
+        /* ============ LEFT PANEL — Academic Visual ============ */
+        .auth-left {
+            width: 480px;
+            flex-shrink: 0;
+            background: var(--navy);
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle radial accent */
+        .auth-left::after {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(34,82,184,0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Brand */
+        .auth-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 48px;
+            position: relative;
+            z-index: 1;
+        }
+        .auth-brand-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+        .auth-brand-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: rgba(249,250,251,0.9);
+            letter-spacing: -0.01em;
+        }
+
+        /* Main copy */
+        .auth-copy {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        .auth-eyebrow {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(147,180,232,0.7);
+            margin-bottom: 16px;
+        }
+        .auth-headline {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            color: #F9FAFB;
+            margin-bottom: 16px;
+        }
+        .auth-headline span { color: #93B4E8; }
+        .auth-body {
+            font-size: 0.875rem;
+            line-height: 1.65;
+            color: rgba(139,148,158,0.75);
+            margin-bottom: 36px;
+            max-width: 340px;
+        }
+
+        /* Feature list */
+        .auth-features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .auth-feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: rgba(205,217,229,0.7);
+        }
+        .auth-feature-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--navy-3);
+            flex-shrink: 0;
+        }
+
+        /* Bottom quote */
+        .auth-quote {
+            position: relative;
+            z-index: 1;
+            padding-top: 28px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+        }
+        .auth-quote blockquote {
+            font-size: 0.78rem;
+            color: rgba(139,148,158,0.55);
+            font-style: italic;
+            line-height: 1.6;
+        }
+        .auth-quote cite {
+            font-size: 0.7rem;
+            color: rgba(100,116,139,0.45);
+            font-style: normal;
+            display: block;
+            margin-top: 6px;
+        }
+
+        /* ============ RIGHT PANEL — Login Form ============ */
+        .auth-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: var(--white);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .auth-form-wrap {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        /* Theme toggle */
+        .auth-theme-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--gray-100);
+            color: var(--gray-500);
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .auth-theme-btn:hover { background: var(--gray-200); color: var(--gray-900); }
+
+        /* Form header */
+        .form-header { margin-bottom: 28px; }
+        .form-eyebrow {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 8px;
+        }
+        .form-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            letter-spacing: -0.025em;
+            margin-bottom: 5px;
+        }
+        .form-subtitle {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+        }
+
+        /* Flash messages */
+        .flash { display: flex; align-items: center; gap: 8px; padding: 10px 13px;
+                 border-radius: 8px; font-size: 0.8rem; font-weight: 500; margin-bottom: 20px; border: 1px solid; }
+        .flash.error   { background: #FEF2F2; border-color: #FECACA; color: var(--danger); border-left: 3px solid var(--danger); }
+        .flash.success { background: #F0FDF4; border-color: #BBF7D0; color: var(--success); border-left: 3px solid var(--success); }
+        .flash.info    { background: #F0F9FF; border-color: #BAE6FD; color: #0369A1; border-left: 3px solid #0369A1; }
+
+        /* Form elements */
+        .form-group { margin-bottom: 16px; }
+        .form-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--gray-700);
+        }
+        .input-wrap { position: relative; }
+        .input-wrap .ic {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 0.78rem;
+            pointer-events: none;
+        }
+        .form-input {
+            width: 100%;
+            padding: 8px 12px 8px 32px;
+            border: 1px solid var(--gray-300);
+            border-radius: 7px;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            appearance: none;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--navy-3);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+            background: var(--white);
+        }
+        .form-input::placeholder { color: var(--gray-400); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 9px 16px;
+            border: none;
+            border-radius: 7px;
+            background: var(--navy-2);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            transition: background 0.15s, box-shadow 0.15s;
+            letter-spacing: -0.01em;
+        }
+        .submit-btn:hover {
+            background: var(--navy);
+            box-shadow: 0 2px 8px rgba(12,26,53,0.3);
+        }
+
+        .auth-footer-link {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 20px;
+        }
+        .auth-footer-link a {
+            color: var(--navy-3);
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .auth-footer-link a:hover { text-decoration: underline; }
+
+        /* Divider */
+        .auth-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 24px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 860px) {
+            .auth-left { display: none; }
+        }
+        @media (max-width: 480px) {
+            .auth-right { padding: 24px 20px; align-items: flex-start; padding-top: 48px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="auth-left">
+    <div class="auth-brand">
+        <div class="auth-brand-icon"><i class="fas fa-graduation-cap"></i></div>
+        <span class="auth-brand-name">Academic Portal</span>
     </div>
 
-    <div class="card" style="padding: 2.5rem;">
-        <form action="{{ url_for('auth.login') }}" method="POST">
+    <div class="auth-copy">
+        <div class="auth-eyebrow">AI-Powered Scheduling</div>
+        <h1 class="auth-headline">
+            Academic<br>Timetable<br><span>Management</span>
+        </h1>
+        <p class="auth-body">
+            Generate conflict-free, optimized timetables for your institution using
+            AI-powered Genetic Algorithms. Built for colleges and universities.
+        </p>
+        <div class="auth-features">
+            <div class="auth-feature">
+                <div class="auth-feature-dot"></div>
+                Zero scheduling conflicts
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-dot"></div>
+                Semester-wise batch management
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-dot"></div>
+                Faculty assignment and tracking
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-dot"></div>
+                Print-ready PDF export
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-quote">
+        <blockquote>
+            "Education is the most powerful weapon which you can use to change the world."
+        </blockquote>
+        <cite>— Nelson Mandela</cite>
+    </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="auth-right">
+    <button class="auth-theme-btn" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+
+    <div class="auth-form-wrap">
+        <div class="form-header">
+            <div class="form-eyebrow">Administrator Access</div>
+            <h2 class="form-title">Sign in to portal</h2>
+            <p class="form-subtitle">Enter your admin credentials to continue.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash {{ 'error' if category == 'error' else 'success' if category == 'success' else 'info' }}" role="alert">
+                <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'error' %}fa-times-circle{% else %}fa-info-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.login') }}" method="POST" novalidate>
             <div class="form-group">
-                <label for="username">Admin Username</label>
-                <div style="position: relative;">
-                    <i class="fas fa-user"
-                        style="position: absolute; left: 1rem; top: 0.9rem; color: var(--text-muted);"></i>
-                    <input type="text" id="username" name="username" required placeholder="Enter your username"
-                        style="padding-left: 2.5rem;">
+                <label class="form-label" for="username">Username</label>
+                <div class="input-wrap">
+                    <i class="ic fas fa-user"></i>
+                    <input class="form-input" type="text" id="username" name="username"
+                        placeholder="Admin username" required autocomplete="username" autofocus>
                 </div>
             </div>
-
-            <div class="form-group" style="margin-top: 1.5rem;">
-                <label for="password">Password</label>
-                <div style="position: relative;">
-                    <i class="fas fa-key"
-                        style="position: absolute; left: 1rem; top: 0.9rem; color: var(--text-muted);"></i>
-                    <input type="password" id="password" name="password" required placeholder="••••••••"
-                        style="padding-left: 2.5rem;">
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <div class="input-wrap">
+                    <i class="ic fas fa-lock"></i>
+                    <input class="form-input" type="password" id="password" name="password"
+                        placeholder="••••••••" required autocomplete="current-password">
                 </div>
             </div>
-
-            <button type="submit" class="btn btn-primary"
-                style="width: 100%; margin-top: 2rem; padding: 1rem; font-size: 1rem;">
-                Sign In <i class="fas fa-arrow-right" style="margin-left: 0.5rem;"></i>
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-sign-in-alt" style="font-size:0.8rem;"></i>
+                Sign In
             </button>
         </form>
-    </div>
 
-    <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.95rem;">
-        Don't have an account? <a href="{{ url_for('auth.register') }}"
-            style="color: var(--primary); font-weight: 600; text-decoration: none;">Register your school</a>
-    </p>
+        <div class="auth-divider"></div>
+        <p class="auth-footer-link">
+            New institution? <a href="{{ url_for('auth.register') }}">Register here</a>
+        </p>
+    </div>
 </div>
-{% endblock %}
+
+<script>
+    const html = document.documentElement;
+    const btn  = document.getElementById('themeToggle');
+    const icon = document.getElementById('themeIcon');
+    const saved = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', saved);
+    icon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    btn.addEventListener('click', function() {
+        const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    });
+</script>
+</body>
+</html>

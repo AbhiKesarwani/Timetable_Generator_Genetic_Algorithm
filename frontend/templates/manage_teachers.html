@@ -1,60 +1,74 @@
 {% extends "layout.html" %}
 
-{% block title %}Manage Teachers - TimetableGen{% endblock %}
+{% block title %}Faculty Directory — Timetable Portal{% endblock %}
 
 {% block breadcrumb %}
-<a href="{{ url_for('main.dashboard') }}" style="text-decoration: none; color: var(--text-muted);">Dashboard</a>
-<span style="color: var(--text-muted); margin: 0 0.5rem;">/</span>
-<span style="color: var(--text-main); font-weight: 600;">Teachers</span>
+<a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-current">Faculty</span>
 {% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+
+<div class="flex items-center justify-between mb-6 anim-fade-up" style="flex-wrap:wrap; gap:12px;">
     <div>
-        <h1 style="font-family: 'Outfit', sans-serif; font-weight: 700; margin-bottom: 0.5rem;">Staff Directory</h1>
-        <p style="color: var(--text-muted);">View and manage all teachers registered in your school.</p>
+        <h1 class="page-title">Faculty Directory</h1>
+        <p class="page-subtitle">Manage faculty members registered under your institution.</p>
     </div>
-    <button class="btn btn-primary"
-        onclick="document.getElementById('add-teacher-form').scrollIntoView({behavior: 'smooth'})">
-        <i class="fas fa-plus"></i> Add New Teacher
-    </button>
+    <a href="#faculty-form" class="btn btn-primary btn-sm"
+        onclick="document.getElementById('faculty-form').scrollIntoView({behavior:'smooth'}); return false;">
+        <i class="fas fa-plus" style="font-size:0.7rem;"></i> Add Faculty
+    </a>
 </div>
 
-<div class="grid grid-cols-3" style="align-items: flex-start;">
-    <!-- List Section -->
-    <div class="card" style="grid-column: span 2;">
-        <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif;">Active Staff</h3>
+<div class="grid grid-cols-3 anim-fade-up delay-100" style="align-items:flex-start;">
 
-        <div class="table-container">
+    <!-- Faculty Table -->
+    <div class="col-span-2">
+        <div class="card" style="padding:0; overflow:hidden; margin-bottom:0;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border);">
+                <span style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Members</span>
+                <span class="badge badge-gray">{{ teachers | length }}</span>
+            </div>
             <table>
                 <thead>
                     <tr>
+                        <th style="padding-left:18px; width:60%;">Name</th>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Actions</th>
+                        <th style="text-align:right; padding-right:18px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for teacher in teachers %}
                     <tr>
-                        <td style="color: var(--text-muted); font-weight: 600;">#{{ teacher.teacher_id }}</td>
-                        <td style="font-weight: 500;">{{ teacher.teacher_name }}</td>
+                        <td style="padding-left:18px;">
+                            <div class="flex items-center gap-3">
+                                <div class="faculty-avatar">{{ teacher.teacher_name[:2] | upper }}</div>
+                                <div>
+                                    <div style="font-weight:500; font-size:0.8125rem;">{{ teacher.teacher_name }}</div>
+                                    <div style="font-size:0.72rem; color:var(--text-disabled);">Faculty Member</div>
+                                </div>
+                            </div>
+                        </td>
                         <td>
-                            <div style="display: flex; gap: 0.5rem;">
+                            <span class="badge badge-gray" style="font-size:0.68rem; letter-spacing:0.02em;">
+                                #{{ teacher.teacher_id }}
+                            </span>
+                        </td>
+                        <td style="text-align:right; padding-right:18px;">
+                            <div class="flex gap-2 justify-end">
                                 <a href="{{ url_for('management.manage_teachers', edit_id=teacher.teacher_id) }}"
-                                    class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;"
-                                    title="Edit">
-                                    <i class="fas fa-edit"></i>
+                                    class="btn btn-secondary btn-sm btn-icon" title="Edit" aria-label="Edit {{ teacher.teacher_name }}">
+                                    <i class="fas fa-pencil" style="font-size:0.7rem;"></i>
                                 </a>
-                                <form action="{{ url_for('management.manage_teachers') }}" method="POST"
-                                    style="display:inline;"
-                                    onsubmit="return confirm('Deleting a teacher will also remove their assigned subjects. Proceed?')">
+                                <form action="{{ url_for('management.manage_teachers') }}" method="POST" style="display:inline;"
+                                    onsubmit="return confirm('Remove this faculty member and all their assignments?')">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="teacher_id" value="{{ teacher.teacher_id }}">
-                                    <button type="submit" class="btn btn-secondary"
-                                        style="padding: 0.4rem 0.75rem; font-size: 0.8rem; color: var(--danger); border-color: rgba(244, 63, 94, 0.2);"
-                                        title="Delete">
-                                        <i class="fas fa-trash-alt"></i>
+                                    <button type="submit" class="btn btn-sm btn-icon"
+                                        style="background:var(--danger-bg); border-color:var(--danger-border); color:var(--danger);"
+                                        title="Remove" aria-label="Remove {{ teacher.teacher_name }}">
+                                        <i class="fas fa-trash" style="font-size:0.7rem;"></i>
                                     </button>
                                 </form>
                             </div>
@@ -62,10 +76,10 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                            <i class="fas fa-user-slash"
-                                style="font-size: 2rem; display: block; margin-bottom: 1rem; opacity: 0.5;"></i>
-                            No teachers added yet.
+                        <td colspan="3" style="text-align:center; padding:48px 20px; color:var(--text-disabled);">
+                            <i class="fas fa-user-slash" style="font-size:1.5rem; display:block; margin-bottom:10px; opacity:0.3;"></i>
+                            <div style="font-size:0.8125rem; font-weight:500; margin-bottom:4px;">No faculty added yet</div>
+                            <div style="font-size:0.78rem;">Use the form on the right to add your first faculty member.</div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -74,11 +88,16 @@
         </div>
     </div>
 
-    <!-- Form Section -->
-    <div class="card" id="add-teacher-form">
-        <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif;">
-            {{ 'Edit Teacher' if edit_teacher else 'Add New Teacher' }}
-        </h3>
+    <!-- Add / Edit Form -->
+    <div class="card sticky-top" id="faculty-form">
+        <div style="margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+            <h3 style="font-size:0.875rem; font-weight:600; color:var(--text-primary); margin-bottom:3px;">
+                {{ 'Edit Faculty Member' if edit_teacher else 'Add New Faculty' }}
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-tertiary);">
+                {{ 'Update the faculty member details below.' if edit_teacher else 'Fill in the details to add a new faculty member.' }}
+            </p>
+        </div>
 
         <form action="{{ url_for('management.manage_teachers') }}" method="POST">
             {% if edit_teacher %}
@@ -89,22 +108,23 @@
             {% endif %}
 
             <div class="form-group">
-                <label for="teacher_name">Teacher Name</label>
-                <input type="text" id="teacher_name" name="teacher_name" required placeholder="e.g. John Doe"
+                <label for="teacher_name">Full Name</label>
+                <input type="text" id="teacher_name" name="teacher_name" required
+                    placeholder="e.g. Dr. Rajesh Kumar"
                     value="{{ edit_teacher.teacher_name if edit_teacher else '' }}">
+                <div class="form-hint">Name as it will appear on timetables.</div>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
-                <i class="fas fa-save"></i> {{ 'Save Changes' if edit_teacher else 'Add Staff Member' }}
+            <button type="submit" class="btn btn-primary w-full">
+                {{ 'Save Changes' if edit_teacher else 'Add Faculty Member' }}
             </button>
-
             {% if edit_teacher %}
-            <a href="{{ url_for('management.manage_teachers') }}" class="btn btn-secondary"
-                style="width: 100%; margin-top: 0.5rem;">
-                Cancel Edit
+            <a href="{{ url_for('management.manage_teachers') }}" class="btn btn-secondary w-full" style="margin-top:8px;">
+                Cancel
             </a>
             {% endif %}
         </form>
     </div>
+
 </div>
 {% endblock %}
