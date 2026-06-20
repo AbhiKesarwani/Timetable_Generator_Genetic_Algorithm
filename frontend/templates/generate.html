@@ -10,86 +10,112 @@
 
 {% block content %}
 
+<!-- Page Header -->
 <div class="page-header anim-fade-up">
-    <h1 class="page-title">AI Timetable Generator</h1>
-    <p class="page-subtitle">Select a batch and semester, then run the Genetic Algorithm engine to generate a conflict-free schedule.</p>
+    <h1 class="page-title">
+        <i class="fas fa-brain" style="color:var(--primary-light); margin-right:0.5rem; font-size:1.5rem;"></i>
+        AI Timetable Generator
+    </h1>
+    <p class="page-subtitle">
+        Configure your batch and priorities, then run the Genetic Algorithm engine to generate a conflict-free academic schedule.
+    </p>
 </div>
 
-<div class="grid grid-cols-3 anim-fade-up delay-100" style="align-items:flex-start;">
+<!-- Info banner -->
+<div style="display:flex; align-items:center; gap:0.75rem; padding:0.875rem 1.25rem; background:rgba(30,58,138,0.07); border:1px solid rgba(30,58,138,0.15); border-radius:var(--radius); margin-bottom:var(--space-6); font-size:0.82rem; color:var(--primary-light);" class="anim-fade-up delay-100">
+    <i class="fas fa-info-circle" style="flex-shrink:0;"></i>
+    <span>Select a batch and semester, fetch the subjects, optionally set subject priorities, then click <strong>Generate Timetable</strong>.</span>
+</div>
 
-    <!-- Setup Panel -->
-    <div class="card sticky-top">
-        <div style="margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--border);">
-            <h3 style="font-size:0.875rem; font-weight:600; color:var(--text-primary); margin-bottom:3px;">Setup</h3>
-            <p style="font-size:0.75rem; color:var(--text-tertiary);">Step 1 of 2 — select batch and semester.</p>
+<div class="grid grid-cols-3 anim-fade-up delay-150" style="align-items:flex-start;">
+
+    <!-- Left: Setup Context -->
+    <div class="card" style="position:sticky; top:calc(var(--topbar-height) + 1.5rem);">
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+            <div style="width:36px; height:36px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                <i class="fas fa-sliders-h"></i>
+            </div>
+            <div>
+                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Generation Setup</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Step 1 of 2</div>
+            </div>
         </div>
 
+        <!-- Form id="setupForm" preserved -->
         <form id="setupForm">
             <div class="form-group">
-                <label>Batch</label>
+                <label>Select Batch</label>
                 <select id="classSelect" required>
-                    <option value="">Select a batch...</option>
+                    <option value="">Choose a batch...</option>
                     {% for c in classes %}
                     <option value="{{ c.class_name }}">{{ c.class_name }}</option>
                     {% endfor %}
                 </select>
             </div>
+
             <div class="form-group">
                 <label>Semester</label>
-                <input type="number" id="semesterInput" placeholder="e.g. 3" required min="1" value="1">
+                <div class="input-group">
+                    <i class="input-icon fas fa-list-ol"></i>
+                    <input type="number" id="semesterInput" placeholder="e.g. 1" required min="1" value="1">
+                </div>
+                <div class="form-hint">Enter the semester number for this timetable.</div>
             </div>
+
             <button type="button" id="loadSubjects" class="btn btn-secondary w-full">
-                <i class="fas fa-arrow-down" style="font-size:0.7rem;"></i> Fetch Subjects
+                <i class="fas fa-sync-alt"></i>
+                Fetch Subjects
             </button>
         </form>
 
-        <div style="margin-top:20px; padding:12px; background:var(--bg-subtle); border-radius:var(--r-md); border:1px solid var(--border);">
-            <div style="font-size:0.72rem; color:var(--text-tertiary); line-height:1.6;">
-                <strong style="color:var(--text-secondary); display:block; margin-bottom:3px;">
-                    <i class="fas fa-info-circle" style="color:var(--primary-light); margin-right:4px;"></i>
-                    About priorities
-                </strong>
-                Subjects with higher priority are placed in preferred time slots by the algorithm.
+        <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border);">
+            <div style="font-size:0.72rem; color:var(--text-faint); line-height:1.6;">
+                <i class="fas fa-lightbulb" style="color:var(--accent); margin-right:0.25rem;"></i>
+                <strong style="color:var(--text-muted);">Tip:</strong> Higher priority subjects are scheduled
+                in preferred time slots by the algorithm.
             </div>
         </div>
     </div>
 
-    <!-- Priority Panel -->
-    <div class="col-span-2">
-        <div class="card">
-            <!-- Before load -->
-            <div id="prioritiesOverlay" style="text-align:center; padding:56px 20px;">
-                <div style="width:52px; height:52px; background:var(--bg-subtle); border-radius:var(--r-xl); display:flex; align-items:center; justify-content:center; font-size:1.25rem; color:var(--text-disabled); margin:0 auto 16px;">
-                    <i class="fas fa-brain"></i>
+    <!-- Right: Priorities Panel (spans 2 cols) -->
+    <div class="card col-span-2" style="position:relative; min-height:400px;">
+
+        <!-- Overlay before subjects are loaded -->
+        <div id="prioritiesOverlay" style="position:absolute; inset:0; background:var(--bg-card); z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-md); text-align:center; padding:2rem;">
+            <div style="width:72px; height:72px; background:var(--bg-muted); border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:2rem; color:var(--text-faint); margin-bottom:1.25rem; animation:float 3s ease-in-out infinite;">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; font-size:1.1rem; color:var(--text-muted); margin-bottom:0.5rem;">
+                Ready for AI Generation
+            </h3>
+            <p style="font-size:0.875rem; color:var(--text-faint); max-width:300px; line-height:1.6;">
+                Select a batch and semester on the left, then click <strong>Fetch Subjects</strong> to begin.
+            </p>
+        </div>
+
+        <!-- Priorities Content (shown after fetch) -->
+        <div id="prioritiesContainer" style="display:none;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+                <div>
+                    <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Subject Priorities</div>
+                    <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.2rem;">Step 2 of 2 — Set priority weights for the algorithm</div>
                 </div>
-                <h3 style="font-size:0.9375rem; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Ready to Generate</h3>
-                <p style="font-size:0.8125rem; color:var(--text-disabled); max-width:280px; margin:0 auto; line-height:1.6;">
-                    Select a batch and semester, then click <strong>Fetch Subjects</strong> to continue.
-                </p>
+                <span class="badge badge-primary" id="subjectCount">0 Subjects</span>
             </div>
 
-            <!-- After load -->
-            <div id="prioritiesContainer" style="display:none;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);">
-                    <div>
-                        <h3 style="font-size:0.875rem; font-weight:600; color:var(--text-primary); margin-bottom:3px;">Subject Priorities</h3>
-                        <p style="font-size:0.75rem; color:var(--text-tertiary);">Step 2 of 2 — set weights for the algorithm.</p>
-                    </div>
-                    <span class="badge badge-primary" id="subjectCount">—</span>
-                </div>
+            <!-- Subject priority rows (dynamically populated by JS) -->
+            <div id="subjectList" style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1.5rem;"></div>
 
-                <div id="subjectList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:20px;"></div>
-
-                <div style="display:flex; justify-content:flex-end; align-items:center; gap:12px; border-top:1px solid var(--border); padding-top:20px;">
-                    <div id="loadingIndicator" style="display:none; align-items:center; gap:8px; font-size:0.8125rem; color:var(--text-tertiary);">
-                        <div class="spinner spinner-dark"></div>
-                        Running algorithm...
-                    </div>
-                    <button id="generateBtn" class="btn btn-primary" style="padding:8px 24px;">
-                        <i class="fas fa-brain" style="font-size:0.75rem;"></i>
-                        Generate Timetable
-                    </button>
+            <!-- Action Row -->
+            <div style="display:flex; justify-content:flex-end; align-items:center; gap:1rem; border-top:1px solid var(--border); padding-top:1.5rem; flex-wrap:wrap;">
+                <div id="loadingIndicator" style="display:none; align-items:center; gap:0.5rem; color:var(--primary-light); font-weight:600; font-size:0.875rem;">
+                    <div class="spinner spinner-dark"></div>
+                    <span>Running Genetic Algorithm...</span>
                 </div>
+                <button id="generateBtn" class="btn btn-primary" style="padding:0.75rem 2.5rem;">
+                    <i class="fas fa-brain"></i>
+                    Generate Timetable
+                </button>
             </div>
         </div>
     </div>
@@ -99,6 +125,7 @@
 
 {% block scripts %}
 <script>
+    // All JavaScript logic preserved exactly from original
     const loadBtn     = document.getElementById('loadSubjects');
     const generateBtn = document.getElementById('generateBtn');
     const classSelect = document.getElementById('classSelect');
@@ -108,11 +135,14 @@
     const subjectList = document.getElementById('subjectList');
     const countBadge  = document.getElementById('subjectCount');
     const loader      = document.getElementById('loadingIndicator');
-    const chips       = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'];
+
+    // Subject color cycling
+    const chipColors = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'];
 
     loadBtn.addEventListener('click', async () => {
         const className = classSelect.value;
         const sem       = semInput.value;
+
         if (!className) { alert('Please select a batch first.'); return; }
 
         loadBtn.disabled = true;
@@ -129,31 +159,35 @@
 
             subjectList.innerHTML = '';
             subjects.forEach((sub, idx) => {
-                const colorClass = chips[idx % chips.length];
+                const colorClass = chipColors[idx % chipColors.length];
                 const div = document.createElement('div');
                 div.className = 'priority-row';
                 div.innerHTML = `
-                    <span class="subject-chip ${colorClass}" style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis;">${sub}</span>
-                    <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
-                        <span style="font-size:0.7rem; color:var(--text-disabled);">Priority</span>
-                        <select class="priority-select" data-subject="${sub}"
-                            style="width:100px; margin-bottom:0; font-size:0.78rem; padding:4px 24px 4px 8px;">
-                            <option value="1">Low</option>
-                            <option value="2" selected>Medium</option>
-                            <option value="3">High</option>
+                    <div class="subject-chip ${colorClass}" style="flex:1; min-width:0;">
+                        <i class="fas fa-book" style="font-size:0.65rem; flex-shrink:0;"></i>
+                        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${sub}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.75rem; flex-shrink:0;">
+                        <span style="font-size:0.72rem; color:var(--text-faint); white-space:nowrap;">Priority</span>
+                        <select class="priority-select" data-subject="${sub}" style="width:110px; margin-bottom:0; font-size:0.8rem;">
+                            <option value="1">🔵 Low</option>
+                            <option value="2" selected>🟡 Medium</option>
+                            <option value="3">🔴 High</option>
                         </select>
-                    </div>`;
+                    </div>
+                `;
                 subjectList.appendChild(div);
             });
 
-            countBadge.innerText = `${subjects.length} subjects`;
-            overlay.style.display   = 'none';
-            container.style.display = 'block';
+            countBadge.innerText = `${subjects.length} Subjects`;
+            overlay.style.display    = 'none';
+            container.style.display  = 'block';
+
         } catch (e) {
             alert('Error loading subjects. Please try again.');
         } finally {
             loadBtn.disabled = false;
-            loadBtn.innerHTML = '<i class="fas fa-arrow-down" style="font-size:0.7rem;"></i> Fetch Subjects';
+            loadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Fetch Subjects';
         }
     });
 
@@ -170,7 +204,11 @@
             const res  = await fetch('/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ class_name: classSelect.value, semester: semInput.value, priorities })
+                body: JSON.stringify({
+                    class_name: classSelect.value,
+                    semester:   semInput.value,
+                    priorities: priorities
+                })
             });
             const data = await res.json();
 
@@ -182,7 +220,7 @@
                 loader.style.display  = 'none';
             }
         } catch (e) {
-            alert('Network error. Please try again.');
+            alert('Network error. Please check your connection and try again.');
             generateBtn.disabled = false;
             loader.style.display  = 'none';
         }

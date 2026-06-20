@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}View Timetable — Academic Portal{% endblock %}
+{% block title %}View Timetable — Timetable Portal{% endblock %}
 
 {% block breadcrumb %}
 <a href="/">Home</a>
@@ -11,15 +11,15 @@
 {% block head %}
 <style>
     @media print {
-        .sidebar, .top-bar, .site-footer, .btn, .breadcrumb, .flash-container,
-        .hamburger-btn, .sidebar-overlay, .topbar-actions, .view-form-section { display: none !important; }
+        .sidebar, .top-bar, .btn, .breadcrumb, .flash-container,
+        .hamburger-btn, .sidebar-overlay, .topbar-actions,
+        .site-footer, .view-form-section { display: none !important; }
         body { display: block; background: white; }
         .main-wrapper { margin: 0 !important; }
-        .content-container { padding: 0.75rem !important; animation: none !important; }
-        #timetableContainer { display: block !important; }
-        table { border: 1px solid #999 !important; font-size: 10px !important; }
-        th { background: #1a1a2e !important; color: white !important; border: 1px solid #999 !important; padding: 5px !important; }
-        td { border: 1px solid #ddd !important; padding: 4px !important; background: white !important; }
+        .content-container { padding: 0.5rem !important; animation: none !important; }
+        #timetableContainer { display: block !important; margin-top: 0 !important; }
+        table { border: 1px solid #999 !important; }
+        th, td { border: 1px solid #aaa !important; color: black !important; background: white !important; padding: 0.4rem !important; }
         .subject-block { background: white !important; border: 1px solid #ccc !important; color: black !important; }
     }
 </style>
@@ -28,91 +28,122 @@
 {% block content %}
 
 <!-- Page Header -->
-<div class="anim-fade-up" style="margin-bottom:28px;">
-    <h1 class="page-title">View Timetable</h1>
-    <p class="page-subtitle">Select your institution, batch, and semester to view the published academic schedule.</p>
+<div style="text-align:center; margin-bottom:var(--space-8);" class="anim-fade-up">
+    <div class="landing-hero-badge" style="display:inline-flex; margin-bottom:1rem;">
+        <i class="fas fa-calendar-week" style="font-size:0.7rem;"></i>
+        Student / Faculty Access
+    </div>
+    <h1 class="page-title" style="font-size:clamp(1.75rem,4vw,2.5rem); text-align:center;">
+        View Academic Timetable 📅
+    </h1>
+    <p class="page-subtitle" style="text-align:center; max-width:550px; margin:0 auto;">
+        Select your institution, batch, and semester to view the latest published schedule.
+    </p>
 </div>
 
-<!-- Lookup Form -->
-<div class="card view-form-section anim-fade-up delay-100" style="max-width:600px; margin-bottom:28px;">
-    <div style="margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--border);">
-        <h3 style="font-size:0.875rem; font-weight:600; color:var(--text-primary); margin-bottom:3px;">Find Schedule</h3>
-        <p style="font-size:0.75rem; color:var(--text-tertiary);">Select in order — fields cascade based on prior selections.</p>
+<!-- Selection Form -->
+<div class="card view-form-section anim-fade-up delay-100" style="max-width:680px; margin:0 auto var(--space-8);">
+    <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+        <div style="width:36px; height:36px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+            <i class="fas fa-search"></i>
+        </div>
+        <div>
+            <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Find Your Schedule</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">Cascading filters — select in order</div>
+        </div>
     </div>
 
-    <form id="viewTimetableForm">
-        <div class="form-group">
-            <label for="username">Institution</label>
-            <select id="username" name="username" required>
-                <option value="">Select institution...</option>
-            </select>
+    <!-- Form — all JS-interacted element IDs preserved exactly -->
+    <form id="viewTimetableForm" style="display:flex; flex-direction:column; gap:1rem;">
+
+        <div class="form-group" style="margin-bottom:0;">
+            <label for="username">Institution Name</label>
+            <div class="input-group">
+                <i class="input-icon fas fa-university"></i>
+                <select id="username" name="username" required>
+                    <option value="">Select your institution...</option>
+                </select>
+            </div>
         </div>
 
-        <div class="grid grid-cols-2" style="gap:12px;">
+        <div class="grid grid-cols-2" style="gap:1rem;">
             <div class="form-group" style="margin-bottom:0;">
-                <label for="class_name">Batch</label>
-                <select id="class_name" name="class_name" required disabled>
-                    <option value="">Select batch...</option>
-                </select>
+                <label for="class_name">Batch / Class</label>
+                <div class="input-group">
+                    <i class="input-icon fas fa-users"></i>
+                    <select id="class_name" name="class_name" required disabled>
+                        <option value="">Choose batch...</option>
+                    </select>
+                </div>
             </div>
             <div class="form-group" style="margin-bottom:0;">
                 <label for="semester">Semester</label>
-                <select id="semester" name="semester" required disabled>
-                    <option value="">Select semester...</option>
-                </select>
+                <div class="input-group">
+                    <i class="input-icon fas fa-list-ol"></i>
+                    <select id="semester" name="semester" required disabled>
+                        <option value="">Choose sem...</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="margin-top:18px;" id="findBtn" disabled>
-            <i class="fas fa-search" style="font-size:0.72rem;"></i> View Schedule
+        <button type="submit" class="btn btn-primary" style="margin-top:0.25rem; padding:0.875rem;" id="findBtn" disabled>
+            <i class="fas fa-search"></i>
+            Find My Timetable
         </button>
+
     </form>
 </div>
 
 <!-- Timetable Display -->
-<div id="timetableContainer" style="display:none;">
+<div id="timetableContainer" style="display:none; max-width:1100px; margin:0 auto;">
 
-    <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap; gap:12px;">
+    <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap; gap:1rem;">
         <div>
-            <h2 id="resultTitle" style="font-size:1rem; font-weight:600; color:var(--text-primary);"></h2>
-            <p style="font-size:0.75rem; color:var(--text-tertiary); margin-top:2px;">
-                <i class="fas fa-check-circle" style="color:var(--success); font-size:0.7rem;"></i>
-                Published schedule
+            <h2 id="resultTitle" style="font-family:'Outfit',sans-serif; font-size:1.25rem; font-weight:700; color:var(--text-main);">
+                Schedule
+            </h2>
+            <p style="font-size:0.78rem; color:var(--text-faint); margin-top:0.2rem;">
+                <i class="fas fa-check-circle" style="color:var(--success);"></i>
+                Published · AI Generated
             </p>
         </div>
         <button onclick="window.print()" class="btn btn-secondary btn-sm">
-            <i class="fas fa-print" style="font-size:0.7rem;"></i> Print
+            <i class="fas fa-print"></i> Print Schedule
         </button>
     </div>
 
     <div class="card timetable-card">
-        <div style="overflow-x:auto;">
-            <table style="min-width:640px; border-collapse:collapse;">
+        <div class="table-container" style="border:none; border-radius:0; margin-top:0;">
+            <table style="border-collapse:collapse;">
                 <thead>
                     <tr class="timetable-header-row">
-                        <th style="min-width:80px; text-align:left; padding-left:14px;">Time</th>
-                        <th>Mon</th>
-                        <th>Tue</th>
-                        <th>Wed</th>
-                        <th>Thu</th>
-                        <th>Fri</th>
-                        <th>Sat</th>
+                        <th style="background:linear-gradient(135deg,#0F172A,#1E293B); color:rgba(148,163,184,0.7); min-width:100px; padding:0.875rem 1rem; font-size:0.7rem; letter-spacing:0.1em; border-right:2px solid rgba(255,255,255,0.08); text-align:left;">TIME</th>
+                        <th>MON</th>
+                        <th>TUE</th>
+                        <th>WED</th>
+                        <th>THU</th>
+                        <th>FRI</th>
+                        <th>SAT</th>
                     </tr>
                 </thead>
-                <tbody id="timetableBody"></tbody>
+                <tbody id="timetableBody">
+                    <!-- JS Populated -->
+                </tbody>
             </table>
         </div>
     </div>
 
-    <div class="card" style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:10px 16px;">
-        <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-disabled);">Legend</span>
-        <div class="flex items-center gap-2" style="font-size:0.78rem;">
-            <div style="width:12px; height:12px; border-radius:3px; border-left:2px solid #3B82F6; background:#EFF6FF;"></div>
-            <span style="color:var(--text-tertiary);">Lecture</span>
+    <!-- Legend -->
+    <div class="card" style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; padding:0.875rem 1.5rem; margin-top:0;">
+        <span style="font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em;">Legend</span>
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.78rem;">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--primary-light); background:rgba(37,99,235,0.1);"></div>
+            <span style="color:var(--text-muted);">Lecture</span>
         </div>
-        <div class="flex items-center gap-2" style="font-size:0.78rem;">
-            <div style="width:12px; height:12px; border-radius:3px; border-left:2px solid #EAB308; background:#FFFBEB;"></div>
-            <span style="color:var(--text-tertiary);">Recess</span>
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.78rem;">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--accent); background:rgba(217,119,6,0.1);"></div>
+            <span style="color:var(--text-muted);">Recess Break</span>
         </div>
     </div>
 </div>
@@ -121,60 +152,70 @@
 
 {% block scripts %}
 <script>
+    // All JavaScript logic preserved exactly from original
     const schoolSelect = document.getElementById('username');
     const classSelect  = document.getElementById('class_name');
     const semSelect    = document.getElementById('semester');
     const findBtn      = document.getElementById('findBtn');
     const form         = document.getElementById("viewTimetableForm");
+
     const chipColors   = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'];
 
+    // 1. Initial Load: Fetch Schools
     async function init() {
         try {
             const res     = await fetch('/api/schools');
             const schools = await res.json();
             schools.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s.username;
-                opt.textContent = s.school_name;
+                const opt        = document.createElement('option');
+                opt.value        = s.username;
+                opt.textContent  = s.school_name;
                 schoolSelect.appendChild(opt);
             });
         } catch (e) { console.error("Error loading schools", e); }
     }
     init();
 
+    // 2. Dependency: School -> Classes
     schoolSelect.addEventListener('change', async () => {
         const username = schoolSelect.value;
-        classSelect.innerHTML = '<option value="">Select batch...</option>';
-        semSelect.innerHTML   = '<option value="">Select semester...</option>';
-        classSelect.disabled  = true;
-        semSelect.disabled    = true;
-        findBtn.disabled      = true;
+        classSelect.innerHTML  = '<option value="">Choose batch...</option>';
+        semSelect.innerHTML    = '<option value="">Choose sem...</option>';
+        classSelect.disabled   = true;
+        semSelect.disabled     = true;
+        findBtn.disabled       = true;
+
         if (!username) return;
+
         try {
             const res     = await fetch(`/api/classes?username=${encodeURIComponent(username)}`);
             const classes = await res.json();
             classes.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = opt.textContent = c;
+                const opt       = document.createElement('option');
+                opt.value       = c;
+                opt.textContent = c;
                 classSelect.appendChild(opt);
             });
             classSelect.disabled = false;
         } catch (e) { alert("Error loading classes"); }
     });
 
+    // 3. Dependency: Class -> Semesters
     classSelect.addEventListener('change', async () => {
         const username  = schoolSelect.value;
         const className = classSelect.value;
-        semSelect.innerHTML = '<option value="">Select semester...</option>';
-        semSelect.disabled  = true;
-        findBtn.disabled    = true;
+        semSelect.innerHTML  = '<option value="">Choose sem...</option>';
+        semSelect.disabled   = true;
+        findBtn.disabled     = true;
+
         if (!className) return;
+
         try {
             const res  = await fetch(`/api/semesters?username=${encodeURIComponent(username)}&class_name=${encodeURIComponent(className)}`);
             const sems = await res.json();
             sems.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s;
+                const opt       = document.createElement('option');
+                opt.value       = s;
                 opt.textContent = `Semester ${s}`;
                 semSelect.appendChild(opt);
             });
@@ -182,77 +223,105 @@
         } catch (e) { alert("Error loading semesters"); }
     });
 
-    semSelect.addEventListener('change', () => { findBtn.disabled = !semSelect.value; });
+    // 4. Enable Find Button
+    semSelect.addEventListener('change', () => {
+        findBtn.disabled = !semSelect.value;
+    });
 
+    // 5. Submit Handler
     form.addEventListener("submit", function (event) {
         event.preventDefault();
+
         const btn       = findBtn;
         const className = classSelect.value;
         const semester  = semSelect.value;
         const username  = schoolSelect.value;
 
-        btn.disabled  = true;
-        btn.innerHTML = '<div class="spinner"></div> Loading...';
+        btn.disabled    = true;
+        btn.innerHTML   = '<div class="spinner"></div> Loading Schedule...';
 
         fetch(`/get_timetable?class_name=${encodeURIComponent(className)}&semester=${encodeURIComponent(semester)}&username=${encodeURIComponent(username)}`)
-            .then(r => r.json())
+            .then(response => response.json())
             .then(data => {
-                if (data.error) { alert("⚠️ " + data.error); return; }
+                if (data.error) {
+                    alert("⚠️ " + data.error);
+                    return;
+                }
 
                 document.getElementById('resultTitle').innerText = `${className} — Semester ${semester}`;
-                let tbody  = document.getElementById("timetableBody");
-                tbody.innerHTML = "";
-                const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-                const subjectColorMap = {};
+                let timetableBody = document.getElementById("timetableBody");
+                timetableBody.innerHTML = "";
+
+                let visualSlots = data.visual_slots;
+                let timetable   = data.timetable;
+                let days        = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+                let subjectColorMap = {};
                 let colorIdx = 0;
 
-                data.visual_slots.forEach(slot => {
+                visualSlots.forEach(slot => {
                     let row = document.createElement('tr');
+
                     if (slot.type === 'break') {
                         row.className = 'timetable-break-row';
-                        row.innerHTML = `<td class="timetable-time-cell" style="color:var(--warning);">${slot.time.substring(0,5)}</td>
-                            <td colspan="6" style="padding:8px 14px !important; vertical-align:middle;">
-                                <div class="break-label">
+                        row.innerHTML = `
+                            <td class="timetable-time-cell" style="color:var(--accent);">${slot.time.substring(0, 5)}</td>
+                            <td colspan="6">
+                                <div class="break-label" style="justify-content:center;">
                                     <div class="break-line"></div>
-                                    <i class="fas fa-coffee" style="font-size:0.7rem;"></i>
+                                    <i class="fas fa-coffee" style="font-size:0.75rem;"></i>
                                     Recess Break
                                     <div class="break-line"></div>
                                 </div>
-                            </td>`;
+                            </td>
+                        `;
                     } else {
                         let timeCell = document.createElement('td');
-                        timeCell.textContent = slot.time.substring(0,5);
+                        timeCell.textContent = slot.time.substring(0, 5);
                         timeCell.className   = 'timetable-time-cell';
                         row.appendChild(timeCell);
+
                         days.forEach(day => {
-                            let cell = document.createElement('td');
+                            let cell     = document.createElement('td');
                             cell.className = 'timetable-subject-cell';
-                            let subject = data.timetable[`${day}_${slot.time}`] || "";
+
+                            let key     = `${day}_${slot.time}`;
+                            let subject = timetable[key] || "";
+
                             if (subject) {
                                 if (!subjectColorMap[subject]) {
                                     subjectColorMap[subject] = chipColors[colorIdx % chipColors.length];
                                     colorIdx++;
                                 }
-                                cell.innerHTML = `<div class="subject-block ${subjectColorMap[subject]}">
-                                    <div class="subject-block-name">${subject}</div>
-                                    <div class="subject-block-label">Lecture</div>
-                                </div>`;
+                                const colorClass = subjectColorMap[subject];
+                                cell.innerHTML = `
+                                    <div class="subject-block ${colorClass}">
+                                        <div class="subject-block-name">${subject}</div>
+                                        <div class="subject-block-label">
+                                            <i class="fas fa-chalkboard-teacher" style="font-size:0.55rem;"></i>
+                                            Lecture
+                                        </div>
+                                    </div>`;
                             } else {
                                 cell.innerHTML = '<div class="empty-cell"><i class="fas fa-minus" style="font-size:0.55rem;"></i></div>';
                             }
                             row.appendChild(cell);
                         });
                     }
-                    tbody.appendChild(row);
+
+                    timetableBody.appendChild(row);
                 });
 
                 document.getElementById("timetableContainer").style.display = "block";
                 document.getElementById("timetableContainer").scrollIntoView({ behavior: 'smooth', block: 'start' });
             })
-            .catch(() => alert("⚠️ Error fetching timetable."))
+            .catch(error => {
+                console.error(error);
+                alert("⚠️ Error fetching timetable. Please try again.");
+            })
             .finally(() => {
                 btn.disabled  = false;
-                btn.innerHTML = '<i class="fas fa-search" style="font-size:0.72rem;"></i> View Schedule';
+                btn.innerHTML = '<i class="fas fa-search"></i> Find My Timetable';
             });
     });
 </script>

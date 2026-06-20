@@ -10,126 +10,170 @@
 
 {% block content %}
 
+<!-- Page Header -->
 <div class="page-header anim-fade-up">
-    <h1 class="page-title">Schedule Configuration</h1>
+    <h1 class="page-title">
+        <i class="fas fa-clock" style="color:var(--accent); margin-right:0.5rem; font-size:1.5rem;"></i>
+        Schedule Configuration
+    </h1>
     <p class="page-subtitle">Configure your institution's daily schedule, lecture durations, and break periods.</p>
 </div>
 
 <div class="grid grid-cols-2 anim-fade-up delay-100" style="align-items:flex-start;">
 
-    <!-- Config Form -->
+    <!-- Configuration Form -->
     <div class="card">
-        <div style="margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);">
-            <h3 style="font-size:0.875rem; font-weight:600; color:var(--text-primary); margin-bottom:3px;">Academic Schedule</h3>
-            <p style="font-size:0.75rem; color:var(--text-tertiary);">Changes apply to all future timetable generations.</p>
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+            <div style="width:36px; height:36px; background:linear-gradient(135deg,#D97706,#F59E0B); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                <i class="fas fa-sliders-h"></i>
+            </div>
+            <div>
+                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Academic Schedule Setup</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Changes apply to all future timetable generations</div>
+            </div>
         </div>
 
+        <!-- Form — all name/action/method attrs preserved -->
         <form action="{{ url_for('management.manage_timings') }}" method="POST">
 
+            <!-- Section: Daily Timing -->
             <div class="form-section-title">
-                <i class="fas fa-sun" style="color:var(--warning); font-size:0.72rem;"></i>
+                <i class="fas fa-sun" style="color:var(--accent);"></i>
                 Daily Timing
             </div>
 
             <div class="form-group">
                 <label>College Start Time</label>
-                <input type="time" name="start_time" required
-                    value="{{ config['start_time'][:5] if config and config['start_time'] else '08:00' }}">
-                <div class="form-hint">Time when the first lecture of the day begins.</div>
+                <div class="input-group">
+                    <i class="input-icon fas fa-sun"></i>
+                    <input type="time" name="start_time" required
+                        value="{{ config['start_time'][:5] if config and config['start_time'] else '08:00' }}">
+                </div>
+                <div class="form-hint">When the first lecture of the day begins.</div>
             </div>
 
-            <div class="form-section-title" style="margin-top:24px;">
-                <i class="fas fa-chalkboard-teacher" style="color:var(--primary-light); font-size:0.72rem;"></i>
+            <!-- Section: Lecture Settings -->
+            <div class="form-section-title" style="margin-top:1.5rem;">
+                <i class="fas fa-chalkboard-teacher" style="color:var(--primary-light);"></i>
                 Lecture Settings
             </div>
 
-            <div class="grid grid-cols-2" style="gap:12px;">
+            <div class="grid grid-cols-2" style="gap:1rem;">
                 <div class="form-group">
-                    <label>Duration (minutes)</label>
-                    <input type="number" name="lecture_duration" required min="15" max="180"
-                        value="{{ config['lecture_duration'] if config else 60 }}">
-                    <div class="form-hint">Length of each lecture.</div>
+                    <label>Lecture Duration (min)</label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-hourglass-half"></i>
+                        <input type="number" name="lecture_duration" required min="15" max="180"
+                            value="{{ config['lecture_duration'] if config else 60 }}">
+                    </div>
+                    <div class="form-hint">Length of each lecture period.</div>
                 </div>
                 <div class="form-group">
                     <label>Lectures per Day</label>
-                    <input type="number" name="num_lectures" required min="1" max="15"
-                        value="{{ config['num_lectures'] if config else 6 }}">
-                    <div class="form-hint">Total lecture slots.</div>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-list-ol"></i>
+                        <input type="number" name="num_lectures" required min="1" max="15"
+                            value="{{ config['num_lectures'] if config else 6 }}">
+                    </div>
+                    <div class="form-hint">Total lecture slots per day.</div>
                 </div>
             </div>
 
-            <div class="form-section-title" style="margin-top:24px;">
-                <i class="fas fa-coffee" style="color:var(--warning); font-size:0.72rem;"></i>
+            <!-- Section: Break Settings -->
+            <div class="form-section-title" style="margin-top:1.5rem;">
+                <i class="fas fa-coffee" style="color:var(--warning);"></i>
                 Break Period
             </div>
 
-            <div class="grid grid-cols-2" style="gap:12px;">
+            <div class="grid grid-cols-2" style="gap:1rem;">
                 <div class="form-group">
                     <label>Break After Lecture #</label>
-                    <input type="number" name="break_after" required min="0" max="10"
-                        value="{{ config['break_after'] if config else 3 }}">
+                    <div class="input-group">
+                        <i class="input-icon fas fa-step-forward"></i>
+                        <input type="number" name="break_after" required min="0" max="10"
+                            value="{{ config['break_after'] if config else 3 }}">
+                    </div>
                     <div class="form-hint">Insert break after this lecture number.</div>
                 </div>
                 <div class="form-group">
-                    <label>Break Duration (minutes)</label>
-                    <input type="number" name="break_duration" required min="0" max="120"
-                        value="{{ config['break_duration'] if config else 30 }}">
+                    <label>Break Duration (min)</label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-pause-circle"></i>
+                        <input type="number" name="break_duration" required min="0" max="120"
+                            value="{{ config['break_duration'] if config else 30 }}">
+                    </div>
                     <div class="form-hint">Length of the break period.</div>
                 </div>
             </div>
 
-            <div style="padding-top:8px;">
-                <button type="submit" class="btn btn-primary">
-                    Save Configuration
-                </button>
-            </div>
+            <button type="submit" class="btn btn-primary w-full" style="margin-top:0.5rem;">
+                <i class="fas fa-check-double"></i>
+                Save Schedule Configuration
+            </button>
         </form>
     </div>
 
-    <!-- Preview Panel -->
-    <div class="card sticky-top">
-        <div style="margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);">
-            <h3 style="font-size:0.875rem; font-weight:600; color:var(--text-primary); margin-bottom:3px;">Daily Preview</h3>
-            <p style="font-size:0.75rem; color:var(--text-tertiary);">Timeline for the current configuration.</p>
+    <!-- Live Preview Panel -->
+    <div class="card" style="background:var(--glass-bg); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+            <div style="width:36px; height:36px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div>
+                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Daily Schedule Preview</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Visual timeline for the current configuration</div>
+            </div>
         </div>
 
         {% if config %}
-        <div class="flex gap-2 flex-wrap" style="margin-bottom:20px;">
-            <span class="badge badge-primary">
-                Start: {{ config['start_time'] }}
+
+        <!-- Summary Chips -->
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+            <span class="badge badge-primary" style="font-size:0.72rem;">
+                <i class="fas fa-play" style="font-size:0.55rem;"></i>
+                Starts: {{ config['start_time'] }}
             </span>
-            <span class="badge badge-green">
-                End: {{ config['end_time'] }}
+            <span class="badge badge-green" style="font-size:0.72rem;">
+                <i class="fas fa-flag-checkered" style="font-size:0.55rem;"></i>
+                Ends: {{ config['end_time'] }}
             </span>
-            <span class="badge badge-gray">
-                {{ config['num_lectures'] }} lectures / day
+            <span class="badge badge-gray" style="font-size:0.72rem;">
+                {{ config['num_lectures'] }} Lectures / Day
             </span>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:0;">
+        <!-- Timeline visualization -->
+        <div class="divider-label">Daily Timeline</div>
+        <div style="display:flex; flex-direction:column; gap:0.5rem;">
             {% for i in range(1, (config['num_lectures'] | int) + 1) %}
             <div class="timeline-slot">
                 <div class="timeline-num">{{ i }}</div>
-                <div class="timeline-label" style="font-size:0.8rem;">Lecture {{ i }}</div>
+                <div class="timeline-label">Lecture {{ i }}</div>
                 <span class="timeline-duration">{{ config['lecture_duration'] }} min</span>
             </div>
+
             {% if i == (config['break_after'] | int) and (config['break_after'] | int) < (config['num_lectures'] | int) %}
             <div class="timeline-slot timeline-break">
-                <div class="timeline-num">
-                    <i class="fas fa-coffee" style="font-size:0.6rem;"></i>
+                <div class="timeline-num" style="background:var(--grad-accent);">
+                    <i class="fas fa-coffee" style="font-size:0.65rem;"></i>
                 </div>
-                <div class="timeline-label" style="font-size:0.8rem; color:var(--warning);">Recess Break</div>
-                <span class="timeline-duration" style="color:var(--warning);">{{ config['break_duration'] }} min</span>
+                <div class="timeline-label">Recess Break</div>
+                <span class="timeline-duration" style="color:var(--accent); background:rgba(217,119,6,0.1);">
+                    {{ config['break_duration'] }} min
+                </span>
             </div>
             {% endif %}
+
             {% endfor %}
         </div>
 
         {% else %}
-        <div style="text-align:center; padding:40px 20px; color:var(--text-disabled);">
-            <i class="fas fa-calendar-times" style="font-size:1.5rem; display:block; margin-bottom:10px; opacity:0.3;"></i>
-            <div style="font-size:0.8125rem; font-weight:500; margin-bottom:4px;">No configuration saved</div>
-            <div style="font-size:0.78rem;">Save your settings to see the preview.</div>
+        <div style="text-align:center; padding:3rem 1.5rem; color:var(--text-faint);">
+            <div style="width:56px; height:56px; background:var(--bg-muted); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:var(--text-faint); margin:0 auto 1rem;">
+                <i class="fas fa-calendar-times"></i>
+            </div>
+            <div style="font-size:0.875rem; font-weight:500; margin-bottom:0.4rem;">No configuration saved yet</div>
+            <div style="font-size:0.78rem;">Save your schedule configuration to see the timeline preview.</div>
         </div>
         {% endif %}
     </div>

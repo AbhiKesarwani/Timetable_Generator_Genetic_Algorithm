@@ -1,210 +1,283 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Academic Timetable Portal{% endblock %}</title>
     <meta name="description" content="AI-Powered Academic Timetable Management System for Colleges and Universities">
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     {% block head %}{% endblock %}
 </head>
+
 <body>
 
-<!-- ======================== SIDEBAR ======================== -->
-<aside class="sidebar" id="sidebar" role="navigation" aria-label="Primary">
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar" id="sidebar">
 
-    <a href="/" class="sidebar-brand" aria-label="Academic Portal Home">
-        <div class="sidebar-crest"><i class="fas fa-graduation-cap"></i></div>
-        <div class="sidebar-brand-text">
-            <span class="sidebar-brand-name">Academic Portal</span>
-            <span class="sidebar-brand-tagline">Timetable Management</span>
-        </div>
-    </a>
-
-    {% if session.get('school_id') %}
-    <div class="sidebar-profile">
-        <div class="sidebar-avatar">{{ session.get('school_name', 'A')[0] | upper }}</div>
-        <div class="sidebar-profile-info">
-            <span class="sidebar-profile-name">{{ session.get('school_name', 'Institution') }}</span>
-            <span class="sidebar-profile-role">Administrator</span>
-        </div>
-    </div>
-    {% endif %}
-
-    <nav class="sidebar-nav">
-        <div class="nav-group">
-            <span class="nav-label">Navigation</span>
-            <a href="{{ url_for('timetable_view.view_timetable') }}" class="nav-item">
-                <i class="fas fa-calendar-week nav-icon"></i><span>View Timetable</span>
-            </a>
-        </div>
-
-        {% if session.get('school_id') %}
-        <div class="nav-group">
-            <span class="nav-label">Management</span>
-            <a href="{{ url_for('main.dashboard') }}" class="nav-item">
-                <i class="fas fa-home nav-icon"></i><span>Dashboard</span>
-            </a>
-            <a href="{{ url_for('management.manage_teachers') }}" class="nav-item">
-                <i class="fas fa-user-tie nav-icon"></i><span>Faculty</span>
-            </a>
-            <a href="{{ url_for('management.manage_subjects') }}" class="nav-item">
-                <i class="fas fa-book-open nav-icon"></i><span>Curriculum</span>
-            </a>
-            <a href="{{ url_for('management.manage_timings') }}" class="nav-item">
-                <i class="fas fa-clock nav-icon"></i><span>Schedule Config</span>
-            </a>
-        </div>
-
-        <div class="nav-group">
-            <span class="nav-label">Scheduling</span>
-            <a href="{{ url_for('generation.generate_setup') }}" class="nav-item">
-                <i class="fas fa-brain nav-icon"></i><span>AI Generator</span>
-            </a>
-        </div>
-        {% endif %}
-    </nav>
-
-    <div class="sidebar-footer">
-        {% if session.get('school_id') %}
-        <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color:rgba(248,113,113,0.75);">
-            <i class="fas fa-sign-out-alt nav-icon"></i><span>Sign Out</span>
-        </a>
-        {% else %}
-        <a href="{{ url_for('auth.login') }}" class="nav-item">
-            <i class="fas fa-sign-in-alt nav-icon"></i><span>Sign In</span>
-        </a>
-        <a href="{{ url_for('auth.register') }}" class="nav-item">
-            <i class="fas fa-university nav-icon"></i><span>Register Institution</span>
-        </a>
-        {% endif %}
-        <div class="sidebar-semester-chip">AY 2025 – 2026</div>
-    </div>
-</aside>
-
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-<!-- ======================== MAIN ======================== -->
-<div class="main-wrapper" id="mainWrapper">
-
-    <header class="top-bar" role="banner">
-        <div class="flex items-center gap-2" style="flex:1; min-width:0;">
-            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">
-                <i class="fas fa-bars"></i>
-            </button>
-            <nav class="breadcrumb" aria-label="Breadcrumb">
-                {% block breadcrumb %}{% endblock %}
-            </nav>
-        </div>
-
-        <div class="topbar-actions">
-            <div class="topbar-chip" id="acYearChip">
-                <i class="fas fa-calendar-alt" style="font-size:0.65rem;"></i>
-                AY 2025–26
+        <!-- Brand -->
+        <a href="/" class="sidebar-brand">
+            <div class="sidebar-crest">
+                <i class="fas fa-graduation-cap"></i>
             </div>
-            <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
-                <i class="fas fa-moon" id="themeIcon"></i>
-            </button>
-            {% if session.get('school_name') %}
-            <div class="topbar-avatar" title="{{ session['school_name'] }}">
-                {{ session['school_name'][0] | upper }}
+            <div class="sidebar-brand-text">
+                <span class="sidebar-brand-name">Academic Portal</span>
+                <span class="sidebar-brand-tagline">Timetable System</span>
+            </div>
+        </a>
+
+        <!-- Profile Card (only when logged in) -->
+        {% if session.get('school_id') %}
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar">
+                {{ session.get('school_name', 'A')[0] | upper }}
+            </div>
+            <div class="sidebar-profile-info">
+                <div class="sidebar-profile-name">{{ session.get('school_name', 'Institution') }}</div>
+                <div class="sidebar-profile-role">Administrator</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav" aria-label="Main navigation">
+
+            <!-- Main Group -->
+            <div class="nav-group">
+                <span class="nav-label">Main</span>
+                <a href="/" class="nav-item" id="nav-home">
+                    <i class="fas fa-home nav-icon"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('timetable_view.view_timetable') }}" class="nav-item" id="nav-view">
+                    <i class="fas fa-calendar-week nav-icon"></i>
+                    <span>View Timetable</span>
+                </a>
+            </div>
+
+            {% if session.get('school_id') %}
+            <!-- Academic Management Group -->
+            <div class="nav-group">
+                <span class="nav-label">Academic Management</span>
+                <a href="{{ url_for('main.dashboard') }}" class="nav-item" id="nav-dashboard">
+                    <i class="fas fa-chart-bar nav-icon"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('management.manage_teachers') }}" class="nav-item" id="nav-faculty">
+                    <i class="fas fa-user-tie nav-icon"></i>
+                    <span>Faculty</span>
+                </a>
+                <a href="{{ url_for('management.manage_subjects') }}" class="nav-item" id="nav-curriculum">
+                    <i class="fas fa-book-open nav-icon"></i>
+                    <span>Curriculum</span>
+                </a>
+                <a href="{{ url_for('management.manage_timings') }}" class="nav-item" id="nav-timings">
+                    <i class="fas fa-clock nav-icon"></i>
+                    <span>Schedule Config</span>
+                </a>
+            </div>
+
+            <!-- Scheduling Group -->
+            <div class="nav-group">
+                <span class="nav-label">Scheduling</span>
+                <a href="{{ url_for('generation.generate_setup') }}" class="nav-item" id="nav-generate">
+                    <i class="fas fa-brain nav-icon"></i>
+                    <span>AI Generator</span>
+                </a>
             </div>
             {% endif %}
-        </div>
-    </header>
 
-    <main class="content-container" role="main">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-container" role="alert" aria-live="polite">
-            {% for category, message in messages %}
-            <div class="flash-message {{ 'success' if category == 'success' else 'error' if category == 'error' else 'info' }}">
-                <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'error' %}fa-times-circle{% else %}fa-info-circle{% endif %}" style="flex-shrink:0;"></i>
-                <span>{{ message }}</span>
-                <button onclick="this.parentElement.remove()" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
-                </button>
+        </nav>
+
+        <!-- Footer -->
+        <div class="sidebar-footer">
+            {% if session.get('school_id') %}
+            <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color: rgba(248, 113, 113, 0.85); margin-bottom: 0;">
+                <i class="fas fa-sign-out-alt nav-icon"></i>
+                <span>Sign Out</span>
+            </a>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}" class="nav-item" style="margin-bottom: 0.25rem;">
+                <i class="fas fa-sign-in-alt nav-icon"></i>
+                <span>Login</span>
+            </a>
+            <a href="{{ url_for('auth.register') }}" class="nav-item" style="margin-bottom: 0;">
+                <i class="fas fa-university nav-icon"></i>
+                <span>Register Institution</span>
+            </a>
+            {% endif %}
+            <div class="sidebar-semester-chip" style="margin-top: 0.5rem;">
+                Academic Year 2025–26
             </div>
-            {% endfor %}
         </div>
-        {% endif %}
-        {% endwith %}
+    </aside>
 
-        {% block content %}{% endblock %}
-    </main>
+    <!-- Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <footer class="site-footer">
-        <span class="footer-brand">
-            <i class="fas fa-graduation-cap" style="margin-right:6px; color:var(--primary-light);"></i>
-            Academic Timetable Portal
-        </span>
-        <span>AI-Powered Scheduling · Genetic Algorithm Engine</span>
-        <span>&copy; 2026 All rights reserved</span>
-    </footer>
+    <!-- ==================== MAIN WRAPPER ==================== -->
+    <div class="main-wrapper" id="mainWrapper">
 
-</div><!-- /.main-wrapper -->
+        <!-- Top Bar -->
+        <header class="top-bar" role="banner">
+            <!-- Left: Hamburger + Breadcrumb -->
+            <div class="flex items-center gap-3" style="flex:1; min-width:0;">
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    {% block breadcrumb %}{% endblock %}
+                </nav>
+            </div>
 
-<script>
-// Theme
-const html = document.documentElement;
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon   = document.getElementById('themeIcon');
-(function() {
-    const t = localStorage.getItem('theme') || 'light';
-    html.setAttribute('data-theme', t);
-    themeIcon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-})();
-themeToggle.addEventListener('click', function() {
-    const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    themeIcon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-});
+            <!-- Right: Actions -->
+            <div class="topbar-actions">
+                <!-- Academic Year chip -->
+                <div class="topbar-chip" style="display:none;" id="acYearChip">
+                    <i class="fas fa-calendar-alt" style="font-size:0.7rem;"></i>
+                    <span>AY 2025–26</span>
+                </div>
 
-// Sidebar mobile
-const sidebar     = document.getElementById('sidebar');
-const overlay     = document.getElementById('sidebarOverlay');
-const hamburger   = document.getElementById('hamburgerBtn');
-function openSidebar() {
-    sidebar.classList.add('mobile-open');
-    overlay.classList.add('active');
-    hamburger.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
-}
-function closeSidebar() {
-    sidebar.classList.remove('mobile-open');
-    overlay.classList.remove('active');
-    hamburger.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-}
-hamburger.addEventListener('click', function() {
-    sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
-});
-overlay.addEventListener('click', closeSidebar);
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
+                <!-- Notification Bell -->
+                <button class="topbar-icon-btn" title="Notifications" aria-label="Notifications">
+                    <i class="fas fa-bell"></i>
+                </button>
 
-// Active nav
-const path = window.location.pathname;
-document.querySelectorAll('.nav-item').forEach(function(el) {
-    const href = el.getAttribute('href');
-    if (!href) return;
-    if (href !== '/' && path.startsWith(href)) el.classList.add('active');
-    else if (href === '/' && path === '/') el.classList.add('active');
-});
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
 
-// Auto-dismiss flashes
-document.querySelectorAll('.flash-message').forEach(function(m) {
-    setTimeout(function() {
-        m.style.transition = 'opacity 0.3s';
-        m.style.opacity = '0';
-        setTimeout(function() { m.remove(); }, 300);
-    }, 5000);
-});
-</script>
-{% block scripts %}{% endblock %}
+                <!-- User Avatar -->
+                {% if session.get('school_name') %}
+                <div class="topbar-avatar" title="{{ session['school_name'] }}" aria-label="Logged in as {{ session['school_name'] }}">
+                    {{ session['school_name'][0] | upper }}
+                </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="content-container" role="main" id="mainContent">
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-container" role="alert">
+                {% for category, message in messages %}
+                <div class="flash-message {{ 'success' if category == 'success' else 'error' if category == 'error' else 'info' }}">
+                    <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;margin-left:auto;color:inherit;opacity:0.7;font-size:1rem;" aria-label="Dismiss">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="site-footer" role="contentinfo">
+            <span class="footer-brand">
+                <i class="fas fa-graduation-cap" style="margin-right:0.4rem; color: var(--primary-light);"></i>
+                Academic Timetable Portal
+            </span>
+            <span>AI-Powered Scheduling · Genetic Algorithm Engine · &copy; 2026</span>
+            <span style="display:flex; align-items:center; gap:0.4rem;">
+                Built with <i class="fas fa-heart" style="color:var(--danger-light); font-size:0.7rem;"></i> for educators
+            </span>
+        </footer>
+    </div>
+
+    <!-- ==================== SCRIPTS ==================== -->
+    <script>
+        // ---- Theme Management ----
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon   = document.getElementById('themeIcon');
+        const html        = document.documentElement;
+
+        const savedTheme  = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        applyThemeIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next    = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            applyThemeIcon(next);
+        });
+
+        function applyThemeIcon(theme) {
+            themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // ---- Mobile Sidebar Toggle ----
+        const hamburgerBtn   = document.getElementById('hamburgerBtn');
+        const sidebar        = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function openSidebar() {
+            sidebar.classList.add('mobile-open');
+            sidebarOverlay.classList.add('active');
+            hamburgerBtn.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('mobile-open');
+            sidebarOverlay.classList.remove('active');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        hamburgerBtn.addEventListener('click', () => {
+            sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+        });
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSidebar();
+        });
+
+        // ---- Active Nav Link ----
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-item').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href !== '/' && currentPath.startsWith(href)) {
+                link.classList.add('active');
+            } else if (href === '/' && currentPath === '/') {
+                link.classList.add('active');
+            }
+        });
+
+        // Show academic year chip on larger screens
+        if (window.innerWidth >= 900) {
+            document.getElementById('acYearChip').style.display = 'flex';
+        }
+
+        // ---- Auto-dismiss flash messages after 5 seconds ----
+        document.querySelectorAll('.flash-message').forEach(msg => {
+            setTimeout(() => {
+                msg.style.opacity = '0';
+                msg.style.transition = 'opacity 0.4s ease';
+                setTimeout(() => msg.remove(), 400);
+            }, 5000);
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+
 </body>
+
 </html>

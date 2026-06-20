@@ -10,23 +10,31 @@
 
 {% block content %}
 
+<!-- Page Header -->
 <div class="page-header anim-fade-up">
-    <h1 class="page-title">Curriculum Management</h1>
+    <h1 class="page-title">
+        <i class="fas fa-book-open" style="color:var(--secondary); margin-right:0.5rem; font-size:1.5rem;"></i>
+        Curriculum Management
+    </h1>
     <p class="page-subtitle">Manage academic batches and assign subjects with faculty and credit hours.</p>
 </div>
 
-<div class="grid grid-cols-2 anim-fade-up delay-100" style="align-items:flex-start; margin-bottom:20px;">
+<!-- Top Row: Batch Management + Subject Form -->
+<div class="grid grid-cols-2 anim-fade-up delay-100" style="align-items:flex-start; margin-bottom:var(--space-8);">
 
-    <!-- Batch Management -->
-    <div class="card" style="padding:0; overflow:hidden; margin-bottom:0;">
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border);">
-            <span style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Academic Batches</span>
-            <span class="badge badge-gray">{{ classes | length }}</span>
+    <!-- Batch / Class Management -->
+    <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+                <i class="fas fa-layer-group" style="color:var(--primary-light);"></i>
+                <span style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Academic Batches</span>
+            </div>
+            <span class="badge badge-primary">{{ classes | length }} Batches</span>
         </div>
 
-        <!-- Inline add form -->
-        <div style="padding:12px 16px; background:var(--bg-subtle); border-bottom:1px solid var(--border);">
-            <form action="{{ url_for('management.manage_subjects') }}" method="POST" style="display:flex; gap:8px; align-items:flex-end;">
+        <!-- Add Batch Form -->
+        <div style="padding:1rem 1.5rem; background:var(--bg-main); border-bottom:1px solid var(--border);">
+            <form action="{{ url_for('management.manage_subjects') }}" method="POST" style="display:flex; gap:0.5rem; align-items:flex-end;">
                 {% if edit_class %}
                 <input type="hidden" name="action" value="update_class">
                 <input type="hidden" name="class_id" value="{{ edit_class.class_id }}">
@@ -34,9 +42,10 @@
                 <input type="hidden" name="action" value="add_class">
                 {% endif %}
                 <div style="flex:1;">
-                    <input type="text" name="class_name" style="margin-bottom:0;"
-                        placeholder="{{ 'Update batch name...' if edit_class else 'e.g. CS-A Semester 3' }}" required
-                        value="{{ edit_class.class_name if edit_class else '' }}">
+                    <input type="text" name="class_name"
+                        placeholder="{{ 'Update batch name...' if edit_class else 'e.g. CS-A Sem 3' }}" required
+                        value="{{ edit_class.class_name if edit_class else '' }}"
+                        style="margin-bottom:0;">
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm">
                     {{ 'Update' if edit_class else 'Add' }}
@@ -47,60 +56,72 @@
             </form>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th style="padding-left:18px;">Batch</th>
-                    <th style="text-align:right; padding-right:18px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cls in classes %}
-                <tr>
-                    <td style="padding-left:18px;">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-users" style="font-size:0.75rem; color:var(--text-disabled);"></i>
-                            <span style="font-weight:500; font-size:0.8125rem;">{{ cls.class_name }}</span>
-                        </div>
-                    </td>
-                    <td style="text-align:right; padding-right:18px;">
-                        <div class="flex gap-2 justify-end">
-                            <a href="{{ url_for('management.manage_subjects', edit_class_id=cls.class_id) }}"
-                                class="btn btn-secondary btn-sm btn-icon" title="Edit">
-                                <i class="fas fa-pencil" style="font-size:0.7rem;"></i>
-                            </a>
-                            <form action="{{ url_for('management.manage_subjects') }}" method="POST" style="display:inline;"
-                                onsubmit="return confirm('Delete this batch and all its subjects?')">
-                                <input type="hidden" name="action" value="delete_class">
-                                <input type="hidden" name="class_id" value="{{ cls.class_id }}">
-                                <button type="submit" class="btn btn-sm btn-icon"
-                                    style="background:var(--danger-bg); border-color:var(--danger-border); color:var(--danger);">
-                                    <i class="fas fa-trash" style="font-size:0.7rem;"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="2" style="text-align:center; padding:32px; color:var(--text-disabled); font-size:0.8125rem;">
-                        No batches added yet.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- Batch list table -->
+        <div class="table-container" style="border:none; border-radius:0; margin-top:0;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="padding-left:1.5rem;">Batch Name</th>
+                        <th style="text-align:right; padding-right:1.5rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cls in classes %}
+                    <tr>
+                        <td style="padding-left:1.5rem;">
+                            <div style="display:flex; align-items:center; gap:0.6rem;">
+                                <div style="width:28px; height:28px; background:rgba(30,58,138,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--primary-light); font-size:0.7rem;">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <span style="font-weight:600; font-size:0.875rem;">{{ cls.class_name }}</span>
+                            </div>
+                        </td>
+                        <td style="text-align:right; padding-right:1.5rem;">
+                            <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                                <a href="{{ url_for('management.manage_subjects', edit_class_id=cls.class_id) }}"
+                                    class="btn btn-secondary btn-sm" title="Edit batch" aria-label="Edit {{ cls.class_name }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ url_for('management.manage_subjects') }}" method="POST" style="display:inline;"
+                                    onsubmit="return confirm('Deleting this batch will also remove all its assigned subjects. Proceed?')">
+                                    <input type="hidden" name="action" value="delete_class">
+                                    <input type="hidden" name="class_id" value="{{ cls.class_id }}">
+                                    <button type="submit" class="btn btn-sm"
+                                        style="background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2); color:var(--danger);"
+                                        title="Delete batch" aria-label="Delete {{ cls.class_name }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="2" style="text-align:center; padding:2.5rem; color:var(--text-faint); font-size:0.875rem;">
+                            No batches added yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Subject Form -->
-    <div class="card sticky-top" style="margin-bottom:0;">
-        <div style="margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--border);">
-            <h3 style="font-size:0.875rem; font-weight:600; color:var(--text-primary); margin-bottom:3px;">
-                {{ 'Edit Subject' if edit_subject else 'Create Subject' }}
-            </h3>
-            <p style="font-size:0.75rem; color:var(--text-tertiary);">Assign to a batch and faculty member.</p>
+    <div class="card" style="position:sticky; top:calc(var(--topbar-height) + 1.5rem);">
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+            <div style="width:36px; height:36px; background:linear-gradient(135deg,#4F46E5,#7C3AED); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                <i class="{{ 'fas fa-edit' if edit_subject else 'fas fa-plus' }}"></i>
+            </div>
+            <div>
+                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">
+                    {{ 'Edit Subject' if edit_subject else 'Create Subject' }}
+                </div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Assign to a batch and faculty member</div>
+            </div>
         </div>
 
+        <!-- Subject form — all name/action/method attrs preserved -->
         <form action="{{ url_for('management.manage_subjects') }}" method="POST">
             {% if edit_subject %}
             <input type="hidden" name="action" value="update_subject">
@@ -111,15 +132,18 @@
 
             <div class="form-group">
                 <label>Subject Name</label>
-                <input type="text" name="subject_name" placeholder="e.g. Advanced Mathematics" required
-                    value="{{ edit_subject.subject_name if edit_subject else '' }}">
+                <div class="input-group">
+                    <i class="input-icon fas fa-book"></i>
+                    <input type="text" name="subject_name" placeholder="e.g. Advanced Mathematics" required
+                        value="{{ edit_subject.subject_name if edit_subject else '' }}">
+                </div>
             </div>
 
-            <div class="grid grid-cols-2" style="gap:12px;">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>Batch</label>
+            <div class="grid grid-cols-2" style="gap:1rem;">
+                <div class="form-group">
+                    <label>Assigned Batch</label>
                     <select name="class_id" required>
-                        <option value="">Select batch</option>
+                        <option value="">Select Batch</option>
                         {% for cls in classes %}
                         <option value="{{ cls.class_id }}" {{ 'selected' if edit_subject and edit_subject.class_id==cls.class_id else '' }}>
                             {{ cls.class_name }}
@@ -127,10 +151,10 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group" style="margin-bottom:0;">
+                <div class="form-group">
                     <label>Faculty</label>
                     <select name="teacher_id" required>
-                        <option value="">Select faculty</option>
+                        <option value="">Select Faculty</option>
                         {% for t in teachers %}
                         <option value="{{ t.teacher_id }}" {{ 'selected' if edit_subject and edit_subject.teacher_id==t.teacher_id else '' }}>
                             {{ t.teacher_name }}
@@ -140,98 +164,128 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2" style="gap:12px; margin-top:16px;">
-                <div class="form-group" style="margin-bottom:0;">
+            <div class="grid grid-cols-2" style="gap:1rem;">
+                <div class="form-group">
                     <label>Semester</label>
-                    <input type="number" name="semester" placeholder="e.g. 1" required min="1"
-                        value="{{ edit_subject.semester if edit_subject else '1' }}">
+                    <div class="input-group">
+                        <i class="input-icon fas fa-list-ol"></i>
+                        <input type="number" name="semester" placeholder="e.g. 1" required min="1"
+                            value="{{ edit_subject.semester if edit_subject else '1' }}">
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom:0;">
+                <div class="form-group">
                     <label>Weekly Credits</label>
-                    <input type="number" name="credits" placeholder="e.g. 4" required min="1"
-                        value="{{ edit_subject.credits if edit_subject else '4' }}">
+                    <div class="input-group">
+                        <i class="input-icon fas fa-star"></i>
+                        <input type="number" name="credits" placeholder="e.g. 4" required min="1"
+                            value="{{ edit_subject.credits if edit_subject else '4' }}">
+                    </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-full" style="margin-top:20px;">
+            <button type="submit" class="btn btn-primary w-full">
+                <i class="fas fa-save"></i>
                 {{ 'Update Subject' if edit_subject else 'Save Subject' }}
             </button>
             {% if edit_subject %}
-            <a href="{{ url_for('management.manage_subjects') }}" class="btn btn-secondary w-full" style="margin-top:8px;">Cancel</a>
+            <a href="{{ url_for('management.manage_subjects') }}" class="btn btn-secondary w-full" style="margin-top:0.5rem;">
+                <i class="fas fa-times"></i> Cancel Edit
+            </a>
             {% endif %}
         </form>
     </div>
 
 </div>
 
-<!-- Curriculum Table -->
+<!-- Curriculum Overview Table -->
 <div class="card anim-fade-up delay-200" style="padding:0; overflow:hidden;">
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border);">
-        <span style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">All Subjects</span>
-        <span class="badge badge-gray">{{ subjects | length }} subjects</span>
+    <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+            <i class="fas fa-table" style="color:var(--secondary);"></i>
+            <span style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Curriculum Overview</span>
+        </div>
+        <span class="badge badge-ind">{{ subjects | length }} Subjects</span>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th style="padding-left:18px;">Subject</th>
-                <th>Batch</th>
-                <th>Faculty</th>
-                <th>Sem</th>
-                <th>Credits</th>
-                <th style="text-align:right; padding-right:18px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% set chips = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'] %}
-            {% for s in subjects %}
-            <tr>
-                <td style="padding-left:18px;">
-                    <span class="subject-chip {{ chips[loop.index0 % 6] }}">{{ s.subject_name }}</span>
-                </td>
-                <td>
-                    <span style="font-size:0.8rem; color:var(--text-secondary);">{{ s.class_name }}</span>
-                </td>
-                <td>
-                    <div class="flex items-center gap-2">
-                        <div class="faculty-avatar" style="width:22px; height:22px; font-size:0.58rem;">
-                            {{ s.teacher_name[:2] | upper }}
+
+    <div class="table-container" style="border:none; border-radius:0; margin-top:0;">
+        <table>
+            <thead>
+                <tr>
+                    <th style="padding-left:1.5rem;">Subject</th>
+                    <th>Batch</th>
+                    <th>Faculty</th>
+                    <th>Semester</th>
+                    <th>Credits</th>
+                    <th style="text-align:right; padding-right:1.5rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set colors = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'] %}
+                {% for s in subjects %}
+                <tr>
+                    <td style="padding-left:1.5rem;">
+                        <span class="subject-chip {{ colors[loop.index0 % 6] }}">
+                            <i class="fas fa-book" style="font-size:0.65rem;"></i>
+                            {{ s.subject_name }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge badge-primary">
+                            <i class="fas fa-users" style="font-size:0.6rem;"></i>
+                            {{ s.class_name }}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <div class="faculty-avatar" style="width:26px; height:26px; font-size:0.62rem;">
+                                {{ s.teacher_name[:2] | upper }}
+                            </div>
+                            <span style="font-size:0.82rem; font-weight:500;">{{ s.teacher_name }}</span>
                         </div>
-                        <span style="font-size:0.8rem;">{{ s.teacher_name }}</span>
-                    </div>
-                </td>
-                <td>
-                    <span class="badge badge-gray">{{ s.semester }}</span>
-                </td>
-                <td>
-                    <span class="badge badge-amber">{{ s.credits }} cr</span>
-                </td>
-                <td style="text-align:right; padding-right:18px;">
-                    <div class="flex gap-2 justify-end">
-                        <a href="{{ url_for('management.manage_subjects', edit_subject_id=s.subject_id) }}"
-                            class="btn btn-secondary btn-sm btn-icon" title="Edit">
-                            <i class="fas fa-pencil" style="font-size:0.7rem;"></i>
-                        </a>
-                        <form action="{{ url_for('management.manage_subjects') }}" method="POST" style="display:inline;">
-                            <input type="hidden" name="action" value="delete_subject">
-                            <input type="hidden" name="subject_id" value="{{ s.subject_id }}">
-                            <button type="submit" class="btn btn-sm btn-icon"
-                                style="background:var(--danger-bg); border-color:var(--danger-border); color:var(--danger);">
-                                <i class="fas fa-trash" style="font-size:0.7rem;"></i>
-                            </button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6" style="text-align:center; padding:48px; color:var(--text-disabled);">
-                    <i class="fas fa-book-open" style="font-size:1.5rem; display:block; margin-bottom:10px; opacity:0.3;"></i>
-                    <div style="font-size:0.8125rem; font-weight:500;">No subjects defined yet</div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    </td>
+                    <td>
+                        <span class="badge badge-gray">Sem {{ s.semester }}</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-gold">
+                            <i class="fas fa-star" style="font-size:0.55rem;"></i>
+                            {{ s.credits }} cr
+                        </span>
+                    </td>
+                    <td style="text-align:right; padding-right:1.5rem;">
+                        <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                            <a href="{{ url_for('management.manage_subjects', edit_subject_id=s.subject_id) }}"
+                                class="btn btn-secondary btn-sm" title="Edit subject" aria-label="Edit {{ s.subject_name }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('management.manage_subjects') }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="action" value="delete_subject">
+                                <input type="hidden" name="subject_id" value="{{ s.subject_id }}">
+                                <button type="submit" class="btn btn-sm"
+                                    style="background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2); color:var(--danger);"
+                                    title="Delete subject" aria-label="Delete {{ s.subject_name }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align:center; padding:4rem; color:var(--text-faint);">
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
+                            <div style="width:56px; height:56px; background:var(--bg-muted); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:var(--text-faint);">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <span style="font-size:0.875rem; font-weight:500;">No subjects assigned yet.</span>
+                            <span style="font-size:0.78rem;">Create a batch first, then add subjects using the form above.</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock %}

@@ -1,102 +1,105 @@
 {% extends "layout.html" %}
 
-{% block title %}Generated Schedule — Timetable Portal{% endblock %}
+{% block title %}Generated Timetable — Timetable Portal{% endblock %}
 
 {% block breadcrumb %}
 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
 <span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
-<span class="breadcrumb-current">Generated Schedule</span>
+<a href="{{ url_for('generation.generate_setup') }}">AI Generator</a>
+<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-current">Results</span>
 {% endblock %}
 
 {% block head %}
 <style>
     @media print {
-        .sidebar, .top-bar, .site-footer, .btn, .breadcrumb, .flash-container,
-        .hamburger-btn, .sidebar-overlay, .topbar-actions, .timetable-action-row,
-        .page-header { display: none !important; }
+        .sidebar, .top-bar, .btn, .breadcrumb, .flash-container,
+        .hamburger-btn, .sidebar-overlay, .topbar-actions,
+        .site-footer, .page-header, .timetable-action-row { display: none !important; }
         body { display: block; background: white; }
         .main-wrapper { margin: 0 !important; }
-        .content-container { padding: 0.75rem !important; animation: none !important; }
-        .print-header { display: block !important; }
-        .card { box-shadow: none !important; border: 1px solid #ddd !important; border-radius: 0 !important; }
-        table { border: 1px solid #999 !important; font-size: 10px !important; }
-        th { background: #1a1a2e !important; color: white !important; border: 1px solid #999 !important; padding: 5px 7px !important; }
-        td { border: 1px solid #ddd !important; padding: 4px 7px !important; background: white !important; }
-        .subject-block { background: white !important; border: 1px solid #bbb !important; color: black !important; padding: 3px 4px !important; }
-        .subject-block-name { color: black !important; font-size: 9px !important; }
-        .timetable-time-cell { background: #f5f5f5 !important; color: #333 !important; }
+        .content-container { padding: 0.5rem !important; animation: none !important; }
+        .card { border: 1px solid #ccc !important; box-shadow: none !important; }
+        table { border: 1px solid #999 !important; }
+        th, td { border: 1px solid #aaa !important; color: black !important; background: white !important; padding: 0.4rem !important; }
+        .subject-block { background: white !important; border: 1px solid #ccc !important; color: black !important; }
+        .subject-block-name { color: black !important; -webkit-text-fill-color: black !important; }
+        .timetable-header-row th { background: #f0f0f0 !important; color: black !important; }
+        .timetable-time-cell { background: #f0f0f0 !important; }
     }
-    .print-header { display: none; }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- Document Header -->
-<div class="print-header" style="margin-bottom:16px; border-bottom:2px solid #000; padding-bottom:12px;">
-    <strong style="font-size:1rem;">Academic Timetable</strong> &nbsp;|&nbsp;
-    {{ class_name }} &nbsp;·&nbsp; Semester {{ semester }}
-</div>
-
-<div class="flex items-center justify-between mb-6 anim-fade-up" style="flex-wrap:wrap; gap:12px;">
+<!-- Page Header -->
+<div class="flex items-center justify-between mb-8 anim-fade-up" style="flex-wrap:wrap; gap:1rem;">
     <div>
-        <div class="flex items-center gap-3 mb-2">
-            <h1 class="page-title" style="margin-bottom:0;">Generated Schedule</h1>
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+            <i class="fas fa-calendar-alt" style="color:var(--primary-light); font-size:1.5rem;"></i>
+            <h1 class="page-title" style="margin-bottom:0;">Generated Timetable</h1>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+            <p class="page-subtitle" style="margin-bottom:0;">
+                Academic Schedule for <strong style="color:var(--text-main);">{{ class_name }}</strong>
+            </p>
+            <span class="badge badge-ind">
+                <i class="fas fa-list-ol" style="font-size:0.55rem;"></i>
+                Semester {{ semester }}
+            </span>
             <span class="badge badge-green">
-                <i class="fas fa-check-circle" style="font-size:0.55rem;"></i> AI Generated
+                <i class="fas fa-check-circle" style="font-size:0.55rem;"></i>
+                AI Generated
             </span>
         </div>
-        <div class="flex items-center gap-2">
-            <span style="font-size:0.8125rem; color:var(--text-tertiary);">{{ class_name }}</span>
-            <span style="color:var(--text-disabled);">·</span>
-            <span class="badge badge-primary">Semester {{ semester }}</span>
-        </div>
     </div>
-    <div class="timetable-action-row flex gap-2">
+
+    <!-- Action buttons — class/action/method preserved -->
+    <div class="timetable-action-row" style="display:flex; gap:0.75rem; flex-wrap:wrap;">
         {% if class_name and semester %}
-        <a href="{{ url_for('generation.regenerate_quick') }}" class="btn btn-secondary btn-sm">
-            <i class="fas fa-redo" style="font-size:0.7rem;"></i> Regenerate
+        <a href="{{ url_for('generation.regenerate_quick') }}" class="btn btn-secondary">
+            <i class="fas fa-redo"></i> Regenerate
         </a>
         {% endif %}
-        <a href="/modify_timetable" class="btn btn-secondary btn-sm">
-            <i class="fas fa-pencil" style="font-size:0.7rem;"></i> Modify
+        <a href="/modify_timetable" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Modify Manually
         </a>
-        <button onclick="window.print()" class="btn btn-primary btn-sm">
-            <i class="fas fa-print" style="font-size:0.7rem;"></i> Print / PDF
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Print / Export PDF
         </button>
     </div>
 </div>
 
-<!-- Timetable -->
+<!-- Timetable Grid -->
 <div class="card timetable-card anim-fade-up delay-100">
-    <div style="overflow-x:auto;">
-        <table style="min-width:720px; border-collapse:collapse;">
+    <div class="table-container" style="border:none; border-radius:0; margin-top:0;">
+        <table style="border-collapse:collapse;">
             <thead>
                 <tr class="timetable-header-row">
-                    <th style="min-width:88px; text-align:left; padding-left:14px;">Time</th>
-                    <th>Monday</th>
-                    <th>Tuesday</th>
-                    <th>Wednesday</th>
-                    <th>Thursday</th>
-                    <th>Friday</th>
-                    <th>Saturday</th>
+                    <th style="background:linear-gradient(135deg,#0F172A,#1E293B); color:rgba(148,163,184,0.7); min-width:110px; padding:0.875rem 1rem; font-size:0.7rem; letter-spacing:0.1em; border-right:2px solid rgba(255,255,255,0.08); text-align:left;">TIME SLOT</th>
+                    <th>MONDAY</th>
+                    <th>TUESDAY</th>
+                    <th>WEDNESDAY</th>
+                    <th>THURSDAY</th>
+                    <th>FRIDAY</th>
+                    <th>SATURDAY</th>
                 </tr>
             </thead>
             <tbody>
-                {% set chips = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'] %}
-                {% set subject_map = namespace(data={}, idx=0) %}
+                {% set colors = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'] %}
+                {% set subject_map = namespace(data={}) %}
 
                 {% for entry in timeslots %}
                 <tr {% if entry.type == 'break' %}class="timetable-break-row"{% endif %}>
 
                     {% if entry.type == 'break' %}
-                    <td class="timetable-time-cell" style="color:var(--warning);">
+                    <td class="timetable-time-cell" style="color:var(--accent);">
                         {{ entry.time[:5] }}
                     </td>
-                    <td colspan="6" style="padding:8px 14px !important; vertical-align:middle;">
-                        <div class="break-label">
+                    <td colspan="6">
+                        <div class="break-label" style="justify-content:center;">
                             <div class="break-line"></div>
-                            <i class="fas fa-coffee" style="font-size:0.7rem;"></i>
+                            <i class="fas fa-coffee" style="font-size:0.75rem;"></i>
                             Recess Break
                             <div class="break-line"></div>
                         </div>
@@ -107,18 +110,20 @@
 
                     {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
                     <td class="timetable-subject-cell">
-                        {% set subj = timetable.get((day, entry.time)) %}
-                        {% if subj %}
-                            {% if subj not in subject_map.data %}
-                                {% set _ = subject_map.data.update({subj: chips[subject_map.idx % 6]}) %}
-                                {% set subject_map.idx = subject_map.idx + 1 %}
-                            {% endif %}
-                            <div class="subject-block {{ subject_map.data[subj] }}">
+                        {% if timetable.get((day, entry.time)) %}
+                            {% set subj = timetable[(day, entry.time)] %}
+                            {% set cidx = (loop.index0 + loop.revindex) % 6 %}
+                            <div class="subject-block {{ colors[cidx] }}">
                                 <div class="subject-block-name">{{ subj }}</div>
-                                <div class="subject-block-label">Lecture</div>
+                                <div class="subject-block-label">
+                                    <i class="fas fa-chalkboard-teacher" style="font-size:0.55rem;"></i>
+                                    Live Session
+                                </div>
                             </div>
                         {% else %}
-                            <div class="empty-cell"><i class="fas fa-minus" style="font-size:0.55rem;"></i></div>
+                            <div class="empty-cell">
+                                <i class="fas fa-minus" style="font-size:0.55rem;"></i>
+                            </div>
                         {% endif %}
                     </td>
                     {% endfor %}
@@ -131,24 +136,24 @@
     </div>
 </div>
 
-<!-- Legend + meta row -->
-<div class="card anim-fade-up delay-200" style="display:flex; align-items:center; gap:20px; flex-wrap:wrap; padding:12px 18px;">
-    <span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-disabled);">Legend</span>
-    <div class="flex items-center gap-2" style="font-size:0.78rem;">
-        <div style="width:12px; height:12px; border-radius:3px; border-left:2px solid #3B82F6; background:#EFF6FF;"></div>
-        <span style="color:var(--text-tertiary);">Subject</span>
+<!-- Legend -->
+<div class="card anim-fade-up delay-200" style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; padding:1rem 1.5rem; margin-top:0;">
+    <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em;">Legend</span>
+    <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.78rem;">
+        <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--primary-light); background:rgba(37,99,235,0.1);"></div>
+        <span style="color:var(--text-muted);">Subject Block</span>
     </div>
-    <div class="flex items-center gap-2" style="font-size:0.78rem;">
-        <div style="width:12px; height:12px; border-radius:3px; border-left:2px solid #EAB308; background:#FFFBEB;"></div>
-        <span style="color:var(--text-tertiary);">Break</span>
+    <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.78rem;">
+        <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--accent); background:rgba(217,119,6,0.1);"></div>
+        <span style="color:var(--text-muted);">Recess Break</span>
     </div>
-    <div class="flex items-center gap-2" style="font-size:0.78rem;">
-        <div style="width:12px; height:12px; border-radius:3px; background:var(--bg-subtle); opacity:0.5;"></div>
-        <span style="color:var(--text-tertiary);">Free</span>
+    <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.78rem;">
+        <div style="width:12px; height:12px; border-radius:3px; background:var(--bg-muted); opacity:0.5;"></div>
+        <span style="color:var(--text-muted);">Free Slot</span>
     </div>
-    <div style="margin-left:auto; font-size:0.72rem; color:var(--text-disabled); display:flex; align-items:center; gap:4px;">
-        <i class="fas fa-brain" style="color:var(--primary-light); font-size:0.65rem;"></i>
-        Genetic Algorithm Engine
+    <div style="margin-left:auto; display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-faint);">
+        <i class="fas fa-brain" style="color:var(--primary-light);"></i>
+        Generated by Genetic Algorithm Engine
     </div>
 </div>
 
