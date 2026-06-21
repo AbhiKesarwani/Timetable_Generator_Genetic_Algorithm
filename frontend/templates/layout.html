@@ -234,28 +234,61 @@
         const sidebar        = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
 
+        // iOS Safari scroll lock: body overflow:hidden alone doesn't work on iOS.
+        // We use the position:fixed trick with scroll position preservation.
+        let _scrollY = 0;
+
+        function lockScroll() {
+            _scrollY = window.scrollY;
+            document.body.style.position  = 'fixed';
+            document.body.style.top       = `-${_scrollY}px`;
+            document.body.style.width     = '100%';
+            document.body.style.overflow  = 'hidden';
+        }
+        function unlockScroll() {
+            document.body.style.position  = '';
+            document.body.style.top       = '';
+            document.body.style.width     = '';
+            document.body.style.overflow  = '';
+            window.scrollTo(0, _scrollY);
+        }
+
         function openSidebar() {
             sidebar.classList.add('mobile-open');
             sidebarOverlay.classList.add('active');
             hamburgerBtn.setAttribute('aria-expanded', 'true');
-            document.body.style.overflow = 'hidden';
+            lockScroll();
         }
         function closeSidebar() {
             sidebar.classList.remove('mobile-open');
             sidebarOverlay.classList.remove('active');
             hamburgerBtn.setAttribute('aria-expanded', 'false');
-            document.body.style.overflow = '';
+            unlockScroll();
         }
 
         hamburgerBtn.addEventListener('click', () => {
             sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
         });
+
+        // Use both click and touchstart for faster iOS response
         sidebarOverlay.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            closeSidebar();
+        }, { passive: false });
 
         // Close sidebar on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeSidebar();
         });
+
+        // Close sidebar when any nav link is tapped on mobile
+        sidebar.querySelectorAll('.nav-item').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 768) closeSidebar();
+            });
+        });
+
 
         // ---- Active Nav Link ----
         const currentPath = window.location.pathname;

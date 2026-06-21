@@ -153,8 +153,26 @@ def perform_timetable_generation(class_name, semester, priorities, school_id):
                 for b_slot in break_slots:
                     invalid_slots[subj_name].add((day, b_slot))
 
+        # 6b. Fetch holiday/blocked days for this school
+        blocked_days = []
+        try:
+            cursor.execute(
+                "SELECT day_name FROM school_holidays WHERE school_id = %s",
+                (school_id,)
+            )
+            holiday_rows = cursor.fetchall()
+            blocked_days = [row['day_name'] for row in holiday_rows]
+        except Exception:
+            # Fallback to session cache if table doesn't exist yet
+            blocked_days = session.get('holiday_days', [])
+
         # 7. Algorithm Call
-        timetable_result = genetic_algorithm(subjects, timeslots, final_priorities, credits_map, invalid_slots=invalid_slots)
+        timetable_result = genetic_algorithm(
+            subjects, timeslots, final_priorities, credits_map,
+            invalid_slots=invalid_slots,
+            blocked_days=blocked_days
+        )
+
 
         for entry in timetable_result:
             if isinstance(entry["timeslot"], timedelta):  

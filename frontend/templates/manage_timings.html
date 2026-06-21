@@ -106,9 +106,65 @@
                 </div>
             </div>
 
+            <!-- Section: Holiday / Off Days -->
+            <div class="form-section-title" style="margin-top:1.5rem;">
+                <i class="fas fa-calendar-times" style="color:var(--danger);"></i>
+                Holiday &amp; Off Days
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.875rem; line-height:1.6;">
+                Select days that are always blocked. The AI generator will never schedule classes on these days.
+                <strong>Sunday is always blocked</strong> and cannot be changed.
+            </p>
+
+            <!-- Day selector grid -->
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:0.5rem; margin-bottom:1.25rem;">
+
+                <!-- Sunday: always blocked, permanently disabled -->
+                <label style="display:flex; flex-direction:column; align-items:center; gap:0.3rem; padding:0.625rem 0.5rem;
+                              background:rgba(220,38,38,0.06); border:1.5px solid rgba(220,38,38,0.25);
+                              border-radius:var(--radius); cursor:not-allowed; opacity:0.6;">
+                    <input type="checkbox" checked disabled
+                           style="width:16px; height:16px; accent-color:var(--danger);">
+                    <span style="font-size:0.72rem; font-weight:600; color:var(--danger);">Sun</span>
+                    <span style="font-size:0.6rem; color:var(--text-faint);">Always</span>
+                </label>
+
+                {% set days_map = [
+                    ('Monday',    'Mon', 'var(--primary-light)', 'rgba(37,99,235,0.1)', 'rgba(37,99,235,0.3)'),
+                    ('Tuesday',   'Tue', 'var(--primary-light)', 'rgba(37,99,235,0.1)', 'rgba(37,99,235,0.3)'),
+                    ('Wednesday', 'Wed', 'var(--secondary)',     'rgba(79,70,229,0.1)', 'rgba(79,70,229,0.3)'),
+                    ('Thursday',  'Thu', 'var(--primary-light)', 'rgba(37,99,235,0.1)', 'rgba(37,99,235,0.3)'),
+                    ('Friday',    'Fri', 'var(--success)',        'rgba(5,150,105,0.1)', 'rgba(5,150,105,0.3)'),
+                    ('Saturday',  'Sat', 'var(--accent)',         'rgba(217,119,6,0.1)', 'rgba(217,119,6,0.3)')
+                ] %}
+
+                {% for day_name, day_short, color, bg, border in days_map %}
+                {% set is_holiday = day_name in (saved_holidays or []) %}
+                <label style="display:flex; flex-direction:column; align-items:center; gap:0.3rem; padding:0.625rem 0.5rem;
+                              background:{{ bg if is_holiday else 'var(--bg-muted)' }};
+                              border:1.5px solid {{ border if is_holiday else 'var(--border)' }};
+                              border-radius:var(--radius); cursor:pointer;
+                              transition:all 0.15s ease;"
+                      onmouseover="this.style.borderColor='{{ border }}';"
+                      onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='var(--border)';"
+                      onclick="var cb=this.querySelector('input'); setTimeout(()=>{ this.style.background=cb.checked?'{{ bg }}':'var(--bg-muted)'; this.style.borderColor=cb.checked?'{{ border }}':'var(--border)'; }, 10);">
+                    <input type="checkbox" name="holiday_days" value="{{ day_name }}"
+                           {{ 'checked' if is_holiday else '' }}
+                           style="width:16px; height:16px; accent-color:{{ color }};">
+                    <span style="font-size:0.72rem; font-weight:600; color:{{ color }};">{{ day_short }}</span>
+                    <span style="font-size:0.6rem; color:var(--text-faint);">{{ 'Off' if is_holiday else 'On' }}</span>
+                </label>
+                {% endfor %}
+
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-faint); display:flex; align-items:center; gap:0.35rem; margin-bottom:1.25rem;">
+                <i class="fas fa-info-circle" style="color:var(--primary-light);"></i>
+                Checked days will be excluded from all future timetable generations.
+            </div>
+
             <button type="submit" class="btn btn-primary w-full" style="margin-top:0.5rem;">
                 <i class="fas fa-check-double"></i>
-                Save Schedule Configuration
+                Save Schedule &amp; Holiday Configuration
             </button>
         </form>
     </div>

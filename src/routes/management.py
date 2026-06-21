@@ -157,6 +157,26 @@ def manage_subjects():
 @management_bp.route('/manage_timings', methods=['GET', 'POST'])
 @login_required
 def manage_timings():
+    # Ensure holidays table exists (safe migration — runs on first visit only)
+    try:
+        _db_init = connect_db()
+        _c = _db_init.cursor()
+        _c.execute("""
+            CREATE TABLE IF NOT EXISTS school_holidays (
+                id       INT AUTO_INCREMENT PRIMARY KEY,
+                school_id INT NOT NULL,
+                day_name  VARCHAR(20) NOT NULL,
+                UNIQUE KEY uq_school_day (school_id, day_name)
+            )
+        """)
+        _db_init.commit()
+        _c.close()
+        _db_init.close()
+    except Exception:
+        pass  # Table may already exist; non-blocking
+
+    VALID_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
     if request.method == 'POST':
         start_time_str = request.form.get('start_time')
         lecture_duration = int(request.form.get('lecture_duration'))
@@ -196,8 +216,31 @@ def manage_timings():
             flash(f'Error updating timings: {str(e)}', 'error')
         finally:
             db.close()
+
+        # Save holiday selections
+        selected_holidays = [d for d in request.form.getlist('holiday_days') if d in VALID_DAYS]
+        try:
+            h_db = connect_db()
+            h_cursor = h_db.cursor()
+            # Clear existing holidays for this school
+            h_cursor.execute("DELETE FROM school_holidays WHERE school_id = %s", (session['school_id'],))
+            # Insert newly selected holidays
+            for day in selected_holidays:
+                h_cursor.execute(
+                    "INSERT IGNORE INTO school_holidays (school_id, day_name) VALUES (%s, %s)",
+                    (session['school_id'], day)
+                )
+            h_db.commit()
+            h_cursor.close()
+            h_db.close()
+            # Cache in session for fast access during timetable generation
+            session['holiday_days'] = selected_holidays
+        except Exception as e:
+            flash(f'Note: Holiday settings could not be saved: {str(e)}', 'info')
+
         return redirect(url_for('management.manage_timings'))
 
+    # ── GET: load config and saved holidays ──────────────────────────────────
     config = session.get('time_config')
     if config and 'num_lectures' not in config:
         try:
@@ -206,7 +249,6 @@ def manage_timings():
             l_dur = int(config.get('lecture_duration', 60))
             b_dur = int(config.get('break_duration', 0))
             b_start_str = config.get('break_start')
-            total_duration = (e_time - s_time).seconds / 60
             if b_start_str:
                 b_start = datetime.strptime(b_start_str, "%H:%M")
                 lectures_before = (b_start - s_time).seconds / 60 / l_dur
@@ -215,7 +257,23 @@ def manage_timings():
                 config['num_lectures'] = int(lectures_before + lectures_after)
                 config['break_after'] = int(lectures_before)
             else:
-                config['num_lectures'] = int(total_duration / l_dur)
+                config['num_lectures'] = int(((e_time - s_time).seconds / 60) / l_dur)
                 config['break_after'] = 0
-        except Exception: pass
-    return render_template('manage_timings.html', config=config)
+        except Exception:
+            pass
+
+    # Fetch saved holidays from DB (fallback to session cache)
+    saved_holidays = []
+    try:
+        h_db = connect_db()
+        h_cursor = h_db.cursor()
+        h_cursor.execute("SELECT day_name FROM school_holidays WHERE school_id = %s", (session['school_id'],))
+        saved_holidays = [row[0] for row in h_cursor.fetchall()]
+        h_cursor.close()
+        h_db.close()
+        session['holiday_days'] = saved_holidays  # keep session in sync
+    except Exception:
+        saved_holidays = session.get('holiday_days', [])
+
+    return render_template('manage_timings.html', config=config, saved_holidays=saved_holidays)
+
