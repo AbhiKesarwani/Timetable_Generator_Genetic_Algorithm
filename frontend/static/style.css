@@ -157,6 +157,17 @@
     box-sizing: border-box;
 }
 
+img, svg, video {
+    max-width: 100%;
+    height: auto;
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -631,7 +642,8 @@ body {
    CONTENT AREA
    ============================================================ */
 .content-container {
-    padding: var(--space-8);
+    --container-padding: var(--space-8);
+    padding: var(--container-padding);
     flex: 1;
     animation: fadeInUp 0.35s ease both;
 }
@@ -1638,282 +1650,7 @@ tbody tr:hover td {
     .page-title { color: black !important; }
 }
 
-/* ============================================================
-   RESPONSIVE BREAKPOINTS — COMPLETE SYSTEM
-   Tested: 1920 / 1600 / 1440 / 1366 / 1280 / 1024 / 900 / 768 / 480 / 430 / 390 / 375 / 320px
-   ============================================================ */
-
-/* ── Global: ensure no element causes horizontal overflow ── */
-body { overflow-x: hidden; }
-img, svg, video { max-width: 100%; height: auto; }
-
-/* ── Timetable grids: always scrollable ── */
-.timetable-card .table-container,
-#timetableContainer .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-.timetable-card table,
-#timetableContainer table {
-    min-width: 700px; /* prevent collapse, force horizontal scroll on mobile */
-}
-
-/* ── Touch-target minimum 44px for all interactive elements ── */
-.btn           { min-height: 44px; }
-.btn-sm        { min-height: 36px; padding: 0.5rem 0.875rem; }
-.nav-item      { min-height: 44px; }
-.filter-chip   { min-height: 36px; }
-.topbar-icon-btn,
-.theme-toggle  { width: 44px; height: 44px; }
-
-/* ── Large Desktop (≤1440px): minor content width adjustments ── */
-@media (max-width: 1440px) {
-    .campus-hero-content { max-width: 1200px; }
-}
-
-/* ── Desktop / Large Laptop (≤1280px) ── */
-@media (max-width: 1280px) {
-    .content-container { padding: var(--space-6); }
-    .campus-hero-content { padding: 4rem var(--space-6); }
-}
-
-/* ── Laptop (≤1366px / ≤1024px) ── */
-@media (max-width: 1024px) {
-    :root { --sidebar-width: 240px; }
-
-    /* Grid collapses */
-    .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
-
-    /* Home: hero illustration hidden — one column */
-    .campus-hero-content { grid-template-columns: 1fr; gap: 2rem; }
-    .campus-hero-right   { display: none; }
-
-    /* Home sections */
-    .how-it-works-grid  { grid-template-columns: repeat(2, 1fr); }
-    .metrics-grid       { grid-template-columns: repeat(2, 1fr); }
-    .showcase-grid      { grid-template-columns: repeat(2, 1fr); }
-    .benefits-grid      { grid-template-columns: repeat(2, 1fr); }
-
-    /* Remove sticky on sidebar form panels at tablet — avoid overlap */
-    .card[style*="position:sticky"],
-    .card[style*="position: sticky"] {
-        position: relative !important;
-        top: auto !important;
-    }
-}
-
-/* ── Tablet (≤900px) ── */
-@media (max-width: 900px) {
-    .grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
-
-    .page-hero   { padding: var(--space-8) var(--space-6); }
-    .page-banner-content { padding: 1.5rem; }
-    .page-banner-title   { font-size: 1.35rem; }
-
-    /* Campus hero */
-    .campus-hero { min-height: 70vh; }
-    .campus-hero-subtitle { font-size: 0.95rem; }
-}
-
-/* ── Tablet / Large Mobile (≤768px) ── */
-@media (max-width: 768px) {
-    :root { --sidebar-width: 280px; }
-
-    /* --- Sidebar: offscreen until hamburger opens --- */
-    .sidebar {
-        transform: translateX(-100%);
-        box-shadow: var(--shadow-xl);
-        z-index: var(--z-sidebar);
-    }
-    .sidebar.mobile-open  { transform: translateX(0); }
-    .sidebar-overlay      { display: block; }
-
-    /* --- Main layout --- */
-    .main-wrapper     { margin-left: 0 !important; }
-    .hamburger-btn    { display: flex !important; }
-    .content-container { padding: var(--space-4); }
-    .top-bar          { padding: 0 var(--space-4); }
-    .topbar-chip      { display: none; }
-
-    /* --- Grid system: all collapse to 1 column --- */
-    .grid-cols-2,
-    .grid-cols-3,
-    .grid-cols-4 { grid-template-columns: 1fr; }
-    .col-span-2,
-    .col-span-3  { grid-column: span 1; }
-
-    /* --- Remove ALL sticky positioning on content cards (prevents overlap) --- */
-    .card[style*="position:sticky"],
-    .card[style*="position: sticky"] {
-        position: static !important;
-        top: auto !important;
-    }
-
-    /* --- Typography --- */
-    .landing-title  { font-size: 2rem; }
-    .page-title     { font-size: 1.5rem; }
-    .hero-title     { font-size: 1.4rem; }
-
-    /* --- Misc cards --- */
-    .page-hero   { padding: var(--space-6); border-radius: var(--radius-md); }
-    .danger-zone { flex-direction: column; align-items: flex-start; }
-    .stat-card   { padding: var(--space-4); }
-    .site-footer { flex-direction: column; text-align: center; }
-
-    /* --- Campus hero --- */
-    .campus-hero          { min-height: 55vh; }
-    .campus-hero-content  { padding: 3rem var(--space-5); grid-template-columns: 1fr; }
-    .campus-hero-title    { font-size: 2rem; }
-    .campus-hero-subtitle { font-size: 0.9rem; max-width: 100%; }
-    .campus-hero-cta      { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-    .campus-hero-cta .btn { width: 100%; justify-content: center; }
-    .campus-hero-trust    { gap: 0.75rem; }
-
-    /* --- How it works: 2 cols → 1 col on small tablet --- */
-    .how-it-works-grid         { grid-template-columns: repeat(2, 1fr); }
-    .how-it-works-grid::before { display: none; }
-
-    /* --- Home page grids --- */
-    .metrics-grid   { grid-template-columns: repeat(2, 1fr); }
-    .showcase-grid  { grid-template-columns: 1fr; }
-    .benefits-grid  { grid-template-columns: repeat(2, 1fr); }
-
-    /* --- Welcome panel: stack on mobile --- */
-    .welcome-panel { flex-direction: column; align-items: flex-start; gap: 1rem; }
-
-    /* --- Page banner padding --- */
-    .page-banner          { min-height: 140px; }
-    .page-banner-content  { padding: 1.25rem 1rem; }
-    .page-banner-title    { font-size: 1.2rem; gap: 0.4rem; }
-    .page-banner-subtitle { font-size: 0.8rem; }
-
-    /* --- Timetable action buttons: stack --- */
-    .timetable-action-row { flex-direction: column; align-items: stretch !important; }
-    .timetable-action-row .btn { width: 100%; justify-content: center; }
-
-    /* --- Legend row: wrap --- */
-    .card[style*="legend"],
-    .card:has(.timetable-timestamp) { flex-wrap: wrap !important; }
-
-    /* --- Faculty table: hide dept column on tablet --- */
-    table .dept-col { display: none; }
-
-    /* --- Modify timetable form: force scroll on table --- */
-    #modifyForm .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    #modifyForm table { min-width: 520px; }
-}
-
-/* ── Mobile (≤480px) ── */
-@media (max-width: 480px) {
-    /* --- Grids --- */
-    .landing-cta { flex-direction: column; align-items: center; }
-    .how-it-works-grid { grid-template-columns: 1fr; }
-    .metrics-grid      { grid-template-columns: repeat(2, 1fr); }
-    .benefits-grid     { grid-template-columns: 1fr; }
-    .showcase-grid     { grid-template-columns: 1fr; }
-
-    /* --- Timetable --- */
-    .timetable-subject-cell { height: 70px; }
-
-    /* --- Typography --- */
-    .feature-card  { padding: var(--space-4); }
-    .page-title    { font-size: 1.35rem; }
-    .section-title { font-size: 1.35rem; }
-
-    /* --- Avatar span text in topbar --- */
-    .topbar-avatar span { display: none; }
-
-    /* --- Campus hero min height --- */
-    .campus-hero { min-height: 50vh; }
-    .campus-hero-title { font-size: clamp(1.6rem, 7vw, 2rem); }
-    .campus-hero-content { padding: 2.5rem var(--space-4); }
-    .campus-hero-badge { font-size: 0.65rem; margin-bottom: 1rem; }
-
-    /* --- Metrics section vertical padding --- */
-    .metrics-section { padding: 2rem 0; }
-    .metric-num      { font-size: 2rem; }
-
-    /* --- Page banner: reduce size more --- */
-    .page-banner { min-height: 120px; }
-    .page-banner-title { font-size: 1.1rem; }
-
-    /* --- Search bar: full width --- */
-    .search-bar { flex-direction: column; align-items: stretch; }
-
-    /* --- Filter chips: wrap to 2 per row --- */
-    .filter-chips { gap: 0.35rem; }
-
-    /* --- Timetable legend: wrap --- */
-    .card:has(.break-label) { flex-wrap: wrap; }
-
-    /* --- Dashboard grid stats: 2 col force --- */
-    /* already 1 col from 768 breakpoint — that's fine for mobile */
-
-    /* --- Form grid on view timetable: stack selects --- */
-    .grid-cols-2 { grid-template-columns: 1fr; }
-
-    /* --- Button groups: full width --- */
-    .campus-hero-cta .btn,
-    .how-step .btn,
-    .card .btn-lg { width: 100%; }
-}
-
-/* ── Small Mobile (≤430px) ── */
-@media (max-width: 430px) {
-    .content-container { padding: 0.875rem; }
-    .card              { padding: var(--space-4); }
-    .page-hero         { padding: var(--space-5) var(--space-4); }
-    .stat-value        { font-size: 1.6rem; }
-
-    /* Topbar: compact */
-    .top-bar           { padding: 0 0.875rem; }
-    .topbar-icon-btn,
-    .theme-toggle      { width: 40px; height: 40px; font-size: 0.85rem; }
-
-    /* Prevent text overflow in table cells */
-    td { max-width: 180px; word-break: break-word; }
-
-    /* Sidebar-footer text shrink */
-    .sidebar-semester-chip { font-size: 0.6rem; }
-}
-
-/* ── Extra Small (≤390px) ── */
-@media (max-width: 390px) {
-    .campus-hero-title { font-size: 1.6rem; }
-    .campus-hero-subtitle { font-size: 0.85rem; }
-    .how-step { padding: 1rem 0.75rem; }
-    .how-step-num { width: 44px; height: 44px; font-size: 1.1rem; }
-    .section-header { margin-bottom: 1.5rem; }
-    .page-banner-content { padding: 1rem; }
-    .page-banner-title { font-size: 1rem; }
-}
-
-/* ── Tiny (≤375px) ── */
-@media (max-width: 375px) {
-    :root {
-        --space-8: 1.5rem;
-        --space-6: 1.25rem;
-    }
-    .content-container { padding: 0.75rem; }
-    .card              { padding: 0.875rem; }
-    .page-title        { font-size: 1.2rem; }
-    .badge             { font-size: 0.62rem; }
-    .filter-chip       { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
-    .campus-hero-trust { display: none; } /* Too cramped at 375 */
-}
-
-/* ── 320px (absolute minimum) ── */
-@media (max-width: 320px) {
-    body { font-size: 14px; }
-    .content-container { padding: 0.625rem; }
-    .card { padding: 0.75rem; border-radius: var(--radius); }
-    .btn  { font-size: 0.8rem; padding: 0.5rem 0.875rem; min-height: 42px; }
-    .page-title { font-size: 1.1rem; }
-    .sidebar-brand-name { font-size: 0.8rem; }
-    .hero-illustration-card { padding: 0.875rem; }
-    .hero-stat-num { font-size: 0.9rem; }
-    .metric-num    { font-size: 1.75rem; }
-}
+/* Media queries moved to the end of the file for CSS cascade correctness */
 
 
 /* ============================================================
@@ -2597,4 +2334,294 @@ img, svg, video { max-width: 100%; height: auto; }
     animation: pulse-ring 2s infinite;
 }
 
-/* All responsive rules consolidated in the RESPONSIVE BREAKPOINTS section above */
+/* All responsive rules consolidated in the RESPONSIVE BREAKPOINTS section below */
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS — COMPLETE SYSTEM
+   Tested: 1920 / 1600 / 1440 / 1366 / 1280 / 1024 / 900 / 768 / 480 / 430 / 390 / 375 / 320px
+   ============================================================ */
+
+/* ── Global: ensure no element causes horizontal overflow ── */
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* ── Timetable grids: always scrollable ── */
+.timetable-card .table-container,
+#timetableContainer .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.timetable-card table,
+#timetableContainer table {
+    min-width: 700px; /* prevent collapse, force horizontal scroll on mobile */
+}
+
+/* ── Touch-target minimum 44px for all interactive elements ── */
+.btn           { min-height: 44px; }
+.btn-sm        { min-height: 36px; padding: 0.5rem 0.875rem; }
+.nav-item      { min-height: 44px; }
+.filter-chip   { min-height: 36px; }
+.topbar-icon-btn,
+.theme-toggle  { width: 44px; height: 44px; }
+
+/* ── Large Desktop (≤1440px): minor content width adjustments ── */
+@media (max-width: 1440px) {
+    .campus-hero-content { max-width: 1200px; }
+}
+
+/* ── Desktop / Large Laptop (≤1280px) ── */
+@media (max-width: 1280px) {
+    .content-container { --container-padding: var(--space-6); padding: var(--container-padding); }
+    .campus-hero-content { padding: 4rem var(--space-6); }
+}
+
+/* ── Laptop (≤1366px / ≤1024px) ── */
+@media (max-width: 1024px) {
+    :root { --sidebar-width: 240px; }
+
+    /* Remove sticky on sidebar form panels at tablet — avoid overlap */
+    .card[style*="position:sticky"],
+    .card[style*="position: sticky"] {
+        position: relative !important;
+        top: auto !important;
+    }
+
+    /* Home: hero illustration hidden — one column */
+    .campus-hero-content { grid-template-columns: 1fr; gap: 2rem; }
+    .campus-hero-right   { display: none; }
+}
+
+/* ── Tablet (≤900px) ── */
+@media (max-width: 900px) {
+    .page-hero   { padding: var(--space-8) var(--space-6); }
+    .page-banner-content { padding: 1.5rem; }
+    .page-banner-title   { font-size: 1.35rem; }
+
+    /* Campus hero */
+    .campus-hero { min-height: 70vh; }
+    .campus-hero-subtitle { font-size: 0.95rem; }
+}
+
+/* ── Tablet / Large Mobile (≤768px) ── */
+@media (max-width: 768px) {
+    :root { --sidebar-width: 280px; }
+
+    /* --- Sidebar: offscreen until hamburger opens --- */
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: var(--shadow-xl);
+        z-index: var(--z-sidebar);
+    }
+    .sidebar.mobile-open  { transform: translateX(0); }
+    .sidebar-overlay      { display: block; }
+
+    /* --- Main layout --- */
+    .main-wrapper     { margin-left: 0 !important; max-width: 100% !important; overflow-x: hidden !important; }
+    .hamburger-btn    { display: flex !important; }
+    .content-container { --container-padding: var(--space-4); padding: var(--container-padding); }
+    .top-bar          { padding: 0 var(--space-4); }
+    .topbar-chip      { display: none; }
+
+    /* --- Remove ALL sticky positioning on content cards (prevents overlap) --- */
+    .card[style*="position:sticky"],
+    .card[style*="position: sticky"] {
+        position: static !important;
+        top: auto !important;
+    }
+
+    /* --- Typography --- */
+    .landing-title  { font-size: 2rem; }
+    .page-title     { font-size: 1.5rem; }
+    .hero-title     { font-size: 1.4rem; }
+
+    /* --- Misc cards --- */
+    .page-hero   { padding: var(--space-6); border-radius: var(--radius-md); }
+    .danger-zone { flex-direction: column; align-items: flex-start; }
+    .stat-card   { padding: var(--space-4); }
+    .site-footer { flex-direction: column; text-align: center; }
+
+    /* --- Campus hero --- */
+    .campus-hero          { min-height: 55vh; }
+    .campus-hero-content  { padding: 3rem var(--space-5); grid-template-columns: 1fr; }
+    .campus-hero-title    { font-size: 2rem; }
+    .campus-hero-subtitle { font-size: 0.9rem; max-width: 100%; }
+    .campus-hero-cta      { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .campus-hero-cta .btn { width: 100%; justify-content: center; }
+    .campus-hero-trust    { gap: 0.75rem; }
+
+    /* --- How it works: connector line hidden --- */
+    .how-it-works-grid::before { display: none; }
+
+    /* --- Welcome panel: stack on mobile --- */
+    .welcome-panel { flex-direction: column; align-items: flex-start; gap: 1rem; }
+
+    /* --- Page banner padding --- */
+    .page-banner          { min-height: 140px; }
+    .page-banner-content  { padding: 1.25rem 1rem; }
+    .page-banner-title    { font-size: 1.2rem; gap: 0.4rem; }
+    .page-banner-subtitle { font-size: 0.8rem; }
+
+    /* --- Timetable action buttons: stack --- */
+    .timetable-action-row { flex-direction: column; align-items: stretch !important; }
+    .timetable-action-row .btn { width: 100%; justify-content: center; }
+
+    /* --- Legend row: wrap --- */
+    .card[style*="legend"],
+    .card:has(.timetable-timestamp) { flex-wrap: wrap !important; }
+
+    /* --- Faculty table: hide dept column on tablet --- */
+    table .dept-col { display: none; }
+
+    /* --- Modify timetable form: force scroll on table --- */
+    #modifyForm .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    #modifyForm table { min-width: 520px; }
+}
+
+/* ── Mobile (≤480px) ── */
+@media (max-width: 480px) {
+    .landing-cta { flex-direction: column; align-items: center; }
+
+    /* --- Timetable --- */
+    .timetable-subject-cell { height: 70px; }
+
+    /* --- Typography --- */
+    .feature-card  { padding: var(--space-4); }
+    .page-title    { font-size: 1.35rem; }
+    .section-title { font-size: 1.35rem; }
+
+    /* --- Avatar span text in topbar --- */
+    .topbar-avatar span { display: none; }
+
+    /* --- Campus hero min height --- */
+    .campus-hero { min-height: 50vh; }
+    .campus-hero-title { font-size: clamp(1.6rem, 7vw, 2rem); }
+    .campus-hero-content { padding: 2.5rem var(--space-4); }
+    .campus-hero-badge { font-size: 0.65rem; margin-bottom: 1rem; }
+
+    /* --- Metrics section vertical padding --- */
+    .metrics-section { padding: 2rem 0; }
+    .metric-num      { font-size: 2rem; }
+
+    /* --- Page banner: reduce size more --- */
+    .page-banner { min-height: 120px; }
+    .page-banner-title { font-size: 1.1rem; }
+
+    /* --- Search bar: full width --- */
+    .search-bar { flex-direction: column; align-items: stretch; }
+
+    /* --- Filter chips: wrap to 2 per row --- */
+    .filter-chips { gap: 0.35rem; }
+
+    /* --- Timetable legend: wrap --- */
+    .card:has(.break-label) { flex-wrap: wrap; }
+
+    /* --- Button groups: full width --- */
+    .campus-hero-cta .btn,
+    .how-step .btn,
+    .card .btn-lg { width: 100%; }
+}
+
+/* ── Small Mobile (≤430px) ── */
+@media (max-width: 430px) {
+    .content-container { --container-padding: 0.875rem; padding: var(--container-padding); }
+    .card              { padding: var(--space-4); }
+    .page-hero         { padding: var(--space-5) var(--space-4); }
+    .stat-value        { font-size: 1.6rem; }
+
+    /* Topbar: compact */
+    .top-bar           { padding: 0 0.875rem; }
+    .topbar-icon-btn,
+    .theme-toggle      { width: 40px; height: 40px; font-size: 0.85rem; }
+
+    /* Prevent text overflow in table cells */
+    td { max-width: 180px; word-break: break-word; }
+
+    /* Sidebar-footer text shrink */
+    .sidebar-semester-chip { font-size: 0.6rem; }
+}
+
+/* ── Extra Small (≤390px) ── */
+@media (max-width: 390px) {
+    .campus-hero-title { font-size: 1.6rem; }
+    .campus-hero-subtitle { font-size: 0.85rem; }
+    .how-step { padding: 1rem 0.75rem; }
+    .how-step-num { width: 44px; height: 44px; font-size: 1.1rem; }
+    .section-header { margin-bottom: 1.5rem; }
+    .page-banner-content { padding: 1rem; }
+    .page-banner-title { font-size: 1rem; }
+}
+
+/* ── Tiny (≤375px) ── */
+@media (max-width: 375px) {
+    :root {
+        --space-8: 1.5rem;
+        --space-6: 1.25rem;
+    }
+    .content-container { --container-padding: 0.75rem; padding: var(--container-padding); }
+    .card              { padding: 0.875rem; }
+    .page-title        { font-size: 1.2rem; }
+    .badge             { font-size: 0.62rem; }
+    .filter-chip       { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+    .campus-hero-trust { display: none; } /* Too cramped at 375 */
+}
+
+/* ── 320px (absolute minimum) ── */
+@media (max-width: 320px) {
+    body { font-size: 14px; }
+    .content-container { --container-padding: 0.625rem; padding: var(--container-padding); }
+    .card { padding: 0.75rem; border-radius: var(--radius); }
+    .btn  { font-size: 0.8rem; padding: 0.5rem 0.875rem; min-height: 42px; }
+    .page-title { font-size: 1.1rem; }
+    .sidebar-brand-name { font-size: 0.8rem; }
+    .hero-illustration-card { padding: 0.875rem; }
+    .hero-stat-num { font-size: 0.9rem; }
+    .metric-num    { font-size: 1.75rem; }
+}
+
+/* ── Grid system: tablet (768px to 1024px) ── */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .grid-cols-2,
+    .grid-cols-3,
+    .grid-cols-4,
+    .benefits-grid,
+    .showcase-grid,
+    .metrics-grid,
+    .how-it-works-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .col-span-2,
+    .col-span-3 {
+        grid-column: span 2 !important;
+    }
+}
+
+/* ── Grid system: mobile (< 768px) ── */
+@media (max-width: 767px) {
+    .grid-cols-2,
+    .grid-cols-3,
+    .grid-cols-4,
+    .benefits-grid,
+    .showcase-grid,
+    .metrics-grid,
+    .how-it-works-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .col-span-2,
+    .col-span-3 {
+        grid-column: span 1 !important;
+    }
+
+    /* --- Flex Layouts stacking for mobile --- */
+    .flex:not(.keep-row),
+    .card[style*="display:flex"],
+    .card[style*="display: flex"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .keep-row {
+        flex-direction: row !important;
+    }
+}

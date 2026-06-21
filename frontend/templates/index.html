@@ -6,9 +6,9 @@
 <style>
     /* Campus hero negative margin fix */
     .content-container > .campus-hero:first-child {
-        margin-left: calc(-1 * var(--space-8));
-        margin-right: calc(-1 * var(--space-8));
-        margin-top: calc(-1 * var(--space-8));
+        margin-left: calc(-1 * var(--container-padding, var(--space-8)));
+        margin-right: calc(-1 * var(--container-padding, var(--space-8)));
+        margin-top: calc(-1 * var(--container-padding, var(--space-8)));
         border-radius: 0;
     }
     .campus-hero {
@@ -16,10 +16,7 @@
     }
     /* Override content-container overflow for hero */
     .inner-content-pad {
-        padding: 0 var(--space-8);
-    }
-    @media (max-width: 768px) {
-        .inner-content-pad { padding: 0 var(--space-4); }
+        padding: 0 var(--container-padding, var(--space-8));
     }
 </style>
 {% endblock %}
