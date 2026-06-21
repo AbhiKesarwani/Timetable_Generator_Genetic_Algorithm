@@ -159,6 +159,8 @@
 
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden; /* GLOBAL: prevent any element causing horizontal scroll */
+    max-width: 100%;
 }
 
 body {
@@ -470,9 +472,11 @@ body {
     margin-left: var(--sidebar-width);
     display: flex;
     flex-direction: column;
-    min-width: 0;
+    min-width: 0;          /* prevents flex child from overflowing */
     min-height: 100vh;
     transition: margin-left var(--transition);
+    overflow-x: hidden;    /* catch any child overflow before it hits html */
+    max-width: calc(100vw - var(--sidebar-width));
 }
 
 /* ============================================================
@@ -634,6 +638,9 @@ body {
     padding: var(--space-8);
     flex: 1;
     animation: fadeInUp 0.35s ease both;
+    width: 100%;           /* must not exceed main-wrapper */
+    box-sizing: border-box;
+    overflow-x: hidden;    /* final backstop for child overflow */
 }
 .content-inner {
     max-width: 1400px;
@@ -709,6 +716,13 @@ body {
     border: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
     transition: box-shadow var(--transition), border-color var(--transition), background var(--transition);
+    /* Overflow containment — card must NEVER exceed its parent width */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 .card:hover {
     box-shadow: var(--shadow);
@@ -790,13 +804,15 @@ body {
 /* ============================================================
    GRID SYSTEM
    ============================================================ */
-.grid { display: grid; gap: var(--space-5); }
+.grid { display: grid; gap: var(--space-5); width: 100%; box-sizing: border-box; }
 .grid-cols-1 { grid-template-columns: 1fr; }
 .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.grid > * { min-width: 0; box-sizing: border-box; } /* prevent children from blowing out columns */
 .col-span-2  { grid-column: span 2; }
 .col-span-3  { grid-column: span 3; }
+
 
 /* ============================================================
    BUTTONS
@@ -1644,8 +1660,27 @@ tbody tr:hover td {
    ============================================================ */
 
 /* ── Global: ensure no element causes horizontal overflow ── */
+html, body { overflow-x: hidden; max-width: 100%; }
 body { overflow-x: hidden; }
 img, svg, video { max-width: 100%; height: auto; }
+
+/* ── Safety: all grid and flex containers must not exceed viewport ── */
+.grid,
+.how-it-works-grid,
+.metrics-grid,
+.showcase-grid,
+.benefits-grid,
+.metrics-section {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* ── Every card must never be wider than its container ── */
+.card, .how-step, .benefit-card, .showcase-card, .metric-item {
+    min-width: 0;  /* prevents flex/grid children from overflowing */
+    box-sizing: border-box;
+}
 
 /* ── Timetable grids: always scrollable ── */
 .timetable-card .table-container,
@@ -1700,6 +1735,9 @@ img, svg, video { max-width: 100%; height: auto; }
         position: relative !important;
         top: auto !important;
     }
+
+    /* Metric dividers: hide on 2-col layout */
+    .metric-item:nth-child(3)::before { display: none; }
 }
 
 /* ── Tablet (≤900px) ── */
@@ -1729,18 +1767,30 @@ img, svg, video { max-width: 100%; height: auto; }
     .sidebar-overlay      { display: block; }
 
     /* --- Main layout --- */
-    .main-wrapper     { margin-left: 0 !important; }
+    .main-wrapper     { margin-left: 0 !important; max-width: 100vw !important; width: 100% !important; }
     .hamburger-btn    { display: flex !important; }
     .content-container { padding: var(--space-4); }
     .top-bar          { padding: 0 var(--space-4); }
     .topbar-chip      { display: none; }
 
-    /* --- Grid system: all collapse to 1 column --- */
+
+    /* --- Grid system: ALL collapse to 1 column at 768px --- */
     .grid-cols-2,
     .grid-cols-3,
     .grid-cols-4 { grid-template-columns: 1fr; }
     .col-span-2,
     .col-span-3  { grid-column: span 1; }
+
+    /* --- HOME PAGE: all section grids → 1 column at mobile --- */
+    .how-it-works-grid { grid-template-columns: 1fr !important; }
+    .metrics-grid      { grid-template-columns: repeat(2, 1fr) !important; }
+    .showcase-grid     { grid-template-columns: 1fr !important; }
+    .benefits-grid     { grid-template-columns: 1fr !important; }
+
+    /* Metric section: reduce padding on mobile */
+    .metrics-section { padding: 2rem 0; }
+    .metric-item     { padding: 1.25rem 0.75rem; }
+    .metric-item + .metric-item::before { top: 10%; bottom: 10%; }
 
     /* --- Remove ALL sticky positioning on content cards (prevents overlap) --- */
     .card[style*="position:sticky"],
@@ -1765,18 +1815,12 @@ img, svg, video { max-width: 100%; height: auto; }
     .campus-hero-content  { padding: 3rem var(--space-5); grid-template-columns: 1fr; }
     .campus-hero-title    { font-size: 2rem; }
     .campus-hero-subtitle { font-size: 0.9rem; max-width: 100%; }
-    .campus-hero-cta      { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .campus-hero-cta      { flex-direction: column; align-items: stretch; gap: 0.75rem; }
     .campus-hero-cta .btn { width: 100%; justify-content: center; }
     .campus-hero-trust    { gap: 0.75rem; }
 
-    /* --- How it works: 2 cols → 1 col on small tablet --- */
-    .how-it-works-grid         { grid-template-columns: repeat(2, 1fr); }
+    /* How-it-works connector line hidden on mobile */
     .how-it-works-grid::before { display: none; }
-
-    /* --- Home page grids --- */
-    .metrics-grid   { grid-template-columns: repeat(2, 1fr); }
-    .showcase-grid  { grid-template-columns: 1fr; }
-    .benefits-grid  { grid-template-columns: repeat(2, 1fr); }
 
     /* --- Welcome panel: stack on mobile --- */
     .welcome-panel { flex-direction: column; align-items: flex-start; gap: 1rem; }
@@ -1801,16 +1845,24 @@ img, svg, video { max-width: 100%; height: auto; }
     /* --- Modify timetable form: force scroll on table --- */
     #modifyForm .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     #modifyForm table { min-width: 520px; }
+
+    /* --- Flex rows must stack --- */
+    .manage-timings-day-grid { grid-template-columns: repeat(4, 1fr); }
 }
+
 
 /* ── Mobile (≤480px) ── */
 @media (max-width: 480px) {
-    /* --- Grids --- */
+    /* --- ALL grids force single column --- */
+    .grid-cols-2,
+    .grid-cols-3,
+    .grid-cols-4 { grid-template-columns: 1fr !important; }
+
     .landing-cta { flex-direction: column; align-items: center; }
-    .how-it-works-grid { grid-template-columns: 1fr; }
-    .metrics-grid      { grid-template-columns: repeat(2, 1fr); }
-    .benefits-grid     { grid-template-columns: 1fr; }
-    .showcase-grid     { grid-template-columns: 1fr; }
+    .how-it-works-grid { grid-template-columns: 1fr !important; }
+    .metrics-grid      { grid-template-columns: repeat(2, 1fr) !important; }
+    .benefits-grid     { grid-template-columns: 1fr !important; }
+    .showcase-grid     { grid-template-columns: 1fr !important; }
 
     /* --- Timetable --- */
     .timetable-subject-cell { height: 70px; }
@@ -1828,10 +1880,13 @@ img, svg, video { max-width: 100%; height: auto; }
     .campus-hero-title { font-size: clamp(1.6rem, 7vw, 2rem); }
     .campus-hero-content { padding: 2.5rem var(--space-4); }
     .campus-hero-badge { font-size: 0.65rem; margin-bottom: 1rem; }
+    .campus-hero-cta { flex-direction: column; align-items: stretch; }
+    .campus-hero-cta .btn { width: 100%; }
 
-    /* --- Metrics section vertical padding --- */
-    .metrics-section { padding: 2rem 0; }
+    /* --- Metrics section --- */
+    .metrics-section { padding: 1.5rem 0; }
     .metric-num      { font-size: 2rem; }
+    .metric-item     { padding: 1rem 0.5rem; }
 
     /* --- Page banner: reduce size more --- */
     .page-banner { min-height: 120px; }
@@ -1846,16 +1901,17 @@ img, svg, video { max-width: 100%; height: auto; }
     /* --- Timetable legend: wrap --- */
     .card:has(.break-label) { flex-wrap: wrap; }
 
-    /* --- Dashboard grid stats: 2 col force --- */
-    /* already 1 col from 768 breakpoint — that's fine for mobile */
-
     /* --- Form grid on view timetable: stack selects --- */
-    .grid-cols-2 { grid-template-columns: 1fr; }
+    .grid-cols-2 { grid-template-columns: 1fr !important; }
 
     /* --- Button groups: full width --- */
     .campus-hero-cta .btn,
     .how-step .btn,
     .card .btn-lg { width: 100%; }
+
+    /* --- Section header: reduce margin --- */
+    .section-header { margin-bottom: 1.5rem; }
+    .section-subtitle { font-size: 0.875rem; }
 }
 
 /* ── Small Mobile (≤430px) ── */
@@ -1926,8 +1982,25 @@ img, svg, video { max-width: 100%; height: auto; }
     align-items: center;
     overflow: hidden;
     background: #0a1628;
-    margin: calc(-1 * var(--space-8));
+    /* Stretch hero full-bleed using negative margin equivalent */
+    width: calc(100% + (var(--space-8) * 2));
+    margin-left: calc(-1 * var(--space-8));
+    margin-right: calc(-1 * var(--space-8));
+    margin-top: calc(-1 * var(--space-8));
     margin-bottom: 0;
+    /* Prevent THIS element from causing horizontal overflow */
+    max-width: calc(100vw);
+    box-sizing: border-box;
+}
+/* On mobile: kill the negative margin entirely, full-width naturally */
+@media (max-width: 768px) {
+    .campus-hero {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 0;
+        border-radius: 0;
+    }
 }
 .campus-hero-bg {
     position: absolute;
@@ -2598,3 +2671,99 @@ img, svg, video { max-width: 100%; height: auto; }
 }
 
 /* All responsive rules consolidated in the RESPONSIVE BREAKPOINTS section above */
+
+
+/* ============================================================
+   FINAL CATCH-ALL — Mobile Overflow Prevention
+   These rules run LAST in the cascade as an absolute safety net.
+   ============================================================ */
+
+/* Universal box model for ALL elements */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Every element: never wider than viewport */
+@media (max-width: 768px) {
+    /* Remove any hardcoded min-widths that could cause overflow */
+    .benefit-card,
+    .showcase-card,
+    .how-step,
+    .metric-item,
+    .stat-card,
+    .feature-card {
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* All flex rows must wrap */
+    [style*="display:flex"],
+    [style*="display: flex"] {
+        flex-wrap: wrap !important;
+    }
+
+    /* Images and media: never overflow */
+    img, svg, video, canvas, iframe {
+        max-width: 100% !important;
+        height: auto;
+    }
+
+    /* Form elements: always full width */
+    input, select, textarea, button {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Force all section grids to single column */
+    .benefits-grid,
+    .showcase-grid,
+    .how-it-works-grid {
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+    }
+
+    /* Metrics stay 2-col but clamp padding */
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        width: 100% !important;
+    }
+
+    /* Remove inner padding that can cause overflow */
+    .metrics-section {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
+
+@media (max-width: 375px) {
+    /* Extra tight: reduce all card padding */
+    .card {
+        padding: 0.875rem !important;
+    }
+    .benefit-card,
+    .how-step {
+        padding: 1rem 0.875rem !important;
+    }
+}
+
+@media (max-width: 320px) {
+    .card {
+        padding: 0.75rem !important;
+    }
+    .benefit-card,
+    .how-step {
+        padding: 0.875rem 0.625rem !important;
+    }
+    /* Metric items: absolute minimum at 320px */
+    .metric-item {
+        padding: 0.875rem 0.25rem !important;
+    }
+    .metric-num {
+        font-size: 1.5rem !important;
+    }
+    .metric-label {
+        font-size: 0.7rem !important;
+    }
+}

@@ -4,23 +4,43 @@
 
 {% block head %}
 <style>
-    /* Campus hero negative margin fix */
-    .content-container > .campus-hero:first-child {
-        margin-left: calc(-1 * var(--space-8));
-        margin-right: calc(-1 * var(--space-8));
-        margin-top: calc(-1 * var(--space-8));
-        border-radius: 0;
-    }
-    .campus-hero {
-        margin: 0 !important;
-    }
-    /* Override content-container overflow for hero */
+    /* ---- Index page: inner section padding ---- */
     .inner-content-pad {
         padding: 0 var(--space-8);
+        width: 100%;
+        box-sizing: border-box;
     }
     @media (max-width: 768px) {
         .inner-content-pad { padding: 0 var(--space-4); }
     }
+    @media (max-width: 430px) {
+        .inner-content-pad { padding: 0 var(--space-3); }
+    }
+    @media (max-width: 375px) {
+        .inner-content-pad { padding: 0 0.625rem; }
+    }
+
+    /* ---- Ensure every section wrapper is clamped ---- */
+    .anim-fade-up {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden; /* catch any child that tries to overflow */
+    }
+
+    /* ---- Metrics: at 430px reduce font sizes ---- */
+    @media (max-width: 430px) {
+        .metric-num { font-size: 1.75rem; }
+        .metric-icon { font-size: 1.1rem; }
+        .metric-item + .metric-item::before { display: none; }
+    }
+
+    /* ---- How-step text: don't let it overflow ---- */
+    .how-step { word-break: break-word; overflow-wrap: break-word; }
+    .how-step-desc { overflow-wrap: break-word; }
+
+    /* ---- Benefit card text: don't let it overflow ---- */
+    .benefit-card { word-break: break-word; overflow-wrap: break-word; }
 </style>
 {% endblock %}
 
@@ -33,7 +53,7 @@
 <!-- ===================================================================
      SECTION 1: CAMPUS HERO
      =================================================================== -->
-<div class="campus-hero" style="border-radius:var(--radius-xl); overflow:hidden; margin-bottom:var(--space-8);">
+<div class="campus-hero" style="margin-bottom: var(--space-8);">
     <!-- Background campus image -->
     <div class="campus-hero-bg" style="background-image:url('{{ url_for('static', filename='images/campus_hero.png') }}');"></div>
     <div class="campus-hero-overlay"></div>

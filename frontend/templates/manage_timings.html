@@ -2,6 +2,35 @@
 
 {% block title %}Schedule Configuration — Timetable Portal{% endblock %}
 
+{% block head %}
+<style>
+    /* Holiday day-selector grid: responsive */
+    .day-selector-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    @media (max-width: 480px) {
+        .day-selector-grid { grid-template-columns: repeat(4, 1fr); gap: 0.35rem; }
+    }
+    @media (max-width: 375px) {
+        .day-selector-grid { grid-template-columns: repeat(4, 1fr); gap: 0.25rem; }
+        .day-selector-grid label { padding: 0.5rem 0.25rem; }
+        .day-selector-grid span { font-size: 0.65rem; }
+    }
+    @media (max-width: 320px) {
+        .day-selector-grid { grid-template-columns: repeat(4, 1fr); gap: 0.2rem; }
+        .day-selector-grid label { padding: 0.4rem 0.15rem; }
+    }
+    /* Timeline slots: prevent text overflow */
+    .timeline-slot { overflow: hidden; }
+    .timeline-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+</style>
+{% endblock %}
+
 {% block breadcrumb %}
 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
 <span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
@@ -117,7 +146,7 @@
             </p>
 
             <!-- Day selector grid -->
-            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:0.5rem; margin-bottom:1.25rem;">
+            <div class="day-selector-grid">
 
                 <!-- Sunday: always blocked, permanently disabled -->
                 <label style="display:flex; flex-direction:column; align-items:center; gap:0.3rem; padding:0.625rem 0.5rem;
