@@ -10,14 +10,36 @@
 
 {% block content %}
 
-<!-- Hero Section -->
-<div class="page-hero anim-fade-up" style="display:flex; align-items:center; justify-content:space-between; gap:2rem; flex-wrap:wrap;">
+<!-- Welcome Panel -->
+<div class="welcome-panel anim-fade-up">
+    <div style="display:flex; align-items:center; gap:1rem; flex:1; min-width:0;">
+        <div class="welcome-avatar">
+            {{ session.get('school_name', 'A')[0] | upper }}
+        </div>
+        <div class="welcome-text">
+            <h2>Welcome back, {{ session.get('school_name', 'Administrator') }}</h2>
+            <p>Today is a great day to generate your next conflict-free timetable.</p>
+        </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.75rem; flex-shrink:0; flex-wrap:wrap;">
+        <div class="ai-status-badge">
+            <div class="ai-status-dot"></div>
+            AI Engine Ready
+        </div>
+        <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-brain"></i> Generate Now
+        </a>
+    </div>
+</div>
+
+<!-- Page Hero -->
+<div class="page-hero anim-fade-up delay-100" style="display:flex; align-items:center; justify-content:space-between; gap:2rem; flex-wrap:wrap; margin-bottom:var(--space-6);">
     <div style="position:relative; z-index:1;">
         <div class="hero-badge">
             <i class="fas fa-university" style="font-size:0.65rem;"></i>
             Academic Management Portal
         </div>
-        <h1 class="hero-title">Institute of Technology</h1>
+        <h1 class="hero-title">Institution Overview</h1>
         <p class="hero-subtitle">
             AI-Powered Academic Timetable Management &mdash;
             <strong style="color:rgba(255,255,255,0.9);">{{ session['school_name'] }}</strong>
@@ -34,7 +56,7 @@
 </div>
 
 <!-- Stats Row -->
-<div class="grid grid-cols-3 anim-fade-up delay-100" style="margin-bottom:var(--space-8);">
+<div class="grid grid-cols-3 anim-fade-up delay-150" style="margin-bottom:var(--space-8);">
 
     <div class="card card-gradient card-gradient-blue stat-card">
         <div class="stat-icon stat-icon-white">
@@ -69,7 +91,7 @@
 </div>
 
 <!-- Management Section -->
-<div class="flex items-center justify-between mb-4 anim-fade-up delay-150">
+<div class="flex items-center justify-between mb-4 anim-fade-up delay-200">
     <h2 style="font-family:'Outfit',sans-serif; font-size:1.25rem; font-weight:700; color:var(--text-main);">
         Academic Management
     </h2>
@@ -106,7 +128,7 @@
         </div>
         <div class="feature-content">
             <div class="feature-title">Schedule Configuration</div>
-            <div class="feature-desc">Set college hours, lecture durations, and break periods to match your institution's calendar.</div>
+            <div class="feature-desc">Set college hours, lecture durations, and break periods to match your academic calendar.</div>
         </div>
         <i class="fas fa-chevron-right feature-arrow"></i>
     </a>
@@ -122,6 +144,30 @@
         <i class="fas fa-chevron-right feature-arrow" style="color:var(--primary-light);"></i>
     </a>
 
+</div>
+
+<!-- AI Engine Status Card -->
+<div class="card anim-fade-up delay-250" style="margin-bottom:var(--space-6); padding:1.25rem 1.5rem;">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div style="width:40px; height:40px; background:rgba(37,99,235,0.1); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.1rem; color:var(--primary-light);">
+                <i class="fas fa-brain"></i>
+            </div>
+            <div>
+                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.9rem; color:var(--text-main);">AI Scheduling Engine</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">Genetic Algorithm · Conflict-Free · Multi-constraint Optimization</div>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+            <div class="ai-status-badge">
+                <div class="ai-status-dot"></div>
+                Online &amp; Ready
+            </div>
+            <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-bolt"></i> Launch Generator
+            </a>
+        </div>
+    </div>
 </div>
 
 <!-- Danger Zone -->

@@ -46,7 +46,7 @@
         /* ---- Left Panel ---- */
         .login-left {
             flex: 1;
-            background: var(--grad-hero);
+            background: #0a1628;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -55,16 +55,27 @@
             overflow: hidden;
         }
 
-        /* Background mesh pattern */
+        /* Campus photo background */
+        .login-campus-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center 30%;
+            filter: saturate(0.6) brightness(0.4);
+            z-index: 0;
+        }
+
+        /* Dark overlay over campus photo */
         .login-left::before {
             content: '';
             position: absolute;
             inset: 0;
             background-image:
-                radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.25) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 60% 80%, rgba(30, 58, 138, 0.3) 0%, transparent 50%);
+                linear-gradient(135deg, rgba(10,22,40,0.88) 0%, rgba(15,30,56,0.75) 50%, rgba(30,58,138,0.6) 100%),
+                radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.15) 0%, transparent 50%);
             pointer-events: none;
+            z-index: 1;
         }
 
         /* Grid overlay */
@@ -83,7 +94,7 @@
             align-items: center;
             gap: 0.75rem;
             position: relative;
-            z-index: 2;
+            z-index: 3;
         }
         .login-brand-crest {
             width: 44px;
@@ -120,7 +131,7 @@
             align-items: flex-start;
             padding: 2rem 0;
             position: relative;
-            z-index: 2;
+            z-index: 3;
         }
 
         .login-badge {
@@ -194,7 +205,7 @@
         /* Quote */
         .login-quote {
             position: relative;
-            z-index: 2;
+            z-index: 3;
             padding-top: 1.5rem;
             border-top: 1px solid rgba(255,255,255,0.08);
         }
@@ -214,13 +225,13 @@
 
         /* ---- Right Panel ---- */
         .login-right {
-            width: 460px;
+            width: 530px;
             flex-shrink: 0;
             background: #F8FAFC;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 3rem;
+            padding: 3.5rem;
             position: relative;
             overflow-y: auto;
         }
@@ -401,6 +412,8 @@
 
     <!-- LEFT PANEL -->
     <div class="login-left">
+        <!-- Campus photo background layer -->
+        <div class="login-campus-bg" style="background-image:url('/static/images/campus_hero.png');"></div>
 
         <!-- Brand -->
         <div class="login-brand">

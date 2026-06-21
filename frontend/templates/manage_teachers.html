@@ -10,20 +10,28 @@
 
 {% block content %}
 
-<!-- Page Header -->
-<div class="flex items-center justify-between mb-8 anim-fade-up" style="flex-wrap:wrap; gap:1rem;">
-    <div>
-        <h1 class="page-title">
-            <i class="fas fa-user-tie" style="color:var(--primary-light); margin-right:0.5rem; font-size:1.5rem;"></i>
+<!-- Page Banner with background image -->
+<div class="page-banner anim-fade-up" style="min-height:180px;">
+    <div class="page-banner-bg" style="background-image:url('{{ url_for('static', filename='images/library_research.png') }}');"></div>
+    <div class="page-banner-overlay"></div>
+    <div class="page-banner-content">
+        <div class="page-banner-title">
+            <i class="fas fa-user-tie" style="font-size:1.4rem;"></i>
             Faculty Directory
-        </h1>
-        <p class="page-subtitle">Manage all faculty members registered under your institution.</p>
+        </div>
+        <div class="page-banner-subtitle">Manage all faculty members registered under your institution</div>
+        <div style="display:flex; gap:0.75rem; align-items:center; margin-top:1rem; flex-wrap:wrap;">
+            <span class="badge" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.2);">
+                <i class="fas fa-users" style="font-size:0.6rem;"></i>
+                {{ teachers | length }} Members
+            </span>
+            <button class="btn btn-sm" onclick="document.getElementById('faculty-form-card').scrollIntoView({behavior:'smooth'})"
+                style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white;">
+                <i class="fas fa-plus"></i>
+                Add Faculty Member
+            </button>
+        </div>
     </div>
-    <button class="btn btn-primary"
-        onclick="document.getElementById('faculty-form-card').scrollIntoView({behavior:'smooth'})">
-        <i class="fas fa-plus"></i>
-        Add Faculty Member
-    </button>
 </div>
 
 <div class="grid grid-cols-3 anim-fade-up delay-100" style="align-items:flex-start;">
@@ -31,29 +39,61 @@
     <!-- Faculty List — spans 2 columns -->
     <div class="card col-span-2" style="padding:0; overflow:hidden;">
         <!-- Card header -->
-        <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
-            <div style="display:flex; align-items:center; gap:0.6rem;">
-                <i class="fas fa-users" style="color:var(--primary-light);"></i>
-                <span style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Active Faculty</span>
+        <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.875rem;">
+                <div style="display:flex; align-items:center; gap:0.6rem;">
+                    <i class="fas fa-users" style="color:var(--primary-light);"></i>
+                    <span style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Active Faculty</span>
+                </div>
+                <span class="badge badge-primary">{{ teachers | length }} Members</span>
             </div>
-            <span class="badge badge-primary">{{ teachers | length }} Members</span>
+
+            <!-- Search bar -->
+            <div class="search-bar">
+                <div class="search-input-wrap">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="facultySearch" placeholder="Search by name..." autocomplete="off"
+                        oninput="filterFaculty(this.value)">
+                </div>
+            </div>
+
+            <!-- Filter chips -->
+            <div class="filter-chips">
+                <div class="filter-chip active" onclick="setFilter(this, 'all')">
+                    <i class="fas fa-th-large"></i> All
+                </div>
+                <div class="filter-chip" onclick="setFilter(this, 'a-f')">
+                    A–F
+                </div>
+                <div class="filter-chip" onclick="setFilter(this, 'g-l')">
+                    G–L
+                </div>
+                <div class="filter-chip" onclick="setFilter(this, 'm-r')">
+                    M–R
+                </div>
+                <div class="filter-chip" onclick="setFilter(this, 's-z')">
+                    S–Z
+                </div>
+            </div>
         </div>
 
-        <div class="table-container" style="border:none; border-radius:0;">
+        <div class="table-container" style="border:none; border-radius:0; margin-top:0;">
             <table>
                 <thead>
                     <tr>
                         <th style="padding-left:1.5rem;">Faculty Member</th>
                         <th>ID</th>
+                        <th>Department</th>
                         <th style="text-align:right; padding-right:1.5rem;">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="facultyTableBody">
+                    {% set avatar_colors = ['avatar-blue','avatar-ind','avatar-grn','avatar-gold','avatar-red','avatar-cyan','avatar-rose','avatar-teal'] %}
                     {% for teacher in teachers %}
-                    <tr>
+                    <tr class="faculty-row" data-name="{{ teacher.teacher_name | lower }}">
                         <td style="padding-left:1.5rem;">
                             <div style="display:flex; align-items:center; gap:0.75rem;">
-                                <div class="faculty-avatar">
+                                <div class="faculty-avatar {{ avatar_colors[loop.index0 % 8] }}">
                                     {{ teacher.teacher_name[:2] | upper }}
                                 </div>
                                 <div>
@@ -66,6 +106,9 @@
                             <span class="badge badge-gray" style="font-family:'Outfit',sans-serif; letter-spacing:0.02em;">
                                 #{{ teacher.teacher_id }}
                             </span>
+                        </td>
+                        <td>
+                            <span class="dept-badge">Academic Staff</span>
                         </td>
                         <td style="text-align:right; padding-right:1.5rem;">
                             <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
@@ -89,7 +132,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="3" style="text-align:center; padding:4rem; color:var(--text-faint);">
+                        <td colspan="4" style="text-align:center; padding:4rem; color:var(--text-faint);">
                             <div style="display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
                                 <div style="width:56px; height:56px; background:var(--bg-muted); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:var(--text-faint);">
                                     <i class="fas fa-user-slash"></i>
@@ -154,4 +197,36 @@
     </div>
 
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterFaculty(query) {
+    const rows = document.querySelectorAll('.faculty-row');
+    const q = query.toLowerCase().trim();
+    rows.forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        row.style.display = name.includes(q) ? '' : 'none';
+    });
+}
+
+function setFilter(el, range) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    const rows = document.querySelectorAll('.faculty-row');
+    rows.forEach(row => {
+        const name = (row.getAttribute('data-name') || '').trim();
+        const first = name[0] || '';
+        let show = true;
+        if (range === 'a-f') show = first >= 'a' && first <= 'f';
+        else if (range === 'g-l') show = first >= 'g' && first <= 'l';
+        else if (range === 'm-r') show = first >= 'm' && first <= 'r';
+        else if (range === 's-z') show = first >= 's' && first <= 'z';
+        row.style.display = show ? '' : 'none';
+    });
+    // Reset search when filter chip is used
+    document.getElementById('facultySearch').value = '';
+}
+</script>
 {% endblock %}

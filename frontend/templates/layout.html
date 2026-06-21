@@ -41,7 +41,10 @@
             </div>
             <div class="sidebar-profile-info">
                 <div class="sidebar-profile-name">{{ session.get('school_name', 'Institution') }}</div>
-                <div class="sidebar-profile-role">Administrator</div>
+                <div class="sidebar-profile-role" style="display:flex; align-items:center; gap:0.3rem;">
+                    <span style="width:5px; height:5px; border-radius:50%; background:#4ade80; display:inline-block; flex-shrink:0;"></span>
+                    Administrator
+                </div>
             </div>
         </div>
         {% endif %}
@@ -113,8 +116,11 @@
                 <span>Register Institution</span>
             </a>
             {% endif %}
-            <div class="sidebar-semester-chip" style="margin-top: 0.5rem;">
-                Academic Year 2025–26
+            <div class="sidebar-semester-chip" style="margin-top: 0.5rem;">Academic Year 2025–26</div>
+            <!-- AI Engine status -->
+            <div style="margin-top:0.5rem; display:flex; align-items:center; justify-content:center; gap:0.4rem; font-size:0.62rem; color:rgba(74,222,128,0.8);">
+                <span style="width:5px; height:5px; border-radius:50%; background:#4ade80; flex-shrink:0; animation:pulse-ring 2s infinite;"></span>
+                AI Engine Online
             </div>
         </div>
     </aside>
