@@ -24,12 +24,28 @@ def save_modified_timetable():
 def final_timetable():
     timetable_data = session.get('timetable', [])
     context = session.get('generation_context', {})
+    
+    school_id = session.get('school_id')
+    subject_teachers = {}
+    if school_id:
+         db = connect_db()
+         cursor = db.cursor(dictionary=True)
+         cursor.execute("""
+             SELECT s.subject_name, t.teacher_name 
+             FROM subject s
+             LEFT JOIN teacher t ON s.teacher_id = t.teacher_id
+             WHERE s.school_id = %s
+         """, (school_id,))
+         subject_teachers = {row['subject_name']: row['teacher_name'] for row in cursor.fetchall()}
+         db.close()
+
     structured_timetable = {}
     for entry in timetable_data:
         day = entry['day']
         timeslot = entry['timeslot']
         subject = entry['subject']
-        structured_timetable[(day, timeslot)] = subject
+        teacher = subject_teachers.get(subject, "Faculty Not Assigned")
+        structured_timetable[(day, timeslot)] = f"{subject} | {teacher or 'Faculty Not Assigned'}"
 
     time_config = session.get('time_config')
     if time_config:
@@ -131,12 +147,26 @@ def get_timetable():
         if not timetable_data:
             return jsonify({"error": "No timetable found for this class."}), 404
 
+        subject_teachers = {}
+        if school_id:
+             db = connect_db()
+             cursor = db.cursor(dictionary=True)
+             cursor.execute("""
+                 SELECT s.subject_name, t.teacher_name 
+                 FROM subject s
+                 LEFT JOIN teacher t ON s.teacher_id = t.teacher_id
+                 WHERE s.school_id = %s
+             """, (school_id,))
+             subject_teachers = {row['subject_name']: row['teacher_name'] for row in cursor.fetchall()}
+             db.close()
+
         structured_timetable = {}
         for entry in timetable_data:
             day = entry['day']
             timeslot = entry['timeslot']
             subject = entry['subject']
-            structured_timetable[f"{day}_{timeslot}"] = subject
+            teacher = subject_teachers.get(subject, "Faculty Not Assigned")
+            structured_timetable[f"{day}_{timeslot}"] = f"{subject} | {teacher or 'Faculty Not Assigned'}"
         return jsonify({"timetable": structured_timetable, "visual_slots": visual_slots})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

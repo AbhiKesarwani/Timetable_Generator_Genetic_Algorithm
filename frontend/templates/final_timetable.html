@@ -131,15 +131,22 @@
                     {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
                     <td class="timetable-subject-cell">
                         {% if timetable.get((day, entry.time)) %}
-                            {% set subj = timetable[(day, entry.time)] %}
-                            {% set cidx = (loop.index0 + loop.revindex) % 6 %}
-                            <div class="subject-block {{ colors[cidx] }}" title="{{ subj }} — {{ day }} {{ entry.time[:5] }}">
-                                <div class="subject-block-name">{{ subj }}</div>
-                                <div class="subject-block-label">
-                                    <i class="fas fa-chalkboard-teacher" style="font-size:0.55rem;"></i>
-                                    Live Session
-                                </div>
-                            </div>
+                             {% set subj = timetable[(day, entry.time)] %}
+                             {% set cidx = (loop.index0 + loop.revindex) % 6 %}
+                             {% if ' | ' in subj %}
+                                 {% set subj_parts = subj.split(' | ') %}
+                                 {% set subj_name = subj_parts[0] %}
+                                 {% set faculty_name = subj_parts[1] %}
+                             {% else %}
+                                 {% set subj_name = subj %}
+                                 {% set faculty_name = "Faculty Not Assigned" %}
+                             {% endif %}
+                             <div class="subject-block {{ colors[cidx] }}" title="{{ subj_name }} — {{ day }} {{ entry.time[:5] }}">
+                                 <div class="subject-block-name">{{ subj_name }}</div>
+                                 <div class="subject-block-label">
+                                     {{ faculty_name }}
+                                 </div>
+                             </div>
                         {% else %}
                             <div class="empty-cell">
                                 <i class="fas fa-minus" style="font-size:0.55rem;"></i>

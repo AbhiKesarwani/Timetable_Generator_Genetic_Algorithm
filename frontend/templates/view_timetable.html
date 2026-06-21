@@ -289,18 +289,23 @@
                             let subject = timetable[key] || "";
 
                             if (subject) {
-                                if (!subjectColorMap[subject]) {
-                                    subjectColorMap[subject] = chipColors[colorIdx % chipColors.length];
+                                let subjectName = subject;
+                                let facultyName = "Faculty Not Assigned";
+                                if (subject.includes(" | ")) {
+                                    const parts = subject.split(" | ");
+                                    subjectName = parts[0];
+                                    facultyName = parts[1];
+                                }
+
+                                if (!subjectColorMap[subjectName]) {
+                                    subjectColorMap[subjectName] = chipColors[colorIdx % chipColors.length];
                                     colorIdx++;
                                 }
-                                const colorClass = subjectColorMap[subject];
+                                const colorClass = subjectColorMap[subjectName];
                                 cell.innerHTML = `
                                     <div class="subject-block ${colorClass}">
-                                        <div class="subject-block-name">${subject}</div>
-                                        <div class="subject-block-label">
-                                            <i class="fas fa-chalkboard-teacher" style="font-size:0.55rem;"></i>
-                                            Lecture
-                                        </div>
+                                        <div class="subject-block-name">${subjectName}</div>
+                                        <div class="subject-block-label">${facultyName}</div>
                                     </div>`;
                             } else {
                                 cell.innerHTML = '<div class="empty-cell"><i class="fas fa-minus" style="font-size:0.55rem;"></i></div>';

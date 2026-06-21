@@ -49,12 +49,13 @@ def get_timetable_by_class(class_name, semester, school_id):
     
     class_id = result[0]
 
-    # Fetch timetable with day and timeslot
+    # Fetch timetable with day, timeslot, and teacher name
     query = """
-    SELECT s.subject_name, t.day, ts.timeslot 
+    SELECT s.subject_name, t.day, ts.timeslot, te.teacher_name 
     FROM timetable t
     JOIN subject s ON t.subject_id = s.subject_id
     JOIN timeslot ts ON t.time_id = ts.time_id
+    LEFT JOIN teacher te ON s.teacher_id = te.teacher_id
     WHERE t.class_id = %s AND s.semester = %s AND t.school_id = %s
     """
     cursor.execute(query, (class_id, semester, school_id))
@@ -67,7 +68,7 @@ def get_timetable_by_class(class_name, semester, school_id):
     db.close()
 
     timetable = {}
-    for subject, day, timeslot in results:
+    for subject, day, timeslot, teacher_name in results:
         if isinstance(timeslot, timedelta):
             # Format timedelta to HH:MM:SS with leading zero for hour
             total_seconds = int(timeslot.total_seconds())
@@ -75,6 +76,6 @@ def get_timetable_by_class(class_name, semester, school_id):
             minutes = (total_seconds % 3600) // 60
             seconds = total_seconds % 60
             timeslot = f"{hours:02}:{minutes:02}:{seconds:02}"
-        timetable[f"{day}_{timeslot}"] = subject
+        timetable[f"{day}_{timeslot}"] = f"{subject} | {teacher_name or 'Faculty Not Assigned'}"
 
     return timetable, sorted(all_timeslots)
