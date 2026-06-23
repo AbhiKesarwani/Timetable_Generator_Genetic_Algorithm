@@ -1,0 +1,446 @@
+{% extends "layout.html" %}
+
+{% block title %}Faculty Timetable — Timetable Portal{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-current">Faculty Timetable</span>
+{% endblock %}
+
+{% block head %}
+<style>
+    /* ── Faculty Timetable Page Styles ─────────────────────────────── */
+    .faculty-select-card {
+        max-width: 560px;
+        margin: 0 auto var(--space-8);
+    }
+
+    .workload-grid {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: var(--space-6);
+        align-items: flex-start;
+        margin-bottom: var(--space-8);
+    }
+
+    @media (max-width: 900px) {
+        .workload-grid { grid-template-columns: 1fr; }
+    }
+
+    .workload-summary-card {
+        position: sticky;
+        top: calc(var(--topbar-height) + 1.5rem);
+    }
+
+    .workload-subject-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.625rem 0;
+        border-bottom: 1px solid var(--border);
+        gap: 0.75rem;
+    }
+    .workload-subject-row:last-child { border-bottom: none; }
+
+    .workload-badge {
+        background: rgba(30,58,138,0.08);
+        color: var(--primary-light);
+        border-radius: 999px;
+        padding: 0.2rem 0.6rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .faculty-grid-section { overflow-x: auto; }
+
+    .faculty-timetable-table {
+        min-width: 700px;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .faculty-timetable-table th {
+        background: linear-gradient(135deg, #0F172A, #1E293B);
+        color: rgba(148,163,184,0.85);
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        padding: 0.875rem 1rem;
+        text-align: center;
+        white-space: nowrap;
+        border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .faculty-timetable-table th:first-child {
+        text-align: left;
+        border-right: 2px solid rgba(255,255,255,0.08);
+        min-width: 100px;
+    }
+    .faculty-timetable-table td {
+        padding: 0.625rem 0.5rem;
+        vertical-align: middle;
+        text-align: center;
+        border: 1px solid var(--border);
+        min-width: 130px;
+    }
+    .faculty-timetable-table td:first-child {
+        text-align: left;
+        background: var(--bg-muted);
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.625rem 1rem;
+        border-right: 2px solid var(--border);
+        white-space: nowrap;
+    }
+
+    .faculty-cell-block {
+        border-radius: var(--radius-sm);
+        padding: 0.4rem 0.5rem;
+        font-size: 0.72rem;
+        line-height: 1.4;
+        text-align: left;
+        border-left: 3px solid;
+    }
+    .faculty-cell-block.color-0 { border-left-color: var(--primary-light); background: rgba(37,99,235,0.08); color: var(--primary-light); }
+    .faculty-cell-block.color-1 { border-left-color: var(--secondary);     background: rgba(99,102,241,0.08); color: var(--secondary); }
+    .faculty-cell-block.color-2 { border-left-color: var(--success);       background: rgba(34,197,94,0.08);  color: var(--success); }
+    .faculty-cell-block.color-3 { border-left-color: var(--accent);        background: rgba(245,158,11,0.08); color: var(--accent); }
+    .faculty-cell-block.color-4 { border-left-color: var(--danger);        background: rgba(239,68,68,0.08);  color: var(--danger); }
+    .faculty-cell-block.color-5 { border-left-color: var(--info);          background: rgba(6,182,212,0.08);  color: var(--info); }
+
+    .faculty-cell-subject  { font-weight: 700; }
+    .faculty-cell-class    { font-size: 0.68rem; opacity: 0.8; margin-top: 0.15rem; }
+    .faculty-cell-sem      { font-size: 0.65rem; opacity: 0.65; }
+
+    .break-row-faculty td {
+        background: rgba(217,119,6,0.04) !important;
+        border-color: rgba(217,119,6,0.12) !important;
+    }
+    .break-label-faculty {
+        display: flex; align-items: center; justify-content: center;
+        gap: 0.5rem; font-size: 0.72rem; color: var(--accent);
+        font-style: italic;
+    }
+
+    .empty-faculty-cell {
+        display: flex; align-items: center; justify-content: center;
+        color: var(--text-faint); font-size: 0.6rem;
+    }
+
+    .total-badge {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white; border-radius: 999px;
+        padding: 0.3rem 0.875rem;
+        font-size: 0.8rem; font-weight: 700;
+    }
+
+    /* Print styles */
+    @media print {
+        .sidebar, .top-bar, .btn, .breadcrumb, .flash-container,
+        .hamburger-btn, .sidebar-overlay, .topbar-actions,
+        .site-footer, .faculty-select-card, .faculty-print-exclude { display: none !important; }
+        body { display: block; background: white; }
+        .main-wrapper { margin: 0 !important; }
+        .content-container { padding: 0.5rem !important; animation: none !important; }
+        .faculty-timetable-table th { background: #1e293b !important; color: white !important; }
+        .faculty-timetable-table td { border: 1px solid #ccc !important; }
+        .faculty-cell-block { border: 1px solid #ccc !important; background: #f8f8f8 !important; color: black !important; }
+        .workload-summary-card { position: static !important; }
+        .workload-grid { display: block !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header anim-fade-up">
+    <h1 class="page-title">
+        <i class="fas fa-id-card" style="color:var(--primary-light); margin-right:0.5rem; font-size:1.5rem;"></i>
+        Faculty Timetable
+    </h1>
+    <p class="page-subtitle">
+        View individual faculty schedules, workload analytics, and weekly teaching loads.
+    </p>
+</div>
+
+<!-- Faculty Selector -->
+<div class="card faculty-select-card anim-fade-up delay-100">
+    <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+        <div style="width:36px; height:36px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+            <i class="fas fa-user-tie"></i>
+        </div>
+        <div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">Select Faculty Member</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">Choose a faculty member to view their complete schedule</div>
+        </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:0;">
+        <label for="teacherSelect">Faculty Member</label>
+        <div class="input-group">
+            <i class="input-icon fas fa-user-tie"></i>
+            <select id="teacherSelect">
+                <option value="">— Select a faculty member —</option>
+                {% for t in teachers %}
+                <option value="{{ t.teacher_id }}">{{ t.teacher_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Spinner (hidden initially) -->
+<div id="loadingState" style="display:none; text-align:center; padding:3rem 0;">
+    <div class="spinner" style="width:36px; height:36px; margin:0 auto 1rem;"></div>
+    <p style="color:var(--text-muted); font-size:0.875rem;">Loading faculty schedule...</p>
+</div>
+
+<!-- Empty State (hidden initially) -->
+<div id="emptyState" style="display:none; text-align:center; padding:3rem 0;">
+    <div style="font-size:3rem; margin-bottom:1rem;">📭</div>
+    <h3 style="color:var(--text-muted); font-size:1rem; font-weight:600;">No Timetable Found</h3>
+    <p style="color:var(--text-faint); font-size:0.82rem; margin-top:0.5rem;">
+        This faculty member has no scheduled lectures yet.
+    </p>
+</div>
+
+<!-- Main Content (hidden until teacher selected) -->
+<div id="facultyContent" style="display:none;" class="anim-fade-up">
+
+    <!-- Action buttons -->
+    <div class="flex items-center justify-between mb-4 faculty-print-exclude" style="flex-wrap:wrap; gap:1rem;">
+        <div>
+            <h2 id="facultyNameHeading" style="font-family:'Outfit',sans-serif; font-size:1.2rem; font-weight:700; color:var(--text-main);"></h2>
+            <p style="font-size:0.75rem; color:var(--text-faint); margin-top:0.2rem;">
+                <i class="fas fa-check-circle" style="color:var(--success);"></i>
+                Faculty Schedule — Academic Year 2025–26
+            </p>
+        </div>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <button onclick="window.print()" class="btn btn-secondary btn-sm">
+                <i class="fas fa-print"></i> Print
+            </button>
+        </div>
+    </div>
+
+    <!-- Workload + Timetable Grid -->
+    <div class="workload-grid">
+
+        <!-- Left: Workload Summary -->
+        <div class="card workload-summary-card" id="workloadCard">
+            <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+                <div style="width:32px; height:32px; background:rgba(99,102,241,0.1); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:var(--secondary); font-size:0.85rem;">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.9rem; color:var(--text-main);">
+                    Workload Summary
+                </div>
+            </div>
+
+            <!-- Total lectures badge -->
+            <div style="text-align:center; margin-bottom:1.5rem;">
+                <span class="total-badge" id="totalLecturesBadge">
+                    <i class="fas fa-book-open" style="font-size:0.65rem;"></i>
+                    <span id="totalLecturesCount">0</span> Weekly Lectures
+                </span>
+            </div>
+
+            <!-- Per-subject breakdown -->
+            <div id="subjectBreakdownList" style="display:flex; flex-direction:column;"></div>
+        </div>
+
+        <!-- Right: Timetable Grid -->
+        <div class="card faculty-grid-section">
+            <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+                <div style="width:32px; height:32px; background:rgba(37,99,235,0.1); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:var(--primary-light); font-size:0.85rem;">
+                    <i class="fas fa-calendar-week"></i>
+                </div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.9rem; color:var(--text-main);">
+                    Weekly Schedule
+                </div>
+            </div>
+            <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
+                <table class="faculty-timetable-table" id="facultyTimetableTable">
+                    <thead>
+                        <tr>
+                            <th>TIME</th>
+                            <th>MON</th>
+                            <th>TUE</th>
+                            <th>WED</th>
+                            <th>THU</th>
+                            <th>FRI</th>
+                            <th>SAT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="facultyTimetableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const teacherSelect  = document.getElementById('teacherSelect');
+    const loadingState   = document.getElementById('loadingState');
+    const emptyState     = document.getElementById('emptyState');
+    const facultyContent = document.getElementById('facultyContent');
+    const facultyNameH   = document.getElementById('facultyNameHeading');
+    const timetableBody  = document.getElementById('facultyTimetableBody');
+    const breakdownList  = document.getElementById('subjectBreakdownList');
+    const totalCount     = document.getElementById('totalLecturesCount');
+
+    const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const COLORS = ['color-0','color-1','color-2','color-3','color-4','color-5'];
+
+    // Subject → color index (stable within a session)
+    const subjectColorMap = {};
+    let colorIdx = 0;
+
+    function getSubjectColor(subjectName) {
+        if (!(subjectName in subjectColorMap)) {
+            subjectColorMap[subjectName] = colorIdx % COLORS.length;
+            colorIdx++;
+        }
+        return COLORS[subjectColorMap[subjectName]];
+    }
+
+    teacherSelect.addEventListener('change', async () => {
+        const teacherId = teacherSelect.value;
+        if (!teacherId) {
+            facultyContent.style.display = 'none';
+            emptyState.style.display     = 'none';
+            loadingState.style.display   = 'none';
+            return;
+        }
+
+        // Show loading
+        facultyContent.style.display = 'none';
+        emptyState.style.display     = 'none';
+        loadingState.style.display   = 'block';
+
+        try {
+            const [ttRes, wlRes] = await Promise.all([
+                fetch(`/api/faculty_timetable?teacher_id=${teacherId}`),
+                fetch(`/api/faculty_workload?teacher_id=${teacherId}`)
+            ]);
+
+            const ttData = await ttRes.json();
+            const wlData = await wlRes.json();
+
+            if (ttData.error || wlData.error) {
+                throw new Error(ttData.error || wlData.error);
+            }
+
+            // No lectures → empty state
+            const hasAny = Object.keys(ttData.timetable).length > 0;
+            if (!hasAny) {
+                loadingState.style.display = 'none';
+                emptyState.style.display   = 'block';
+                return;
+            }
+
+            renderTimetable(ttData);
+            renderWorkload(wlData);
+
+            // Update heading
+            facultyNameH.textContent = ttData.teacher_name;
+
+            loadingState.style.display   = 'none';
+            facultyContent.style.display = 'block';
+
+        } catch (err) {
+            loadingState.style.display = 'none';
+            emptyState.style.display   = 'block';
+            console.error('Error loading faculty data:', err);
+        }
+    });
+
+    function renderTimetable(data) {
+        timetableBody.innerHTML = '';
+        const visualSlots = data.visual_slots;
+        const timetable   = data.timetable;
+
+        visualSlots.forEach(slot => {
+            const row = document.createElement('tr');
+
+            if (slot.type === 'break') {
+                row.className = 'break-row-faculty';
+                row.innerHTML = `
+                    <td style="color:var(--accent); font-size:0.75rem; font-weight:600; padding:0.5rem 1rem;">${slot.time.substring(0,5)}</td>
+                    <td colspan="6">
+                        <div class="break-label-faculty">
+                            <i class="fas fa-coffee" style="font-size:0.65rem;"></i>
+                            Recess Break
+                        </div>
+                    </td>
+                `;
+            } else {
+                const timeCell = document.createElement('td');
+                timeCell.textContent = slot.time.substring(0, 5);
+                row.appendChild(timeCell);
+
+                DAYS.forEach(day => {
+                    const cell = document.createElement('td');
+                    const key  = `${day}_${slot.time}`;
+                    const entry = timetable[key];
+
+                    if (entry) {
+                        const colorClass = getSubjectColor(entry.subject);
+                        cell.innerHTML = `
+                            <div class="faculty-cell-block ${colorClass}">
+                                <div class="faculty-cell-subject">${entry.subject}</div>
+                                <div class="faculty-cell-class">${entry.class_name}</div>
+                                <div class="faculty-cell-sem">Sem ${entry.semester}</div>
+                            </div>
+                        `;
+                    } else {
+                        cell.innerHTML = '<div class="empty-faculty-cell"><i class="fas fa-minus" style="font-size:0.5rem;"></i></div>';
+                    }
+                    row.appendChild(cell);
+                });
+            }
+
+            timetableBody.appendChild(row);
+        });
+    }
+
+    function renderWorkload(data) {
+        totalCount.textContent = data.total_lectures;
+        breakdownList.innerHTML = '';
+
+        if (data.subjects.length === 0) {
+            breakdownList.innerHTML = '<p style="font-size:0.78rem; color:var(--text-faint); text-align:center; padding:1rem 0;">No scheduled lectures.</p>';
+            return;
+        }
+
+        data.subjects.forEach(s => {
+            const colorClass = getSubjectColor(s.subject_name);
+            const colorIdx2  = COLORS.indexOf(getSubjectColor(s.subject_name));
+            const colorVars  = ['var(--primary-light)','var(--secondary)','var(--success)','var(--accent)','var(--danger)','var(--info)'];
+            const color      = colorVars[colorIdx2] || colorVars[0];
+
+            const row = document.createElement('div');
+            row.className = 'workload-subject-row';
+            row.innerHTML = `
+                <div style="min-width:0;">
+                    <div style="font-size:0.82rem; font-weight:600; color:var(--text-main); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${s.subject_name}</div>
+                    <div style="font-size:0.7rem; color:var(--text-faint); margin-top:0.1rem;">${s.class_name} &bull; Sem ${s.semester}</div>
+                </div>
+                <span class="workload-badge" style="background:${color}1a; color:${color};">
+                    ${s.lecture_count} ${s.lecture_count === 1 ? 'Lecture' : 'Lectures'}
+                </span>
+            `;
+            breakdownList.appendChild(row);
+        });
+    }
+</script>
+{% endblock %}

@@ -1,6 +1,7 @@
 
 import random
 from collections import Counter
+from copy import deepcopy
 
 
 def genetic_algorithm(
@@ -10,11 +11,13 @@ def genetic_algorithm(
     credits,
     invalid_slots=None,
     blocked_days=None,
+    faculty_busy_slots=None,
+    subject_faculty_map=None,
     generations=50,
     population_size=20,
 ):
     """
-    TRUE Genetic Algorithm for conflict-free academic timetable generation.
+    Faculty-Aware Genetic Algorithm for conflict-free academic timetable generation.
 
     Encoding: Indirect (ordering/permutation) encoding.
       - Chromosome = a permutation of the subject pool (subjects repeated by credit count)
@@ -22,27 +25,31 @@ def genetic_algorithm(
       - Sunday is always blocked (not in days list).
       - Additional blocked_days (holidays) are also excluded.
 
-    Components:
-      - Population initialisation  : random shuffles of subject pool
-      - Fitness function           : penalty/reward scoring of decoded schedule
-      - Parent selection           : k=3 Tournament Selection
-      - Crossover                  : Single-cut Order Crossover (OX) preserving multiset
-      - Mutation                   : Swap Mutation at rate=0.10
-      - Elitism                    : top elite_count chromosomes carried forward unchanged
-      - Adaptive mutation          : rate increases by 15% every 25 generations
+    Faculty Hard Constraint (NEW):
+      - Each chromosome evaluation works on its OWN deepcopy of faculty_busy_slots.
+      - Before assigning any (day, time) slot, the faculty member's busy set is checked.
+      - If the faculty is already occupied, the slot is SKIPPED — never assigned.
+      - As slots are assigned, they are added to the local copy immediately.
+      - This makes faculty conflicts IMPOSSIBLE within a single schedule.
 
     Args:
-        subjects      : list of subject name strings
-        timeslots     : list of time strings e.g. ["08:00:00", "09:00:00", ...]
-        priorities    : dict {subject_name: int priority 1-5}
-        credits       : dict {subject_name: int credit_count}
-        invalid_slots : dict {subject: set of (day, time_str) tuples teacher is busy}
-        blocked_days  : list of day names to block e.g. ["Wednesday", "Saturday"]
-        generations   : number of GA generations (default 50)
-        population_size: size of population (default 20)
+        subjects          : list of subject name strings
+        timeslots         : list of time strings e.g. ["08:00:00", "09:00:00", ...]
+        priorities        : dict {subject_name: int priority 1-5}
+        credits           : dict {subject_name: int credit_count}
+        invalid_slots     : dict {subject: set of (day, time_str)} — break slots + legacy
+        blocked_days      : list of day names to block e.g. ["Wednesday", "Saturday"]
+        faculty_busy_slots: dict {teacher_id: set of (day, time_str)} — cross-class
+                            occupancy loaded from DB BEFORE deleting current class rows.
+                            This is the GLOBAL pre-existing occupancy.
+        subject_faculty_map: dict {subject_name: teacher_id}
+        generations       : number of GA generations (default 50)
+        population_size   : size of population (default 20)
 
     Returns:
-        list of {"subject": str, "day": str, "timeslot": str} dicts
+        (schedule, unscheduled_list) where:
+          schedule         = list of {"subject": str, "day": str, "timeslot": str}
+          unscheduled_list = list of {"subject": str, "reason": str}
     """
 
     # ── Defaults ──────────────────────────────────────────────────────────────
@@ -50,6 +57,10 @@ def genetic_algorithm(
         invalid_slots = {}
     if blocked_days is None:
         blocked_days = []
+    if faculty_busy_slots is None:
+        faculty_busy_slots = {}
+    if subject_faculty_map is None:
+        subject_faculty_map = {}
 
     # ── Available days (Sunday always excluded; blocked_days also removed) ────
     ALL_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -66,7 +77,7 @@ def genetic_algorithm(
         class_pool.extend([subject] * count)
 
     if not class_pool or not all_slots:
-        return []
+        return [], []
 
     pool_counts = Counter(class_pool)
     total_needed = len(class_pool)
@@ -79,65 +90,117 @@ def genetic_algorithm(
     # ═══════════════════════════════════════════════════════════════════════════
     # DECODE  — chromosome (ordering) → concrete schedule
     # ═══════════════════════════════════════════════════════════════════════════
-    def decode(ordering: list[str]):
+    def decode(ordering: list[str], local_faculty_busy: dict):
         """
         Greedy decoder: assign each subject in chromosome order to the next
         available valid (day, timeslot) slot.
 
         Hard constraints enforced:
-          - No two subjects share the same (day, timeslot)
-          - No subject placed in a slot marked invalid for it (faculty busy / break)
-          - Max 2 lectures per subject per day
-          - No lectures on blocked days
-        Returns list of entry dicts or None if infeasible.
+          1. No two subjects share the same (day, timeslot) within this class.
+          2. No subject placed in a slot marked invalid for it (break slot).
+          3. Max 2 lectures per subject per day.
+          4. No lectures on blocked days.
+          5. [NEW] Faculty hard constraint: check local_faculty_busy[teacher_id]
+             before every assignment. Update it immediately on assignment.
+
+        Args:
+            ordering           : chromosome (list of subject names, ordered)
+            local_faculty_busy : deepcopy of faculty_busy_slots for this evaluation.
+                                 MUTATED locally — never touches global state.
+
+        Returns:
+            (schedule, unscheduled) tuple.
+            schedule    = list of entry dicts
+            unscheduled = list of {"subject": str, "reason": str}
         """
         schedule = []
+        unscheduled = []
         slots = all_slots[:]          # Work on a copy; ordering is fixed
         subject_day_counts: dict = {}
 
         for subj in ordering:
             assigned = False
-            constraints = invalid_slots.get(subj, set())
-            for i, (day, time) in enumerate(slots):
-                if (
-                    subject_day_counts.get((subj, day), 0) < 2
-                    and (day, time) not in constraints
-                ):
-                    schedule.append({"subject": subj, "day": day, "timeslot": time})
-                    slots.pop(i)
-                    subject_day_counts[(subj, day)] = (
-                        subject_day_counts.get((subj, day), 0) + 1
-                    )
-                    assigned = True
-                    break
-            if not assigned:
-                return None   # Chromosome is infeasible for current constraints
+            # Break / legacy invalid slots for this subject
+            break_constraints = invalid_slots.get(subj, set())
+            # The faculty teaching this subject
+            teacher_id = subject_faculty_map.get(subj)
+            # Faculty's currently-busy slots (from cross-class occupancy + this decode)
+            faculty_busy = local_faculty_busy.get(teacher_id, set()) if teacher_id else set()
 
-        return schedule
+            for i, (day, time) in enumerate(slots):
+                # Hard constraint 1: max 2 lectures per subject per day
+                if subject_day_counts.get((subj, day), 0) >= 2:
+                    continue
+
+                # Hard constraint 2: break/invalid slots
+                if (day, time) in break_constraints:
+                    continue
+
+                # Hard constraint 3: FACULTY CONFLICT CHECK
+                # If teacher is already occupied at (day, time) in ANY class, skip.
+                if (day, time) in faculty_busy:
+                    continue
+
+                # All constraints satisfied — assign this slot
+                schedule.append({"subject": subj, "day": day, "timeslot": time})
+                slots.pop(i)
+                subject_day_counts[(subj, day)] = (
+                    subject_day_counts.get((subj, day), 0) + 1
+                )
+                # Update local faculty busy immediately so next lecture in same
+                # decode pass cannot reuse this slot for the same teacher.
+                if teacher_id is not None:
+                    if teacher_id not in local_faculty_busy:
+                        local_faculty_busy[teacher_id] = set()
+                    local_faculty_busy[teacher_id].add((day, time))
+                    faculty_busy = local_faculty_busy[teacher_id]
+
+                assigned = True
+                break
+
+            if not assigned:
+                unscheduled.append({
+                    "subject": subj,
+                    "reason": "No conflict-free slot available after applying faculty and timetable constraints"
+                })
+
+        return schedule, unscheduled
 
     # ═══════════════════════════════════════════════════════════════════════════
     # FITNESS FUNCTION
+    # Each call to calculate_fitness gets its OWN deepcopy of faculty_busy_slots.
+    # This is critical: without deepcopy, GA generations corrupt shared state.
     # ═══════════════════════════════════════════════════════════════════════════
     def calculate_fitness(ordering: list[str]) -> float:
         """
         Decode chromosome and score the resulting schedule.
+
+        Uses deepcopy(faculty_busy_slots) so each evaluation is independent.
 
         Rewards:
           +100  per unique subject on a day (variety)
           +30   per subject per day (spreading across days)
           +2×p  per lecture (general priority reward, p = priority value)
           +20×p for each consecutive pair of high-priority lectures on same day
+          +50   bonus per successfully scheduled lecture (conflict avoidance reward)
 
         Penalties:
           -500×(k-2) if a subject appears >2 times on same day (k = excess count)
           -20        if a non-high-priority subject has 2 lectures on same day
           -100×count if multi-lectures on same day are NOT in consecutive time slots
+          -200       per unscheduled lecture (strong pressure toward full feasibility)
         """
-        schedule = decode(ordering)
-        if schedule is None:
+        local_busy = deepcopy(faculty_busy_slots)
+        schedule, unscheduled = decode(ordering, local_busy)
+
+        if not schedule and unscheduled:
             return float("-inf")
 
         score = 0.0
+
+        # Penalty for unscheduled lectures
+        score -= len(unscheduled) * 200
+
         day_map: dict = {day: [] for day in available_days}
         for entry in schedule:
             day_map[entry["day"]].append(entry)
@@ -162,8 +225,9 @@ def genetic_algorithm(
                     ):
                         score += 20 * priorities.get(subj, 1)
 
-                # General priority reward per lecture
+                # General priority reward per lecture + scheduling success bonus
                 score += priorities.get(subj, 1) * 2
+                score += 50  # reward for each successfully placed lecture
 
             # Variety reward: unique subjects on this day
             score += len(sub_slots) * 100
@@ -298,17 +362,19 @@ def genetic_algorithm(
             mutation_rate = min(0.30, mutation_rate * 1.15)
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # DECODE BEST CHROMOSOME
+    # DECODE BEST CHROMOSOME — final authoritative decode with fresh deepcopy
     # ═══════════════════════════════════════════════════════════════════════════
     if best_chromosome:
-        result = decode(best_chromosome)
-        if result:
-            return result
+        final_busy = deepcopy(faculty_busy_slots)
+        result_schedule, result_unscheduled = decode(best_chromosome, final_busy)
+        if result_schedule:
+            return result_schedule, result_unscheduled
 
-    # Fallback: try each population member in case best chromosome decodes None
+    # Fallback: try each population member in case best chromosome decodes empty
     for ch in population:
-        result = decode(ch)
-        if result:
-            return result
+        final_busy = deepcopy(faculty_busy_slots)
+        result_schedule, result_unscheduled = decode(ch, final_busy)
+        if result_schedule:
+            return result_schedule, result_unscheduled
 
-    return []
+    return [], [{"subject": s, "reason": "No feasible schedule found after full GA run"} for s in class_pool]
