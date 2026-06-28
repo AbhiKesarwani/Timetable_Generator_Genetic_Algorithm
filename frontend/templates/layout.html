@@ -138,7 +138,7 @@
         <header class="top-bar" role="banner">
             <!-- Left: Hamburger + Breadcrumb -->
             <div class="flex items-center gap-3" style="flex:1; min-width:0;">
-                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false">
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle sidebar navigation" aria-expanded="false" title="Pin/unpin sidebar">
                     <i data-lucide="menu"></i>
                 </button>
                 <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -202,7 +202,7 @@
                 <i data-lucide="graduation-cap"></i>
                 <span>Academic Timetable Portal</span>
             </div>
-            <span style="color:var(--text-muted);">Made with <span style="color:#EF4444;">❤️</span> by Abhinav</span>
+            <span style="color:var(--text-muted); font-size:0.7rem;">Made with <span style="color:#EF4444;">❤</span> by Abhinav &nbsp;·&nbsp; AY 2025–26</span>
         </footer>
     </div>
 
@@ -243,8 +243,8 @@
 
         const isDesktop = () => window.innerWidth >= 768;
 
-        // Restore desktop sidebar state
-        const sidebarExpanded = localStorage.getItem('sidebarExpanded') !== 'false';
+        // Restore desktop sidebar state — collapsed by default, pinned on demand
+        const sidebarExpanded = localStorage.getItem('sidebarExpanded') === 'true';
         if (isDesktop() && sidebarExpanded) {
             sidebar.classList.add('expanded');
             mainWrapper.classList.add('sidebar-expanded');

@@ -13,12 +13,12 @@
 <!-- Welcome Panel -->
 <div class="welcome-panel anim-fade-up">
     <div style="display:flex; align-items:center; gap:1rem; flex:1; min-width:0;">
-        <div class="welcome-avatar">
+        <div class="welcome-avatar" aria-hidden="true">
             {{ session.get('school_name', 'A')[0] | upper }}
         </div>
         <div class="welcome-text" style="min-width:0;">
-            <h2 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Welcome back, {{ session.get('school_name', 'Administrator') }}</h2>
-            <p>Today is a great day to generate your next conflict-free timetable.</p>
+            <h2 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:'Outfit',sans-serif; font-size:1.1rem; font-weight:700; color:var(--text-primary);">Welcome back, {{ session.get('school_name', 'Administrator') }}</h2>
+            <p style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.2rem;">Today is a great day to generate your next conflict-free timetable.</p>
         </div>
     </div>
     <div style="display:flex; align-items:center; gap:0.75rem; flex-shrink:0; flex-wrap:wrap;">
@@ -35,33 +35,33 @@
 <!-- Stats Row -->
 <div class="grid grid-cols-3 anim-fade-up delay-100" style="margin-bottom:var(--space-8);">
 
-    <div class="card card-gradient card-gradient-blue stat-card">
+    <div class="card card-gradient card-gradient-blue stat-card" style="cursor:default;">
         <div class="stat-icon stat-icon-white">
             <i data-lucide="layers"></i>
         </div>
         <div class="stat-info">
             <div class="stat-label">Active Batches</div>
-            <div class="stat-value">{{ class_count }}</div>
+            <div class="stat-value" data-target="{{ class_count }}">{{ class_count }}</div>
         </div>
     </div>
 
-    <div class="card stat-card">
+    <div class="card stat-card" style="cursor:default;">
         <div class="stat-icon stat-icon-green">
             <i data-lucide="user-check"></i>
         </div>
         <div class="stat-info">
             <div class="stat-label">Faculty Members</div>
-            <div class="stat-value">{{ staff_count }}</div>
+            <div class="stat-value" data-target="{{ staff_count }}">{{ staff_count }}</div>
         </div>
     </div>
 
-    <div class="card stat-card">
+    <div class="card stat-card" style="cursor:default;">
         <div class="stat-icon stat-icon-gold">
             <i data-lucide="calendar-check"></i>
         </div>
         <div class="stat-info">
             <div class="stat-label">Generated Timetables</div>
-            <div class="stat-value">{{ timetable_count }}</div>
+            <div class="stat-value" data-target="{{ timetable_count }}">{{ timetable_count }}</div>
         </div>
     </div>
 
@@ -178,4 +178,36 @@
 
 <form id="delete-account-form" action="{{ url_for('auth.delete_account') }}" method="POST" style="display:none;"></form>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* ---- Dashboard stat counter animation ---- */
+(function() {
+    function easeOutExpo(t) {
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    }
+    function animateCount(el) {
+        const target = parseInt(el.getAttribute('data-target'), 10);
+        if (isNaN(target) || target === 0) return;
+        const duration = 900;
+        const start    = performance.now();
+        const startVal = 0;
+        function step(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const val = Math.round(startVal + (target - startVal) * easeOutExpo(progress));
+            el.textContent = val;
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+    // Only animate if user hasn't set reduced motion
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.querySelectorAll('.stat-value[data-target]').forEach(el => {
+            animateCount(el);
+        });
+    }
+})();
+</script>
 {% endblock %}

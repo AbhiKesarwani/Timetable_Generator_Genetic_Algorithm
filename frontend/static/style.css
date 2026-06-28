@@ -94,7 +94,7 @@
     /* Sidebar */
     --sidebar-width:          260px;
     --sidebar-collapsed-w:    64px;
-    --topbar-height:          64px;
+    --topbar-height:          54px;
 
     /* Transitions */
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -514,12 +514,13 @@ img, svg, video { max-width: 100%; height: auto; }
     color: var(--text-primary);
 }
 .nav-item.active {
-    background: var(--primary-dim);
+    background: rgba(79, 107, 255, 0.09);
     color: var(--primary);
     font-weight: 600;
 }
 .nav-item.active::before {
     transform: scaleY(1);
+    box-shadow: 2px 0 8px rgba(79, 107, 255, 0.55);
 }
 
 /* ---- Sidebar Footer ---- */
@@ -1176,7 +1177,9 @@ td {
 }
 tr:last-child td { border-bottom: none; }
 tbody tr { transition: background var(--transition-fast); }
-tbody tr:hover td { background: var(--bg-surface-hover); }
+tbody tr:nth-child(even) td { background-color: rgba(255, 255, 255, 0.018); }
+[data-theme="light"] tbody tr:nth-child(even) td { background-color: rgba(0, 0, 0, 0.02); }
+tbody tr:hover td { background: var(--primary-dim) !important; }
 
 /* Table action buttons */
 .table-action-edit {
@@ -1507,7 +1510,9 @@ tbody tr:hover td { background: var(--bg-surface-hover); }
 }
 .cal-day-cell.today-col {
     color: var(--primary);
-    background: var(--primary-dim);
+    background: linear-gradient(135deg, rgba(79, 107, 255, 0.18) 0%, rgba(139, 92, 246, 0.12) 100%);
+    border-bottom: 2px solid var(--primary);
+    font-weight: 800;
 }
 .cal-time-header {
     background: var(--bg-base);
@@ -2767,4 +2772,400 @@ body { overflow-x: hidden; }
     .page-title { font-size: 1.1rem; }
     .hero-stat-num { font-size: 0.85rem; }
     .metric-num { font-size: 1.75rem; }
+}
+
+/* ================================================================
+   V3 PREMIUM POLISH LAYER
+   Fine-tuned micro-interactions, animations, and visual refinements
+   that elevate the design to commercial SaaS quality.
+   ================================================================ */
+
+/* ---- Custom Scrollbar ---- */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-hover);
+    border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+/* Firefox */
+* { scrollbar-width: thin; scrollbar-color: var(--border-hover) transparent; }
+
+/* ---- New Keyframes ---- */
+@keyframes heroParticle {
+    0%   { transform: translate(0, 0) scale(1);          opacity: 0.3; }
+    25%  { transform: translate(14px, -22px) scale(1.2); opacity: 0.55; }
+    50%  { transform: translate(-10px, -38px) scale(0.85); opacity: 0.2; }
+    75%  { transform: translate(18px, -18px) scale(1.1); opacity: 0.45; }
+    100% { transform: translate(0, 0) scale(1);          opacity: 0.3; }
+}
+@keyframes connectorFlow {
+    0%   { background-position: 0% 0; }
+    100% { background-position: 200% 0; }
+}
+@keyframes skeletonShimmer {
+    0%   { background-position: -400% 0; }
+    100% { background-position:  400% 0; }
+}
+@keyframes avatarRingPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(79, 107, 255, 0.4); }
+    50%       { box-shadow: 0 0 0 6px rgba(79, 107, 255, 0); }
+}
+@keyframes borderGlow {
+    0%, 100% { border-color: rgba(79, 107, 255, 0.2); }
+    50%       { border-color: rgba(79, 107, 255, 0.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .hero-particle,
+    .timeline-connector-line,
+    .skeleton { animation: none !important; }
+}
+
+/* ---- Sidebar: Hover-to-Expand (Desktop) ---- */
+/* On desktop with hover support, hovering the collapsed sidebar reveals labels */
+@media (hover: hover) and (min-width: 769px) {
+    .sidebar:not(.expanded):hover {
+        width: var(--sidebar-width);
+    }
+    .sidebar:not(.expanded):hover .sidebar-brand-text {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+    .sidebar:not(.expanded):hover .sidebar-profile-info {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+    .sidebar:not(.expanded):hover .nav-item span:last-child {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+    .sidebar:not(.expanded):hover .nav-label {
+        opacity: 1;
+    }
+    .sidebar:not(.expanded):hover .sidebar-semester-chip,
+    .sidebar:not(.expanded):hover .ai-engine-status {
+        opacity: 1;
+    }
+}
+
+/* ---- Nav Item: Smooth Lateral Slide on Hover ---- */
+.nav-item:hover:not(.active) {
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+}
+/* Active item: subtle accent glow on left indicator */
+.nav-item.active {
+    background: rgba(79, 107, 255, 0.09);
+}
+.nav-item.active::before {
+    box-shadow: 2px 0 10px rgba(79, 107, 255, 0.6);
+}
+
+/* ---- Focus Rings — WCAG AA ---- */
+.btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(79, 107, 255, 0.15);
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+}
+.nav-item:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+    border-radius: var(--radius);
+}
+
+/* ---- Hero Floating Particles ---- */
+.hero-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    will-change: transform, opacity;
+    animation: heroParticle var(--duration, 9s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+    background: var(--color, rgba(79, 107, 255, 0.4));
+    width: var(--size, 4px);
+    height: var(--size, 4px);
+    filter: blur(0.5px);
+    z-index: 1;
+}
+
+/* ---- Loading Skeleton ---- */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--bg-surface) 25%,
+        var(--bg-elevated) 50%,
+        var(--bg-surface) 75%
+    );
+    background-size: 400% 100%;
+    animation: skeletonShimmer 1.6s ease infinite;
+    border-radius: var(--radius-sm);
+    color: transparent !important;
+    user-select: none;
+}
+
+/* ---- Current Lecture Highlight ---- */
+.subject-block-current {
+    box-shadow:
+        0 0 0 2px rgba(79, 107, 255, 0.85),
+        0 4px 24px rgba(79, 107, 255, 0.35),
+        inset 0 0 0 1px rgba(79, 107, 255, 0.2);
+    transform: scale(1.03) translateY(-1px) !important;
+    z-index: 5;
+    position: relative;
+    animation: borderGlow 2.5s ease-in-out infinite;
+}
+
+/* ---- Today Subject Cell Subtle Tint ---- */
+.cal-subject-cell.today-col {
+    background: rgba(79, 107, 255, 0.04);
+}
+
+/* ---- Animated Timeline Connector (How It Works) ---- */
+.timeline-connector-line {
+    position: absolute;
+    top: 44px;
+    /* Start from the right edge of this card */
+    left: calc(100% + 0.25rem);
+    /* Span to the left edge of the next card (gap compensation) */
+    width: calc(1rem - 0.5rem);
+    right: auto;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        var(--primary) 0%, var(--primary) 33%,
+        transparent 33%, transparent 66%,
+        var(--primary) 66%, var(--primary) 100%
+    );
+    background-size: 200% 100%;
+    animation: connectorFlow 2.5s linear infinite;
+    opacity: 0.3;
+    z-index: 0;
+    pointer-events: none;
+}
+/* In the grid, connector spans the gap */
+.how-it-works-grid {
+    gap: 1.5rem;
+}
+.how-it-works-grid .how-step:not(:last-child) .timeline-connector-line {
+    display: block;
+    left: 100%;
+    width: 1.5rem;
+}
+.how-it-works-grid .how-step:last-child .timeline-connector-line {
+    display: none;
+}
+/* Mobile: hide connectors when stacked */
+@media (max-width: 768px) {
+    .timeline-connector-line { display: none !important; }
+}
+
+/* How-step premium hover */
+.how-step:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(79, 107, 255, 0.3);
+}
+.how-step-icon {
+    transition: transform var(--transition);
+}
+.how-step:hover .how-step-icon {
+    transform: scale(1.12);
+}
+
+/* ---- Metrics: Intersection Observer animation hook ---- */
+.metric-item.in-view .metric-num {
+    animation: countUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ---- Benefit Cards — Enhanced ---- */
+.benefit-icon {
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+.benefit-card:hover .benefit-icon {
+    transform: scale(1.12) rotate(4deg);
+}
+.benefit-card:hover {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(79, 107, 255, 0.2);
+    border-color: rgba(79, 107, 255, 0.25);
+}
+
+/* ---- Showcase Card — Perspective hover ---- */
+.showcase-preview-inner {
+    transition: transform var(--transition-slow);
+}
+.showcase-card:hover .showcase-preview-inner {
+    transform: perspective(600px) rotateX(0deg);
+}
+
+/* ---- Welcome Panel — Avatar Glow ---- */
+.welcome-avatar {
+    position: relative;
+}
+.welcome-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: calc(var(--radius) + 3px);
+    background: var(--grad-primary);
+    z-index: -1;
+    opacity: 0.35;
+    animation: avatarRingPulse 3s ease-in-out infinite;
+}
+
+/* ---- Stat Card — Hover value color shift ---- */
+.stat-card:hover .stat-value {
+    color: var(--primary);
+    transition: color var(--transition);
+}
+
+/* ---- Feature Cards — Top gradient accent ---- */
+.feature-card::after {
+    height: 2px;
+    background: transparent;
+    transition: background var(--transition), opacity var(--transition);
+}
+.feature-card:hover::after {
+    background: var(--grad-primary);
+}
+
+/* ---- Sidebar Brand — Enhanced hover ---- */
+.sidebar-brand:hover .sidebar-crest {
+    box-shadow: 0 6px 20px rgba(79, 107, 255, 0.5);
+}
+
+/* ---- Flash Message — Spring animation ---- */
+.flash-message {
+    animation: slideDown 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ---- Footer — More minimal ---- */
+.site-footer {
+    padding: var(--space-4) var(--space-8);
+    font-size: 0.72rem;
+}
+@media (max-width: 768px) {
+    .site-footer { padding: var(--space-3) var(--space-4); }
+}
+
+/* ---- Topbar chip — refined size ---- */
+.topbar-chip {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.65rem;
+}
+
+/* ---- Input placeholder hierarchy ---- */
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+    color: var(--text-faint);
+    font-size: 0.85rem;
+}
+
+/* ---- Timeline Slot — smooth translate on hover ---- */
+.timeline-slot:hover {
+    transform: translateX(3px);
+    border-color: rgba(79, 107, 255, 0.4);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ---- Priority Row — drag affordance ---- */
+.priority-row:hover {
+    border-color: rgba(79, 107, 255, 0.4);
+    background: var(--bg-surface-hover);
+}
+
+/* ---- Page Banner — Bottom shimmer line ---- */
+.page-banner::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(79, 107, 255, 0.5), rgba(139, 92, 246, 0.4), transparent);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* ---- Section Badge — Subtle interactive ---- */
+.section-badge {
+    transition: background var(--transition), box-shadow var(--transition);
+    cursor: default;
+}
+
+/* ---- Timetable Action Row — consistent layout ---- */
+.timetable-action-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* ---- Print: hide particles ---- */
+@media print {
+    .hero-particle,
+    .timeline-connector-line,
+    .welcome-avatar::after { display: none !important; }
+}
+
+/* ---- Breadcrumb: refined sizing ---- */
+.breadcrumb a,
+.breadcrumb-current { font-size: 0.78rem; }
+
+/* ---- Card glass — refined blur ---- */
+.card-glass {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* ---- Button secondary — glass hover ---- */
+.btn-secondary:hover {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---- Topbar icon buttons — touch target 40×40 on mobile ---- */
+@media (max-width: 480px) {
+    .topbar-icon-btn,
+    .theme-toggle { width: 40px; height: 40px; }
+}
+
+/* ---- Nav group label: keep tight spacing ---- */
+.nav-group { margin-bottom: var(--space-3); }
+
+/* ---- Sidebar footer: pin-mode tooltip hint ---- */
+.sidebar-semester-chip {
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+}
+
+/* ---- Subject block: slightly richer hover ---- */
+.subject-block:hover {
+    transform: scale(1.04) translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    z-index: 6;
+}
+
+/* ---- cal-time-cell: bolder visual weight ---- */
+.cal-time-cell {
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+}
+
+/* ---- Empty state improved ---- */
+.empty-cell {
+    opacity: 0.08;
 }

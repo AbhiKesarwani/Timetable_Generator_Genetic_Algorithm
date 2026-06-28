@@ -371,3 +371,86 @@
 </div>
 
 {% endblock %}
+
+{% block scripts %}
+<script>
+/* ---- Timetable: Today column + current lecture highlight ---- */
+(function() {
+    // Days of week: JS getDay() returns 0=Sun … 6=Sat
+    // Timetable columns order: MON(0), TUE(1), WED(2), THU(3), FRI(4), SAT(5)
+    const jsDay = new Date().getDay(); // 0=Sun,1=Mon,...6=Sat
+    const colMap = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5 }; // Mon→0 … Sat→5
+    const todayColIdx = colMap[jsDay]; // undefined on Sunday
+
+    // Get the calendar grid
+    const grid = document.querySelector('.cal-grid');
+    if (!grid) return;
+
+    // Helper: get all cells in a column by nth-position
+    // Grid has 7 columns (time + 6 days), repeated per row
+    // We need to mark header cell and all subject cells at that column offset
+
+    if (todayColIdx !== undefined) {
+        // Mark day header (col index 1-6 = colIdx 0-5 → grid child position 1-indexed offset 1+1=2 for Mon)
+        const headerCells = grid.querySelectorAll('.cal-day-cell:not(.cal-time-header)');
+        if (headerCells[todayColIdx]) {
+            headerCells[todayColIdx].classList.add('today-col');
+        }
+
+        // Mark subject cells for today's column
+        // Each row: [time-cell, mon-cell, tue-cell, wed-cell, thu-cell, fri-cell, sat-cell]
+        // Subject cells per row that are not break rows
+        const subjectRows = grid.querySelectorAll('.cal-time-cell');
+        subjectRows.forEach(timeCell => {
+            // The subject cells follow the time cell in DOM order
+            // They are siblings after the time cell until the next time cell or break
+            let sibling = timeCell.nextElementSibling;
+            let idx = 0;
+            while (sibling && sibling.classList.contains('cal-subject-cell')) {
+                if (idx === todayColIdx) {
+                    sibling.classList.add('today-col');
+                }
+                sibling = sibling.nextElementSibling;
+                idx++;
+            }
+        });
+    }
+
+    // Current lecture highlight (only on weekdays during college hours)
+    if (todayColIdx !== undefined && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const now = new Date();
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+
+        // Time cells contain the period start time e.g. "08:00"
+        const timeCells = grid.querySelectorAll('.cal-time-cell');
+        const timesArr  = Array.from(timeCells);
+
+        timesArr.forEach((tc, i) => {
+            const txt = tc.textContent.trim(); // "08:00"
+            const parts = txt.split(':');
+            if (parts.length < 2) return;
+            const slotStart = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+            // Look ahead to next slot for end time (or assume 60 min)
+            let slotEnd = slotStart + 60;
+            if (timesArr[i + 1]) {
+                const nxt = timesArr[i + 1].textContent.trim().split(':');
+                if (nxt.length >= 2) slotEnd = parseInt(nxt[0], 10) * 60 + parseInt(nxt[1], 10);
+            }
+            if (nowMins >= slotStart && nowMins < slotEnd) {
+                // Find the subject cell for today in this row
+                let sibling = tc.nextElementSibling;
+                let idx = 0;
+                while (sibling && sibling.classList.contains('cal-subject-cell')) {
+                    if (idx === todayColIdx) {
+                        const block = sibling.querySelector('.subject-block');
+                        if (block) block.classList.add('subject-block-current');
+                    }
+                    sibling = sibling.nextElementSibling;
+                    idx++;
+                }
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

@@ -86,6 +86,14 @@
     <div class="campus-hero-bg" style="background-image:url('{{ url_for('static', filename='images/campus_hero.png') }}');"></div>
     <div class="campus-hero-overlay"></div>
 
+    <!-- Floating ambient particles (GPU-accelerated, reduced-motion safe) -->
+    <span class="hero-particle" style="--duration:11s; --delay:0s;   --size:5px; --color:rgba(79,107,255,0.5);   top:18%; left:16%;"></span>
+    <span class="hero-particle" style="--duration:15s; --delay:2.5s; --size:3px; --color:rgba(139,92,246,0.4);  top:42%; left:74%;"></span>
+    <span class="hero-particle" style="--duration:9s;  --delay:4s;   --size:4px; --color:rgba(34,197,94,0.3);   top:68%; left:82%;"></span>
+    <span class="hero-particle" style="--duration:13s; --delay:1s;   --size:6px; --color:rgba(245,158,11,0.2);  top:78%; left:38%;"></span>
+    <span class="hero-particle" style="--duration:12s; --delay:3s;   --size:3px; --color:rgba(244,63,94,0.3);   top:28%; left:58%;"></span>
+    <span class="hero-particle" style="--duration:16s; --delay:0.5s; --size:4px; --color:rgba(79,107,255,0.3);  top:55%; left:12%;"></span>
+
     <div class="campus-hero-content">
         <!-- LEFT -->
         <div class="campus-hero-left">
@@ -293,8 +301,9 @@
         <p class="section-subtitle">Four simple steps to a fully automated, conflict-free academic timetable.</p>
     </div>
 
-    <div class="how-it-works-grid" style="gap:1rem;">
+    <div class="how-it-works-grid">
         <div class="how-step">
+            <div class="timeline-connector-line" aria-hidden="true"></div>
             <div class="how-step-num">1</div>
             <div class="how-step-icon" style="color:var(--primary);">
                 <i data-lucide="user-check"></i>
@@ -303,6 +312,7 @@
             <p class="how-step-desc">Register all faculty members in the system. Each faculty is linked to their assigned subjects and batch.</p>
         </div>
         <div class="how-step">
+            <div class="timeline-connector-line" aria-hidden="true"></div>
             <div class="how-step-num">2</div>
             <div class="how-step-icon" style="color:var(--secondary);">
                 <i data-lucide="book-open"></i>
@@ -311,6 +321,7 @@
             <p class="how-step-desc">Add academic batches, assign subjects with credit hours, and map faculty to each subject per semester.</p>
         </div>
         <div class="how-step">
+            <div class="timeline-connector-line" aria-hidden="true"></div>
             <div class="how-step-num">3</div>
             <div class="how-step-icon" style="color:var(--warning);">
                 <i data-lucide="cpu"></i>
@@ -319,6 +330,7 @@
             <p class="how-step-desc">Configure your schedule timing preferences and let the Genetic Algorithm engine optimize all constraints.</p>
         </div>
         <div class="how-step">
+            <!-- No connector on last step -->
             <div class="how-step-num">4</div>
             <div class="how-step-icon" style="color:var(--success);">
                 <i data-lucide="calendar-check"></i>
@@ -612,4 +624,63 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* ---- Scroll-triggered animations ---- */
+(function() {
+    // Metric items: trigger in-view class for CSS counter animation
+    const metricItems = document.querySelectorAll('.metric-item');
+    if ('IntersectionObserver' in window && metricItems.length) {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('in-view');
+                    io.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.4 });
+        metricItems.forEach(m => io.observe(m));
+    } else {
+        // Fallback: add class immediately
+        metricItems.forEach(m => m.classList.add('in-view'));
+    }
+
+    // Anim-fade-up sections: trigger on scroll
+    const animEls = document.querySelectorAll('.anim-fade-up:not(.campus-hero *)');
+    if ('IntersectionObserver' in window && animEls.length) {
+        const fadeIO = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.animationPlayState = 'running';
+                    fadeIO.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        animEls.forEach(el => {
+            // Only pause elements that are below the fold
+            if (el.getBoundingClientRect().top > window.innerHeight) {
+                el.style.animationPlayState = 'paused';
+                fadeIO.observe(el);
+            }
+        });
+    }
+
+    // Slow hero background subtle shift on mouse move (desktop only)
+    const heroBg = document.querySelector('.campus-hero-bg');
+    const hero   = document.querySelector('.campus-hero');
+    if (heroBg && hero && window.matchMedia('(min-width:1024px) and (hover:hover)').matches) {
+        hero.addEventListener('mousemove', (e) => {
+            const rect = hero.getBoundingClientRect();
+            const xPct = (e.clientX - rect.left) / rect.width - 0.5;
+            const yPct = (e.clientY - rect.top)  / rect.height - 0.5;
+            heroBg.style.transform = `scale(1.04) translate(${xPct * -6}px, ${yPct * -4}px)`;
+        }, { passive: true });
+        hero.addEventListener('mouseleave', () => {
+            heroBg.style.transform = 'scale(1.04)';
+        }, { passive: true });
+    }
+})();
+</script>
 {% endblock %}
