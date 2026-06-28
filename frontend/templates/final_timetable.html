@@ -1,35 +1,210 @@
 {% extends "layout.html" %}
 
-{% block title %}Generated Timetable — Timetable Portal{% endblock %}
+{% block title %}Generated Timetable — {{ class_name }} Sem {{ semester }} — Academic Portal{% endblock %}
 
 {% block breadcrumb %}
 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="width:10px;height:10px;stroke-width:2.5;"></i></span>
 <a href="{{ url_for('generation.generate_setup') }}">AI Generator</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="width:10px;height:10px;stroke-width:2.5;"></i></span>
 <span class="breadcrumb-current">Results</span>
 {% endblock %}
 
 {% block head %}
 <style>
+    /* Calendar grid wrapper */
+    .cal-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: var(--bg-surface);
+    }
+    .cal-grid {
+        display: grid;
+        grid-template-columns: 100px repeat(6, 1fr);
+        min-width: 780px;
+    }
+
+    /* Sticky header cells */
+    .cal-day-cell {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--bg-base);
+        padding: 0.875rem 0.5rem;
+        text-align: center;
+        font-size: 0.66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+    }
+    .cal-time-header {
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 30;
+        background: var(--bg-base);
+        border-bottom: 1px solid var(--border);
+        border-right: 2px solid var(--border-strong);
+    }
+
+    /* Time column cells */
+    .cal-time-cell {
+        background: var(--bg-surface);
+        border-right: 2px solid var(--border-strong);
+        border-bottom: 1px solid var(--border);
+        padding: 0.5rem 0.5rem;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        white-space: nowrap;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 88px;
+        position: sticky;
+        left: 0;
+        z-index: 10;
+    }
+
+    /* Subject cells */
+    .cal-subject-cell {
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 6px;
+        min-height: 88px;
+        position: relative;
+    }
+
+    /* Break row */
+    .cal-break-full {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        min-height: 36px;
+        background: rgba(245,158,11,0.05);
+        border-top: 1px dashed rgba(245,158,11,0.3);
+        border-bottom: 1px dashed rgba(245,158,11,0.3);
+        position: relative;
+    }
+    .cal-break-time {
+        min-width: 100px;
+        max-width: 100px;
+        padding: 0.5rem;
+        font-size: 0.66rem;
+        font-weight: 700;
+        color: var(--warning);
+        text-align: center;
+        border-right: 2px solid var(--border-strong);
+        position: sticky;
+        left: 0;
+        background: rgba(245,158,11,0.05);
+        z-index: 10;
+        flex-shrink: 0;
+        align-self: stretch;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .cal-break-label {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 0.68rem;
+        font-weight: 800;
+        color: var(--warning);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+    }
+    .cal-break-label svg, .cal-break-label i { width:12px; height:12px; font-size:12px; }
+    .break-line-dashed {
+        width: 60px;
+        height: 1px;
+        background: repeating-linear-gradient(90deg, var(--warning) 0, var(--warning) 4px, transparent 4px, transparent 8px);
+        opacity: 0.45;
+    }
+
+    /* Subject block */
+    .subject-block {
+        padding: 8px 10px;
+        border-radius: 8px;
+        height: 100%;
+        min-height: 74px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.15s, box-shadow 0.15s;
+        border-left: 3px solid;
+        cursor: default;
+    }
+    .subject-block:hover {
+        transform: scale(1.03) translateY(-1px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        z-index: 5;
+        position: relative;
+    }
+    .subject-block-name {
+        font-size: 0.73rem;
+        font-weight: 700;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    .subject-block-label {
+        font-size: 0.6rem;
+        font-weight: 500;
+        opacity: 0.7;
+        margin-top: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+    }
+    .subject-block-label svg, .subject-block-label i { width:8px; height:8px; font-size:8px; flex-shrink:0; }
+
+    /* empty cell */
+    .empty-cell {
+        height: 100%;
+        min-height: 74px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.1;
+    }
+
     @media print {
         .sidebar, .top-bar, .btn, .breadcrumb, .flash-container,
         .hamburger-btn, .sidebar-overlay, .topbar-actions,
         .site-footer, .page-header, .timetable-action-row { display: none !important; }
         body { display: block; background: white; }
-        .main-wrapper { margin: 0 !important; }
+        .main-wrapper { margin: 0 !important; max-width: 100% !important; }
         .content-container { padding: 0.5rem !important; animation: none !important; }
-        .card { border: 1px solid #ccc !important; box-shadow: none !important; }
-        table { border: 1px solid #999 !important; }
-        th, td { border: 1px solid #aaa !important; color: black !important; background: white !important; padding: 0.4rem !important; }
-        .subject-block { background: white !important; border: 1px solid #ccc !important; color: black !important; }
-        .subject-block-name { color: black !important; -webkit-text-fill-color: black !important; }
-        .timetable-header-row th { background: #f0f0f0 !important; color: black !important; }
-        .timetable-time-cell { background: #f0f0f0 !important; }
-        /* Show print-only elements */
-        .timetable-print-header { display: block !important; }
+        .timetable-print-header { display: block !important; margin-bottom: 1rem; }
         .timetable-timestamp { display: flex !important; }
         .print-legend { display: flex !important; }
+        .cal-wrapper { border: 1px solid #ccc !important; }
+        .cal-day-cell { background: #f0f0f0 !important; color: black !important; border-color: #ccc !important; }
+        .cal-time-cell { background: #f0f0f0 !important; color: black !important; border-color: #ccc !important; }
+        .cal-break-full { background: #fffbeb !important; border-color: #d97706 !important; }
+        .cal-break-time { background: #fffbeb !important; color: #d97706 !important; border-color: #ccc !important; }
+        .cal-break-label { color: #d97706 !important; }
+        .subject-block { background: #f8f8f8 !important; border: 1px solid #ccc !important; color: black !important; border-left: 3px solid #999 !important; }
+        .subject-block-name, .subject-block-label { color: black !important; }
+        .cal-subject-cell { border-color: #ccc !important; }
     }
 </style>
 {% endblock %}
@@ -37,162 +212,161 @@
 {% block content %}
 
 <!-- University Branding Header (print-only, hidden on screen) -->
-<div class="timetable-print-header" style="display:none;">
-    <div style="font-size:1.25rem; font-weight:800; font-family:'Plus Jakarta Sans',sans-serif;">Academic Timetable Portal</div>
+<div class="timetable-print-header" style="display:none; margin-bottom:1.5rem;">
+    <div style="font-size:1.25rem; font-weight:800; font-family:'Outfit',sans-serif;">Academic Timetable Portal</div>
     <div style="font-size:0.9rem; color:#555; margin-top:0.25rem;">{{ class_name }} — Semester {{ semester }}</div>
     <div style="font-size:0.75rem; color:#888; margin-top:0.1rem;">AI-Generated via Genetic Algorithm Engine</div>
 </div>
 
 <!-- Page Header -->
-<div class="flex items-center justify-between mb-8 anim-fade-up" style="flex-wrap:wrap; gap:1rem;">
+<div class="flex items-center justify-between mb-8 anim-fade-up page-header" style="flex-wrap:wrap; gap:1rem;">
     <div>
-        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
-            <i class="fas fa-calendar-alt" style="color:var(--primary-light); font-size:1.5rem;"></i>
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.625rem;">
+            <div style="width:44px; height:44px; background:var(--primary-dim); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:var(--primary); flex-shrink:0;">
+                <i data-lucide="calendar-days" style="width:20px;height:20px;stroke-width:1.75;"></i>
+            </div>
             <h1 class="page-title" style="margin-bottom:0;">Generated Timetable</h1>
         </div>
-        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.4rem;">
             <p class="page-subtitle" style="margin-bottom:0;">
-                Academic Schedule for <strong style="color:var(--text-main);">{{ class_name }}</strong>
+                Academic Schedule for <strong style="color:var(--text-primary);">{{ class_name }}</strong>
             </p>
-            <span class="badge badge-ind">
-                <i class="fas fa-list-ol" style="font-size:0.55rem;"></i>
-                Semester {{ semester }}
-            </span>
-            <span class="badge badge-green">
-                <i class="fas fa-check-circle" style="font-size:0.55rem;"></i>
-                AI Generated
-            </span>
-            <span class="badge badge-gray">
-                <i class="fas fa-ban" style="font-size:0.55rem;"></i>
-                Zero Conflicts
-            </span>
+            <span class="badge badge-ind"><i data-lucide="list-ordered" style="width:9px;height:9px;"></i> Semester {{ semester }}</span>
+            <span class="badge badge-green"><i data-lucide="check-circle" style="width:9px;height:9px;"></i> AI Generated</span>
+            <span class="badge badge-gray"><i data-lucide="ban" style="width:9px;height:9px;"></i> Zero Conflicts</span>
         </div>
-        <!-- Generated timestamp -->
-        <div class="timetable-timestamp" style="display:flex; margin-top:0.4rem;">
-            <i class="fas fa-clock" style="font-size:0.65rem;"></i>
+        <div class="timetable-timestamp" style="display:flex; align-items:center; gap:0.5rem; font-size:0.72rem; color:var(--text-muted);">
+            <i data-lucide="clock" style="width:12px;height:12px;"></i>
             Generated by Genetic Algorithm Engine · Academic Year 2025–26
         </div>
     </div>
 
-    <!-- Action buttons — class/action/method preserved -->
+    <!-- Action buttons — all href/action preserved -->
     <div class="timetable-action-row" style="display:flex; gap:0.75rem; flex-wrap:wrap;">
         {% if class_name and semester %}
         <a href="{{ url_for('generation.regenerate_quick') }}" class="btn btn-secondary">
-            <i class="fas fa-redo"></i> Regenerate
+            <i data-lucide="refresh-cw"></i> Regenerate
         </a>
         {% endif %}
         <a href="/modify_timetable" class="btn btn-secondary">
-            <i class="fas fa-edit"></i> Modify Manually
+            <i data-lucide="pencil"></i> Modify Manually
         </a>
         <button onclick="window.print()" class="btn btn-primary">
-            <i class="fas fa-print"></i> Print / Export PDF
+            <i data-lucide="printer"></i> Print / Export PDF
         </button>
     </div>
 </div>
 
-<!-- Timetable Grid -->
-<div class="card timetable-card anim-fade-up delay-100">
-    <div class="table-container" style="border:none; border-radius:0; margin-top:0;">
-        <table style="border-collapse:collapse;">
-            <thead>
-                <tr class="timetable-header-row">
-                    <th style="background:linear-gradient(135deg,#0F172A,#1E293B); color:rgba(148,163,184,0.7); min-width:110px; padding:0.875rem 1rem; font-size:0.7rem; letter-spacing:0.1em; border-right:2px solid rgba(255,255,255,0.08); text-align:left;">TIME SLOT</th>
-                    <th>MONDAY</th>
-                    <th>TUESDAY</th>
-                    <th>WEDNESDAY</th>
-                    <th>THURSDAY</th>
-                    <th>FRIDAY</th>
-                    <th>SATURDAY</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set colors = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'] %}
-                {% set subject_map = namespace(data={}) %}
+<!-- ======= CALENDAR GRID TIMETABLE ======= -->
+<div class="cal-wrapper anim-fade-up delay-100">
+    <div class="cal-grid">
 
-                {% for entry in timeslots %}
-                <tr {% if entry.type == 'break' %}class="timetable-break-row"{% endif %}>
+        <!-- Header row -->
+        <div class="cal-time-header cal-day-cell"></div>
+        <div class="cal-day-cell">MON</div>
+        <div class="cal-day-cell">TUE</div>
+        <div class="cal-day-cell">WED</div>
+        <div class="cal-day-cell">THU</div>
+        <div class="cal-day-cell">FRI</div>
+        <div class="cal-day-cell">SAT</div>
 
-                    {% if entry.type == 'break' %}
-                    <td class="timetable-time-cell" style="color:var(--accent);">
-                        {{ entry.time[:5] }}
-                    </td>
-                    <td colspan="6">
-                        <div class="break-label" style="justify-content:center;">
-                            <div class="break-line"></div>
-                            <i class="fas fa-coffee" style="font-size:0.75rem;"></i>
-                            Recess Break
-                            <div class="break-line"></div>
-                        </div>
-                    </td>
+        {% set colors = ['sb-blue','sb-ind','sb-grn','sb-gold','sb-red','sb-cyan'] %}
+        {% set color_counter = namespace(n=0) %}
+        {% set subject_color_map = namespace(data={}) %}
 
+        {% for entry in timeslots %}
+
+            {% if entry.type == 'break' %}
+            <!-- Break row spans full grid -->
+            <div class="cal-break-full">
+                <div class="cal-break-time">
+                    <i data-lucide="coffee" style="width:11px;height:11px;margin-bottom:2px;display:block;margin-left:auto;margin-right:auto;"></i>
+                    {{ entry.time[:5] }}
+                </div>
+                <div class="cal-break-label">
+                    <div class="break-line-dashed"></div>
+                    <i data-lucide="coffee"></i>
+                    Recess Break
+                    <div class="break-line-dashed"></div>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Time cell (sticky left) -->
+            <div class="cal-time-cell">{{ entry.time[:5] }}</div>
+
+            {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
+            <div class="cal-subject-cell">
+                {% if timetable.get((day, entry.time)) %}
+                    {% set subj = timetable[(day, entry.time)] %}
+                    {% if ' | ' in subj %}
+                        {% set subj_parts = subj.split(' | ') %}
+                        {% set subj_name = subj_parts[0] %}
+                        {% set faculty_name = subj_parts[1] %}
                     {% else %}
-                    <td class="timetable-time-cell">{{ entry.time[:5] }}</td>
-
-                    {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
-                    <td class="timetable-subject-cell">
-                        {% if timetable.get((day, entry.time)) %}
-                             {% set subj = timetable[(day, entry.time)] %}
-                             {% set cidx = (loop.index0 + loop.revindex) % 6 %}
-                             {% if ' | ' in subj %}
-                                 {% set subj_parts = subj.split(' | ') %}
-                                 {% set subj_name = subj_parts[0] %}
-                                 {% set faculty_name = subj_parts[1] %}
-                             {% else %}
-                                 {% set subj_name = subj %}
-                                 {% set faculty_name = "Faculty Not Assigned" %}
-                             {% endif %}
-                             <div class="subject-block {{ colors[cidx] }}" title="{{ subj_name }} — {{ day }} {{ entry.time[:5] }}">
-                                 <div class="subject-block-name">{{ subj_name }}</div>
-                                 <div class="subject-block-label">
-                                     {{ faculty_name }}
-                                 </div>
-                             </div>
-                        {% else %}
-                            <div class="empty-cell">
-                                <i class="fas fa-minus" style="font-size:0.55rem;"></i>
-                            </div>
-                        {% endif %}
-                    </td>
-                    {% endfor %}
+                        {% set subj_name = subj %}
+                        {% set faculty_name = 'Not Assigned' %}
                     {% endif %}
 
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+                    {% if subj_name not in subject_color_map.data %}
+                        {% set _ = subject_color_map.data.update({subj_name: colors[color_counter.n % 6]}) %}
+                        {% set color_counter.n = color_counter.n + 1 %}
+                    {% endif %}
 
-<!-- Enhanced Legend + Info Row -->
-<div class="anim-fade-up delay-200" style="display:grid; grid-template-columns:1fr auto; gap:1rem; margin-top:0; align-items:start; flex-wrap:wrap;">
+                    <div class="subject-block {{ subject_color_map.data[subj_name] }}" title="{{ subj_name }} — {{ faculty_name }} · {{ day }} {{ entry.time[:5] }}">
+                        <div class="subject-block-name">{{ subj_name }}</div>
+                        <div class="subject-block-label">
+                            <i data-lucide="user" style="width:8px;height:8px;"></i>
+                            {{ faculty_name }}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-cell">
+                        <i data-lucide="minus" style="width:10px;height:10px;stroke-width:2;"></i>
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
 
-    <!-- Legend card -->
-    <div class="card" style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; padding:1rem 1.5rem;">
-        <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em;">Legend</span>
-
-        {% set legend_colors = [('sb-blue', 'primary-light'), ('sb-ind', 'secondary'), ('sb-grn', 'success'), ('sb-gold', 'accent'), ('sb-red', 'danger'), ('sb-cyan', 'info')] %}
-        {% for cls, col in legend_colors %}
-        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-muted);">
-            <div style="width:14px; height:14px; border-radius:3px; border-left:3px solid var(--{{ col }}); background:rgba(0,0,0,0.05);"></div>
-            <span>Subject {{ loop.index }}</span>
-        </div>
+            {% endif %}
         {% endfor %}
 
-        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.78rem; color:var(--text-muted);">
-            <div style="width:14px; height:14px; border-radius:3px; border-left:3px solid var(--accent); background:rgba(217,119,6,0.08);"></div>
+    </div><!-- /.cal-grid -->
+</div><!-- /.cal-wrapper -->
+
+<!-- Legend + AI attribution -->
+<div class="anim-fade-up delay-200" style="display:grid; grid-template-columns:1fr auto; gap:1rem; margin-top:var(--space-5); align-items:start;">
+
+    <!-- Legend -->
+    <div class="card print-legend" style="display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; padding:0.875rem 1.25rem;">
+        <span style="font-size:0.68rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; flex-shrink:0;">Legend</span>
+        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-secondary);">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--accent-blue); background:rgba(79,107,255,0.08);"></div>
+            <span>Subject A</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-secondary);">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--accent-purple); background:rgba(139,92,246,0.08);"></div>
+            <span>Subject B</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-secondary);">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--accent-green); background:rgba(34,197,94,0.08);"></div>
+            <span>Subject C</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-secondary);">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--warning); background:rgba(245,158,11,0.08);"></div>
             <span>Recess Break</span>
         </div>
-        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.78rem; color:var(--text-muted);">
-            <div style="width:14px; height:14px; border-radius:3px; background:var(--bg-muted); opacity:0.5;"></div>
+        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-secondary);">
+            <div style="width:12px; height:12px; border-radius:3px; background:var(--bg-muted); opacity:0.5;"></div>
             <span>Free Slot</span>
         </div>
     </div>
 
-    <!-- AI attribution -->
-    <div class="card" style="padding:1rem 1.25rem; display:flex; flex-direction:column; align-items:center; gap:0.3rem; text-align:center; white-space:nowrap;">
-        <i class="fas fa-brain" style="color:var(--primary-light); font-size:1.25rem;"></i>
-        <div style="font-size:0.72rem; font-weight:700; color:var(--text-main);">Genetic Algorithm</div>
-        <div style="font-size:0.65rem; color:var(--text-faint);">Zero Conflicts</div>
+    <!-- AI badge -->
+    <div class="card" style="padding:0.875rem 1.25rem; display:flex; flex-direction:column; align-items:center; gap:0.25rem; text-align:center; white-space:nowrap;">
+        <i data-lucide="cpu" style="color:var(--primary); width:22px; height:22px;"></i>
+        <div style="font-size:0.72rem; font-weight:700; color:var(--text-primary); margin-top:2px;">Genetic Algorithm</div>
+        <div style="font-size:0.62rem; color:var(--text-muted);">Zero Conflicts</div>
     </div>
 </div>
 

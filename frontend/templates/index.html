@@ -10,37 +10,65 @@
         width: 100%;
         box-sizing: border-box;
     }
-    @media (max-width: 768px) {
-        .inner-content-pad { padding: 0 var(--space-4); }
-    }
+    @media (max-width: 768px) { .inner-content-pad { padding: 0 var(--space-4); } }
+    @media (max-width: 430px) { .inner-content-pad { padding: 0 var(--space-3); } }
+    @media (max-width: 375px) { .inner-content-pad { padding: 0 0.625rem; } }
+
+    .anim-fade-up { width: 100%; max-width: 100%; box-sizing: border-box; overflow: hidden; }
+
     @media (max-width: 430px) {
-        .inner-content-pad { padding: 0 var(--space-3); }
-    }
-    @media (max-width: 375px) {
-        .inner-content-pad { padding: 0 0.625rem; }
+        .metric-num { font-size: 2rem; }
+        .metric-icon svg, .metric-icon i { width: 22px; height: 22px; }
     }
 
-    /* ---- Ensure every section wrapper is clamped ---- */
-    .anim-fade-up {
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        overflow: hidden; /* catch any child that tries to overflow */
-    }
-
-    /* ---- Metrics: at 430px reduce font sizes ---- */
-    @media (max-width: 430px) {
-        .metric-num { font-size: 1.75rem; }
-        .metric-icon { font-size: 1.1rem; }
-        .metric-item + .metric-item::before { display: none; }
-    }
-
-    /* ---- How-step text: don't let it overflow ---- */
     .how-step { word-break: break-word; overflow-wrap: break-word; }
     .how-step-desc { overflow-wrap: break-word; }
-
-    /* ---- Benefit card text: don't let it overflow ---- */
     .benefit-card { word-break: break-word; overflow-wrap: break-word; }
+
+    /* How-it-works connector */
+    .how-it-works-grid {
+        position: relative;
+        padding-top: 24px;
+    }
+    @media (min-width: 769px) {
+        .how-it-works-grid::before {
+            content: '';
+            position: absolute;
+            top: 42px;
+            left: calc(12.5% + 18px);
+            right: calc(12.5% + 18px);
+            height: 2px;
+            background: repeating-linear-gradient(90deg, var(--primary) 0, var(--primary) 6px, transparent 6px, transparent 14px);
+            opacity: 0.2;
+            pointer-events: none;
+        }
+    }
+
+    /* Bottom CTA */
+    .bottom-cta {
+        position: relative;
+        border-radius: var(--radius-xl);
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        padding: var(--space-12) var(--space-8);
+        text-align: center;
+        overflow: hidden;
+    }
+    .bottom-cta::before {
+        content: '';
+        position: absolute;
+        top: -80px; left: 50%; transform: translateX(-50%);
+        width: 500px; height: 300px;
+        background: radial-gradient(ellipse, rgba(79,107,255,0.12) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .bottom-cta::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: var(--grad-primary);
+    }
 </style>
 {% endblock %}
 
@@ -62,7 +90,7 @@
         <!-- LEFT -->
         <div class="campus-hero-left">
             <div class="campus-hero-badge">
-                <i class="fas fa-brain"></i>
+                <i data-lucide="cpu"></i>
                 AI-Powered Scheduling
             </div>
             <h1 class="campus-hero-title">
@@ -76,20 +104,20 @@
             <div class="campus-hero-cta">
                 {% if session.get('school_id') %}
                 <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-chart-bar"></i>
+                    <i data-lucide="layout-dashboard"></i>
                     Go to Dashboard
                 </a>
-                <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-lg" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white;">
-                    <i class="fas fa-brain"></i>
+                <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-lg" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:white;">
+                    <i data-lucide="cpu"></i>
                     Generate Timetable
                 </a>
                 {% else %}
                 <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-sign-in-alt"></i>
+                    <i data-lucide="log-in"></i>
                     Get Started
                 </a>
-                <a href="{{ url_for('timetable_view.view_timetable') }}" class="btn btn-lg" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white;">
-                    <i class="fas fa-calendar-week"></i>
+                <a href="{{ url_for('timetable_view.view_timetable') }}" class="btn btn-lg" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:white;">
+                    <i data-lucide="calendar-days"></i>
                     View Timetables
                 </a>
                 {% endif %}
@@ -98,15 +126,15 @@
             <!-- Trust indicators -->
             <div class="campus-hero-trust">
                 <div class="campus-hero-trust-item">
-                    <i class="fas fa-check-circle"></i>
+                    <i data-lucide="check-circle"></i>
                     Zero Faculty Conflicts
                 </div>
                 <div class="campus-hero-trust-item">
-                    <i class="fas fa-check-circle"></i>
+                    <i data-lucide="check-circle"></i>
                     Multi-Batch Support
                 </div>
                 <div class="campus-hero-trust-item">
-                    <i class="fas fa-check-circle"></i>
+                    <i data-lucide="check-circle"></i>
                     Under 10 Seconds
                 </div>
             </div>
@@ -115,50 +143,79 @@
         <!-- RIGHT: Timetable Illustration -->
         <div class="campus-hero-right">
             <div class="hero-illustration-card">
-                <!-- Timetable SVG illustration — PRODUCT BRANDING ELEMENT — DO NOT REMOVE -->
+                <!-- Premium animated timetable illustration -->
                 <svg viewBox="0 0 420 260" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:100%; height:auto; display:block;">
-                    <!-- Background grid -->
-                    <rect x="10" y="10" width="400" height="240" rx="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-                    <!-- Timetable grid lines -->
-                    <line x1="10" y1="50" x2="410" y2="50" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <line x1="10" y1="90" x2="410" y2="90" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <line x1="10" y1="130" x2="410" y2="130" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <line x1="10" y1="170" x2="410" y2="170" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <line x1="10" y1="210" x2="410" y2="210" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <line x1="80" y1="10" x2="80" y2="250" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <line x1="142" y1="10" x2="142" y2="250" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <line x1="204" y1="10" x2="204" y2="250" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <line x1="266" y1="10" x2="266" y2="250" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <line x1="328" y1="10" x2="328" y2="250" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                    <!-- Header cells -->
-                    <rect x="80" y="10" width="62" height="40" rx="0" fill="rgba(37,99,235,0.2)"/>
-                    <rect x="142" y="10" width="62" height="40" rx="0" fill="rgba(37,99,235,0.15)"/>
-                    <rect x="204" y="10" width="62" height="40" rx="0" fill="rgba(37,99,235,0.2)"/>
-                    <rect x="266" y="10" width="62" height="40" rx="0" fill="rgba(37,99,235,0.15)"/>
-                    <rect x="328" y="10" width="82" height="40" rx="0" fill="rgba(37,99,235,0.2)"/>
-                    <!-- Subject blocks (colored) -->
-                    <rect x="84" y="54" width="54" height="32" rx="4" fill="rgba(37,99,235,0.5)"/>
-                    <rect x="146" y="54" width="54" height="32" rx="4" fill="rgba(79,70,229,0.5)"/>
-                    <rect x="208" y="54" width="54" height="32" rx="4" fill="rgba(5,150,105,0.5)"/>
-                    <rect x="84" y="94" width="54" height="32" rx="4" fill="rgba(217,119,6,0.5)"/>
-                    <rect x="270" y="94" width="54" height="32" rx="4" fill="rgba(37,99,235,0.5)"/>
-                    <rect x="332" y="94" width="54" height="32" rx="4" fill="rgba(79,70,229,0.5)"/>
-                    <rect x="146" y="134" width="54" height="32" rx="4" fill="rgba(5,150,105,0.5)"/>
-                    <rect x="208" y="134" width="54" height="32" rx="4" fill="rgba(217,119,6,0.5)"/>
-                    <rect x="332" y="134" width="54" height="32" rx="4" fill="rgba(220,38,38,0.4)"/>
-                    <rect x="84" y="174" width="54" height="32" rx="4" fill="rgba(5,150,105,0.5)"/>
-                    <rect x="208" y="174" width="54" height="32" rx="4" fill="rgba(79,70,229,0.5)"/>
-                    <rect x="270" y="174" width="54" height="32" rx="4" fill="rgba(217,119,6,0.5)"/>
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4F6BFF;stop-opacity:0.6"/>
+                            <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:0.6"/>
+                        </linearGradient>
+                        <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#22C55E;stop-opacity:0.6"/>
+                            <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0.6"/>
+                        </linearGradient>
+                        <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:0.6"/>
+                            <stop offset="100%" style="stop-color:#F43F5E;stop-opacity:0.5"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Card background -->
+                    <rect x="8" y="8" width="404" height="244" rx="12" fill="rgba(22,32,51,0.7)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                    <!-- Header row -->
+                    <rect x="8" y="8" width="404" height="38" rx="12" fill="rgba(11,17,32,0.9)"/>
+                    <rect x="8" y="34" width="404" height="12" fill="rgba(11,17,32,0.9)"/>
+                    <!-- Day labels -->
+                    <rect x="90" y="15" width="52" height="22" rx="6" fill="rgba(79,107,255,0.25)"/>
+                    <rect x="150" y="15" width="52" height="22" rx="6" fill="rgba(79,107,255,0.2)"/>
+                    <rect x="210" y="15" width="52" height="22" rx="6" fill="rgba(79,107,255,0.25)"/>
+                    <rect x="270" y="15" width="52" height="22" rx="6" fill="rgba(79,107,255,0.2)"/>
+                    <rect x="330" y="15" width="70" height="22" rx="6" fill="rgba(79,107,255,0.25)"/>
+                    <!-- Grid lines -->
+                    <line x1="8" y1="88" x2="412" y2="88" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    <line x1="8" y1="128" x2="412" y2="128" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    <line x1="8" y1="168" x2="412" y2="168" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    <line x1="8" y1="208" x2="412" y2="208" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    <line x1="88" y1="46" x2="88" y2="252" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    <line x1="148" y1="46" x2="148" y2="252" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    <line x1="208" y1="46" x2="208" y2="252" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    <line x1="268" y1="46" x2="268" y2="252" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    <line x1="328" y1="46" x2="328" y2="252" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    <!-- Time column -->
+                    <rect x="8" y="46" width="80" height="206" fill="rgba(11,17,32,0.5)"/>
+                    <!-- Time labels (blocks) -->
+                    <rect x="12" y="52" width="72" height="32" rx="4" fill="rgba(255,255,255,0.04)"/>
+                    <rect x="12" y="92" width="72" height="32" rx="4" fill="rgba(255,255,255,0.04)"/>
+                    <rect x="12" y="132" width="72" height="32" rx="4" fill="rgba(255,255,255,0.04)"/>
+                    <rect x="12" y="172" width="72" height="32" rx="4" fill="rgba(255,255,255,0.04)"/>
+                    <!-- Subject blocks — row 1 -->
+                    <rect x="92" y="50" width="52" height="34" rx="6" fill="url(#grad1)"/>
+                    <rect x="152" y="50" width="52" height="34" rx="6" fill="url(#grad2)"/>
+                    <rect x="212" y="50" width="52" height="34" rx="6" fill="rgba(245,158,11,0.45)"/>
+                    <rect x="272" y="50" width="52" height="34" rx="6" fill="url(#grad1)"/>
+                    <!-- Row 2 -->
+                    <rect x="92" y="90" width="52" height="34" rx="6" fill="rgba(244,63,94,0.4)"/>
+                    <rect x="212" y="90" width="52" height="34" rx="6" fill="url(#grad2)"/>
+                    <rect x="272" y="90" width="52" height="34" rx="6" fill="rgba(139,92,246,0.45)"/>
+                    <rect x="332" y="90" width="68" height="34" rx="6" fill="url(#grad1)"/>
                     <!-- Break row -->
-                    <rect x="80" y="166" width="330" height="4" rx="2" fill="rgba(217,119,6,0.25)"/>
-                    <!-- Time labels -->
-                    <rect x="10" y="54" width="70" height="32" rx="0" fill="rgba(255,255,255,0.04)"/>
-                    <rect x="10" y="94" width="70" height="32" rx="0" fill="rgba(255,255,255,0.04)"/>
-                    <rect x="10" y="134" width="70" height="32" rx="0" fill="rgba(255,255,255,0.04)"/>
-                    <rect x="10" y="174" width="70" height="32" rx="0" fill="rgba(255,255,255,0.04)"/>
-                    <!-- AI sparkle -->
-                    <circle cx="390" cy="30" r="14" fill="rgba(79,70,229,0.3)" stroke="rgba(79,70,229,0.5)" stroke-width="1.5"/>
-                    <path d="M390 23 L392 29 L398 31 L392 33 L390 39 L388 33 L382 31 L388 29 Z" fill="white" opacity="0.9"/>
+                    <rect x="88" y="127" width="316" height="2" rx="1" fill="rgba(245,158,11,0.4)"/>
+                    <rect x="8" y="127" width="404" height="2" rx="0" fill="rgba(245,158,11,0.12)"/>
+                    <!-- Row 3 -->
+                    <rect x="152" y="130" width="52" height="34" rx="6" fill="url(#grad3)"/>
+                    <rect x="212" y="130" width="52" height="34" rx="6" fill="url(#grad2)"/>
+                    <rect x="332" y="130" width="68" height="34" rx="6" fill="rgba(79,107,255,0.4)"/>
+                    <!-- Row 4 -->
+                    <rect x="92" y="170" width="52" height="34" rx="6" fill="url(#grad2)"/>
+                    <rect x="152" y="170" width="52" height="34" rx="6" fill="rgba(139,92,246,0.45)"/>
+                    <rect x="272" y="170" width="52" height="34" rx="6" fill="url(#grad3)"/>
+                    <rect x="332" y="170" width="68" height="34" rx="6" fill="url(#grad1)"/>
+                    <!-- Today column highlight -->
+                    <rect x="148" y="46" width="60" height="206" fill="rgba(79,107,255,0.04)" rx="0"/>
+                    <!-- AI badge -->
+                    <circle cx="392" cy="28" r="16" fill="rgba(79,107,255,0.25)" stroke="rgba(79,107,255,0.5)" stroke-width="1.5"/>
+                    <path d="M392 21 L394 27 L400 29 L394 31 L392 37 L390 31 L384 29 L390 27 Z" fill="white" opacity="0.9"/>
+                    <!-- Animated pulse rings (simulated with opacity) -->
+                    <circle cx="392" cy="28" r="20" fill="none" stroke="rgba(79,107,255,0.2)" stroke-width="1" opacity="0.7"/>
                 </svg>
 
                 <!-- Live Stats below illustration -->
@@ -176,8 +233,8 @@
                         <span class="hero-stat-label">Batches</span>
                     </div>
                     <div class="hero-stat-item">
-                        <span class="hero-stat-num" style="color:#4ade80;">100%</span>
-                        <span class="hero-stat-label">Conflict Free</span>
+                        <span class="hero-stat-num" style="color:var(--success);">100%</span>
+                        <span class="hero-stat-label">Conflict-Free</span>
                     </div>
                 </div>
             </div>
@@ -188,26 +245,34 @@
 <!-- ===================================================================
      SECTION 2: INSTITUTION METRICS
      =================================================================== -->
-<div class="anim-fade-up delay-100" style="margin-bottom:var(--space-8);">
+<div class="anim-fade-up delay-100" style="margin-bottom:var(--space-10);">
     <div class="metrics-section">
         <div class="metrics-grid">
             <div class="metric-item">
-                <div class="metric-icon" style="color:var(--primary-light);">📚</div>
+                <div class="metric-icon" style="color:var(--primary);">
+                    <i data-lucide="book-open"></i>
+                </div>
                 <div class="metric-num">∞</div>
                 <div class="metric-label">Subjects Supported</div>
             </div>
             <div class="metric-item">
-                <div class="metric-icon" style="color:var(--success);">👥</div>
+                <div class="metric-icon" style="color:var(--success);">
+                    <i data-lucide="users"></i>
+                </div>
                 <div class="metric-num">∞</div>
                 <div class="metric-label">Faculty Members</div>
             </div>
             <div class="metric-item">
-                <div class="metric-icon" style="color:var(--accent);">🎓</div>
+                <div class="metric-icon" style="color:var(--secondary);">
+                    <i data-lucide="graduation-cap"></i>
+                </div>
                 <div class="metric-num">∞</div>
                 <div class="metric-label">Academic Batches</div>
             </div>
             <div class="metric-item">
-                <div class="metric-icon" style="color:var(--secondary);">⚡</div>
+                <div class="metric-icon" style="color:var(--warning);">
+                    <i data-lucide="zap"></i>
+                </div>
                 <div class="metric-num">&lt;10s</div>
                 <div class="metric-label">Generation Time</div>
             </div>
@@ -218,21 +283,21 @@
 <!-- ===================================================================
      SECTION 3: HOW IT WORKS
      =================================================================== -->
-<div class="anim-fade-up delay-150" style="margin-bottom:var(--space-8);">
+<div class="anim-fade-up delay-150" style="margin-bottom:var(--space-10);">
     <div class="section-header">
         <div class="section-badge">
-            <i class="fas fa-route"></i>
+            <i data-lucide="route"></i>
             Process
         </div>
         <h2 class="section-title">How It Works</h2>
         <p class="section-subtitle">Four simple steps to a fully automated, conflict-free academic timetable.</p>
     </div>
 
-    <div class="how-it-works-grid">
+    <div class="how-it-works-grid" style="gap:1rem;">
         <div class="how-step">
             <div class="how-step-num">1</div>
-            <div class="how-step-icon" style="color:var(--primary-light);">
-                <i class="fas fa-user-tie"></i>
+            <div class="how-step-icon" style="color:var(--primary);">
+                <i data-lucide="user-check"></i>
             </div>
             <div class="how-step-title">Add Faculty</div>
             <p class="how-step-desc">Register all faculty members in the system. Each faculty is linked to their assigned subjects and batch.</p>
@@ -240,15 +305,15 @@
         <div class="how-step">
             <div class="how-step-num">2</div>
             <div class="how-step-icon" style="color:var(--secondary);">
-                <i class="fas fa-book-open"></i>
+                <i data-lucide="book-open"></i>
             </div>
             <div class="how-step-title">Configure Curriculum</div>
             <p class="how-step-desc">Add academic batches, assign subjects with credit hours, and map faculty to each subject per semester.</p>
         </div>
         <div class="how-step">
             <div class="how-step-num">3</div>
-            <div class="how-step-icon" style="color:var(--accent);">
-                <i class="fas fa-brain"></i>
+            <div class="how-step-icon" style="color:var(--warning);">
+                <i data-lucide="cpu"></i>
             </div>
             <div class="how-step-title">Run Algorithm</div>
             <p class="how-step-desc">Configure your schedule timing preferences and let the Genetic Algorithm engine optimize all constraints.</p>
@@ -256,7 +321,7 @@
         <div class="how-step">
             <div class="how-step-num">4</div>
             <div class="how-step-icon" style="color:var(--success);">
-                <i class="fas fa-calendar-check"></i>
+                <i data-lucide="calendar-check"></i>
             </div>
             <div class="how-step-title">Get Timetable</div>
             <p class="how-step-desc">Review, manually adjust, and finalize a conflict-free timetable. Export to PDF or share the public link.</p>
@@ -267,10 +332,10 @@
 <!-- ===================================================================
      SECTION 4: PRODUCT SHOWCASE
      =================================================================== -->
-<div class="anim-fade-up delay-200" style="margin-bottom:var(--space-8);">
+<div class="anim-fade-up delay-200" style="margin-bottom:var(--space-10);">
     <div class="section-header">
         <div class="section-badge">
-            <i class="fas fa-desktop"></i>
+            <i data-lucide="monitor"></i>
             Product
         </div>
         <h2 class="section-title">Built for Real Universities</h2>
@@ -281,25 +346,25 @@
 
         <!-- Dashboard -->
         <div class="showcase-card">
-            <div class="showcase-preview" style="background:linear-gradient(135deg,#0F172A,#1E3A8A);">
+            <div class="showcase-preview" style="background:linear-gradient(135deg,#0B1120,#162033);">
                 <div class="showcase-preview-inner" style="background:#0f1e35; padding:0.5rem;">
-                    <div style="height:12px; background:rgba(37,99,235,0.4); border-radius:3px; margin-bottom:6px;"></div>
+                    <div style="height:10px; background:rgba(79,107,255,0.4); border-radius:3px; margin-bottom:6px;"></div>
                     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-bottom:6px;">
-                        <div style="height:28px; background:rgba(37,99,235,0.3); border-radius:4px;"></div>
-                        <div style="height:28px; background:rgba(5,150,105,0.3); border-radius:4px;"></div>
-                        <div style="height:28px; background:rgba(217,119,6,0.3); border-radius:4px;"></div>
+                        <div style="height:26px; background:rgba(79,107,255,0.3); border-radius:4px;"></div>
+                        <div style="height:26px; background:rgba(34,197,94,0.3); border-radius:4px;"></div>
+                        <div style="height:26px; background:rgba(245,158,11,0.3); border-radius:4px;"></div>
                     </div>
                     <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:4px;">
-                        <div style="height:36px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:4px;"></div>
-                        <div style="height:36px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:4px;"></div>
-                        <div style="height:36px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:4px;"></div>
-                        <div style="height:36px; background:rgba(37,99,235,0.15); border:1px solid rgba(37,99,235,0.25); border-radius:4px;"></div>
+                        <div style="height:32px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:4px;"></div>
+                        <div style="height:32px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:4px;"></div>
+                        <div style="height:32px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:4px;"></div>
+                        <div style="height:32px; background:rgba(79,107,255,0.15); border:1px solid rgba(79,107,255,0.25); border-radius:4px;"></div>
                     </div>
                 </div>
             </div>
             <div class="showcase-info">
                 <div class="showcase-title">
-                    <i class="fas fa-chart-bar" style="color:var(--primary-light); margin-right:0.4rem;"></i>
+                    <i data-lucide="layout-dashboard" style="color:var(--primary);"></i>
                     Academic Dashboard
                 </div>
                 <p class="showcase-desc">Institution overview with real-time stats, quick actions, and management shortcuts.</p>
@@ -308,32 +373,28 @@
 
         <!-- Faculty -->
         <div class="showcase-card">
-            <div class="showcase-preview" style="background:linear-gradient(135deg,#065F46,#1E3A8A);">
+            <div class="showcase-preview" style="background:linear-gradient(135deg,#052e16,#0f2b1a);">
                 <div class="showcase-preview-inner" style="background:#0f1e35; padding:0.5rem;">
-                    <div style="height:10px; background:rgba(5,150,105,0.4); border-radius:3px; margin-bottom:6px; width:60%;"></div>
+                    <div style="height:9px; background:rgba(34,197,94,0.4); border-radius:3px; margin-bottom:6px; width:60%;"></div>
                     <div style="display:flex; flex-direction:column; gap:4px;">
                         <div style="display:flex; align-items:center; gap:4px;">
-                            <div style="width:18px; height:18px; background:linear-gradient(135deg,#1E3A8A,#2563EB); border-radius:3px; flex-shrink:0;"></div>
-                            <div style="height:10px; background:rgba(255,255,255,0.1); border-radius:2px; flex:1;"></div>
+                            <div style="width:18px; height:18px; background:linear-gradient(135deg,#1e40af,#4F6BFF); border-radius:3px; flex-shrink:0;"></div>
+                            <div style="height:9px; background:rgba(255,255,255,0.1); border-radius:2px; flex:1;"></div>
                         </div>
                         <div style="display:flex; align-items:center; gap:4px;">
-                            <div style="width:18px; height:18px; background:linear-gradient(135deg,#4F46E5,#7C3AED); border-radius:3px; flex-shrink:0;"></div>
-                            <div style="height:10px; background:rgba(255,255,255,0.1); border-radius:2px; flex:1;"></div>
+                            <div style="width:18px; height:18px; background:linear-gradient(135deg,#5b21b6,#8B5CF6); border-radius:3px; flex-shrink:0;"></div>
+                            <div style="height:9px; background:rgba(255,255,255,0.1); border-radius:2px; flex:1;"></div>
                         </div>
                         <div style="display:flex; align-items:center; gap:4px;">
-                            <div style="width:18px; height:18px; background:linear-gradient(135deg,#065F46,#059669); border-radius:3px; flex-shrink:0;"></div>
-                            <div style="height:10px; background:rgba(255,255,255,0.1); border-radius:2px; flex:1;"></div>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:4px;">
-                            <div style="width:18px; height:18px; background:linear-gradient(135deg,#92400E,#D97706); border-radius:3px; flex-shrink:0;"></div>
-                            <div style="height:10px; background:rgba(255,255,255,0.1); border-radius:2px; flex:1;"></div>
+                            <div style="width:18px; height:18px; background:linear-gradient(135deg,#14532d,#22C55E); border-radius:3px; flex-shrink:0;"></div>
+                            <div style="height:9px; background:rgba(255,255,255,0.1); border-radius:2px; flex:1;"></div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="showcase-info">
                 <div class="showcase-title">
-                    <i class="fas fa-user-tie" style="color:var(--success); margin-right:0.4rem;"></i>
+                    <i data-lucide="user-check" style="color:var(--success);"></i>
                     Faculty Directory
                 </div>
                 <p class="showcase-desc">Manage faculty members with colored avatars, department badges, and search/filter capabilities.</p>
@@ -342,68 +403,62 @@
 
         <!-- Timetable -->
         <div class="showcase-card">
-            <div class="showcase-preview" style="background:linear-gradient(135deg,#312E81,#1E3A8A);">
+            <div class="showcase-preview" style="background:linear-gradient(135deg,#1e1b4b,#162033);">
                 <div class="showcase-preview-inner" style="background:#0f1e35; padding:0; overflow:hidden;">
-                    <div style="display:grid; grid-template-columns:30px repeat(5,1fr); gap:1px; background:rgba(255,255,255,0.05);">
-                        <div style="background:#0a1225; height:14px;"></div>
-                        <div style="background:rgba(37,99,235,0.3); height:14px;"></div>
-                        <div style="background:rgba(37,99,235,0.3); height:14px;"></div>
-                        <div style="background:rgba(37,99,235,0.3); height:14px;"></div>
-                        <div style="background:rgba(37,99,235,0.3); height:14px;"></div>
-                        <div style="background:rgba(37,99,235,0.3); height:14px;"></div>
+                    <div style="display:grid; grid-template-columns:28px repeat(5,1fr); gap:1px; background:rgba(255,255,255,0.04);">
+                        <div style="background:#0B1120; height:13px;"></div>
+                        <div style="background:rgba(79,107,255,0.3); height:13px;"></div>
+                        <div style="background:rgba(79,107,255,0.25); height:13px;"></div>
+                        <div style="background:rgba(79,107,255,0.3); height:13px;"></div>
+                        <div style="background:rgba(79,107,255,0.25); height:13px;"></div>
+                        <div style="background:rgba(79,107,255,0.3); height:13px;"></div>
                         <!-- rows -->
-                        <div style="background:#0f1e35; height:18px;"></div>
-                        <div style="background:rgba(37,99,235,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:rgba(79,70,229,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:#0f1e35; height:18px;"></div>
-                        <div style="background:rgba(5,150,105,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:rgba(37,99,235,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:#0f1e35; height:18px;"></div>
-                        <div style="background:rgba(217,119,6,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:#0f1e35; height:18px;"></div>
-                        <div style="background:rgba(5,150,105,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:rgba(220,38,38,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:#0f1e35; height:18px;"></div>
-                        <div style="background:#0f1e35; height:18px;"></div>
-                        <div style="background:rgba(5,150,105,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:rgba(79,70,229,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:#0f1e35; height:18px;"></div>
-                        <div style="background:rgba(217,119,6,0.25); border-radius:2px; height:18px; margin:1px;"></div>
-                        <div style="background:rgba(37,99,235,0.25); border-radius:2px; height:18px; margin:1px;"></div>
+                        <div style="background:#0f1e35; height:16px;"></div>
+                        <div style="background:rgba(79,107,255,0.25); border-radius:2px; height:16px; margin:1px;"></div>
+                        <div style="background:rgba(139,92,246,0.25); border-radius:2px; height:16px; margin:1px;"></div>
+                        <div style="background:#0f1e35; height:16px;"></div>
+                        <div style="background:rgba(34,197,94,0.25); border-radius:2px; height:16px; margin:1px;"></div>
+                        <div style="background:rgba(79,107,255,0.25); border-radius:2px; height:16px; margin:1px;"></div>
+                        <div style="background:#0f1e35; height:16px;"></div>
+                        <div style="background:rgba(245,158,11,0.25); border-radius:2px; height:16px; margin:1px;"></div>
+                        <div style="background:#0f1e35; height:16px;"></div>
+                        <div style="background:rgba(34,197,94,0.25); border-radius:2px; height:16px; margin:1px;"></div>
+                        <div style="background:rgba(244,63,94,0.25); border-radius:2px; height:16px; margin:1px;"></div>
+                        <div style="background:#0f1e35; height:16px;"></div>
                     </div>
                 </div>
             </div>
             <div class="showcase-info">
                 <div class="showcase-title">
-                    <i class="fas fa-calendar-alt" style="color:var(--secondary); margin-right:0.4rem;"></i>
+                    <i data-lucide="calendar-days" style="color:var(--secondary);"></i>
                     Timetable Generator
                 </div>
-                <p class="showcase-desc">Color-coded timetable grid with subject blocks, recess breaks, and one-click PDF export.</p>
+                <p class="showcase-desc">Color-coded calendar grid with subject blocks, recess breaks, and one-click PDF export.</p>
             </div>
         </div>
 
         <!-- Curriculum -->
         <div class="showcase-card">
-            <div class="showcase-preview" style="background:linear-gradient(135deg,#1E3A8A,#4F46E5);">
+            <div class="showcase-preview" style="background:linear-gradient(135deg,#1e3a8a,#1e1b4b);">
                 <div class="showcase-preview-inner" style="background:#0f1e35; padding:0.5rem;">
                     <div style="display:flex; flex-direction:column; gap:5px;">
                         <div style="display:flex; gap:3px; flex-wrap:wrap;">
-                            <div style="height:12px; width:45px; background:rgba(37,99,235,0.4); border-radius:2px; border-left:2px solid #2563EB;"></div>
-                            <div style="height:12px; width:40px; background:rgba(79,70,229,0.4); border-radius:2px; border-left:2px solid #4F46E5;"></div>
-                            <div style="height:12px; width:50px; background:rgba(5,150,105,0.4); border-radius:2px; border-left:2px solid #059669;"></div>
+                            <div style="height:11px; width:42px; background:rgba(79,107,255,0.4); border-radius:2px; border-left:2px solid #4F6BFF;"></div>
+                            <div style="height:11px; width:38px; background:rgba(139,92,246,0.4); border-radius:2px; border-left:2px solid #8B5CF6;"></div>
+                            <div style="height:11px; width:48px; background:rgba(34,197,94,0.4); border-radius:2px; border-left:2px solid #22C55E;"></div>
                         </div>
                         <div style="display:flex; gap:3px; flex-wrap:wrap;">
-                            <div style="height:12px; width:38px; background:rgba(217,119,6,0.4); border-radius:2px; border-left:2px solid #D97706;"></div>
-                            <div style="height:12px; width:55px; background:rgba(220,38,38,0.4); border-radius:2px; border-left:2px solid #DC2626;"></div>
+                            <div style="height:11px; width:36px; background:rgba(245,158,11,0.4); border-radius:2px; border-left:2px solid #F59E0B;"></div>
+                            <div style="height:11px; width:52px; background:rgba(244,63,94,0.4); border-radius:2px; border-left:2px solid #F43F5E;"></div>
                         </div>
-                        <div style="height:8px; background:rgba(255,255,255,0.05); border-radius:2px;"></div>
-                        <div style="height:8px; background:rgba(255,255,255,0.05); border-radius:2px; width:70%;"></div>
+                        <div style="height:7px; background:rgba(255,255,255,0.05); border-radius:2px;"></div>
+                        <div style="height:7px; background:rgba(255,255,255,0.05); border-radius:2px; width:70%;"></div>
                     </div>
                 </div>
             </div>
             <div class="showcase-info">
                 <div class="showcase-title">
-                    <i class="fas fa-book-open" style="color:var(--accent); margin-right:0.4rem;"></i>
+                    <i data-lucide="book-open" style="color:var(--warning);"></i>
                     Curriculum Management
                 </div>
                 <p class="showcase-desc">Color-coded subject chips, semester badges, faculty assignment, and credit hour tracking.</p>
@@ -412,46 +467,48 @@
 
         <!-- AI Generator -->
         <div class="showcase-card">
-            <div class="showcase-preview" style="background:linear-gradient(135deg,#0F172A,#312E81);">
+            <div class="showcase-preview" style="background:linear-gradient(135deg,#0B1120,#1e1b4b);">
                 <div class="showcase-preview-inner" style="background:#0f1e35; display:flex; align-items:center; justify-content:center;">
-                    <div style="text-align:center; opacity:0.7;">
-                        <div style="font-size:2rem; margin-bottom:4px;">🧠</div>
-                        <div style="height:6px; background:rgba(37,99,235,0.4); border-radius:3px; width:80px; margin:0 auto 3px;"></div>
-                        <div style="height:4px; background:rgba(79,70,229,0.3); border-radius:3px; width:60px; margin:0 auto;"></div>
+                    <div style="text-align:center; opacity:0.75;">
+                        <div style="width:40px; height:40px; background:var(--grad-primary); border-radius:50%; margin:0 auto 8px; display:flex; align-items:center; justify-content:center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+                        </div>
+                        <div style="height:5px; background:rgba(79,107,255,0.5); border-radius:3px; width:70px; margin:0 auto 3px;"></div>
+                        <div style="height:3px; background:rgba(139,92,246,0.35); border-radius:3px; width:50px; margin:0 auto;"></div>
                     </div>
                 </div>
             </div>
             <div class="showcase-info">
                 <div class="showcase-title">
-                    <i class="fas fa-brain" style="color:var(--primary-light); margin-right:0.4rem;"></i>
+                    <i data-lucide="cpu" style="color:var(--primary);"></i>
                     AI Generator
                 </div>
                 <p class="showcase-desc">Genetic Algorithm wizard with configurable subject priorities for instant optimal scheduling.</p>
             </div>
         </div>
 
-        <!-- View Timetable (public) -->
+        <!-- View Timetable -->
         <div class="showcase-card">
-            <div class="showcase-preview" style="background:linear-gradient(135deg,#065F46,#0E7490);">
+            <div class="showcase-preview" style="background:linear-gradient(135deg,#052e16,#0c4a6e);">
                 <div class="showcase-preview-inner" style="background:#0f1e35; padding:0.5rem;">
                     <div style="display:flex; flex-direction:column; gap:5px;">
-                        <div style="height:18px; background:rgba(255,255,255,0.05); border-radius:4px; display:flex; align-items:center; padding:0 6px;">
-                            <div style="height:6px; background:rgba(37,99,235,0.3); border-radius:2px; flex:1;"></div>
+                        <div style="height:16px; background:rgba(255,255,255,0.04); border-radius:4px; display:flex; align-items:center; padding:0 6px;">
+                            <div style="height:5px; background:rgba(79,107,255,0.3); border-radius:2px; flex:1;"></div>
                         </div>
                         <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:3px;">
-                            <div style="height:24px; background:rgba(37,99,235,0.25); border-radius:3px;"></div>
-                            <div style="height:24px; background:rgba(5,150,105,0.25); border-radius:3px;"></div>
-                            <div style="height:24px; background:rgba(217,119,6,0.25); border-radius:3px;"></div>
-                            <div style="height:24px; background:rgba(79,70,229,0.25); border-radius:3px;"></div>
-                            <div style="height:24px; background:rgba(220,38,38,0.25); border-radius:3px;"></div>
-                            <div style="height:24px; background:rgba(37,99,235,0.25); border-radius:3px;"></div>
+                            <div style="height:22px; background:rgba(79,107,255,0.25); border-radius:3px;"></div>
+                            <div style="height:22px; background:rgba(34,197,94,0.25); border-radius:3px;"></div>
+                            <div style="height:22px; background:rgba(245,158,11,0.25); border-radius:3px;"></div>
+                            <div style="height:22px; background:rgba(139,92,246,0.25); border-radius:3px;"></div>
+                            <div style="height:22px; background:rgba(244,63,94,0.25); border-radius:3px;"></div>
+                            <div style="height:22px; background:rgba(79,107,255,0.25); border-radius:3px;"></div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="showcase-info">
                 <div class="showcase-title">
-                    <i class="fas fa-eye" style="color:var(--success); margin-right:0.4rem;"></i>
+                    <i data-lucide="eye" style="color:var(--success);"></i>
                     Public Timetable Viewer
                 </div>
                 <p class="showcase-desc">Students access timetables publicly — just search by institution, class, and semester.</p>
@@ -462,57 +519,57 @@
 </div>
 
 <!-- ===================================================================
-     SECTION 5: UNIVERSITY BENEFITS
+     SECTION 5: BENEFITS
      =================================================================== -->
-<div class="anim-fade-up delay-300" style="margin-bottom:var(--space-8);">
+<div class="anim-fade-up delay-300" style="margin-bottom:var(--space-10);">
     <div class="section-header">
         <div class="section-badge">
-            <i class="fas fa-star"></i>
+            <i data-lucide="star"></i>
             Benefits
         </div>
-        <h2 class="section-title">Why Universities Choose Us</h2>
+        <h2 class="section-title">Why Institutions Choose Us</h2>
         <p class="section-subtitle">Enterprise-grade scheduling intelligence, built for academic institutions of all sizes.</p>
     </div>
 
     <div class="benefits-grid">
         <div class="benefit-card">
-            <div class="benefit-icon" style="background:rgba(37,99,235,0.1); color:var(--primary-light);">
-                <i class="fas fa-ban"></i>
+            <div class="benefit-icon" style="background:rgba(79,107,255,0.1); color:var(--primary);">
+                <i data-lucide="ban"></i>
             </div>
             <div class="benefit-title">Zero Conflicts</div>
             <p class="benefit-desc">The Genetic Algorithm enforces hard constraints — no faculty is ever double-booked across any batch or timeslot.</p>
         </div>
         <div class="benefit-card">
-            <div class="benefit-icon" style="background:rgba(5,150,105,0.1); color:var(--success);">
-                <i class="fas fa-user-tie"></i>
+            <div class="benefit-icon" style="background:rgba(34,197,94,0.1); color:var(--success);">
+                <i data-lucide="user-check"></i>
             </div>
             <div class="benefit-title">Faculty Optimization</div>
             <p class="benefit-desc">Intelligently distributes workload across faculty members, respecting their subject assignments and availability.</p>
         </div>
         <div class="benefit-card">
-            <div class="benefit-icon" style="background:rgba(217,119,6,0.1); color:var(--accent);">
-                <i class="fas fa-cubes"></i>
+            <div class="benefit-icon" style="background:rgba(245,158,11,0.1); color:var(--warning);">
+                <i data-lucide="layers"></i>
             </div>
             <div class="benefit-title">Smart Resource Allocation</div>
             <p class="benefit-desc">Optimized slot and room usage across all batches, reducing idle time and resource waste throughout the week.</p>
         </div>
         <div class="benefit-card">
-            <div class="benefit-icon" style="background:rgba(79,70,229,0.1); color:var(--secondary);">
-                <i class="fas fa-layer-group"></i>
+            <div class="benefit-icon" style="background:rgba(139,92,246,0.1); color:var(--secondary);">
+                <i data-lucide="git-branch"></i>
             </div>
             <div class="benefit-title">Multi-Batch Scheduling</div>
             <p class="benefit-desc">Generate separate timetables for any number of academic batches simultaneously — CS-A, CS-B, IT, and more.</p>
         </div>
         <div class="benefit-card">
-            <div class="benefit-icon" style="background:rgba(2,132,199,0.1); color:var(--info);">
-                <i class="fas fa-calendar-alt"></i>
+            <div class="benefit-icon" style="background:rgba(56,189,248,0.1); color:var(--info);">
+                <i data-lucide="calendar-range"></i>
             </div>
             <div class="benefit-title">Semester-Wise Planning</div>
             <p class="benefit-desc">Full semester-based curriculum support with per-semester subject lists, faculty assignments, and credit tracking.</p>
         </div>
         <div class="benefit-card">
-            <div class="benefit-icon" style="background:rgba(220,38,38,0.1); color:var(--danger);">
-                <i class="fas fa-print"></i>
+            <div class="benefit-icon" style="background:rgba(244,63,94,0.1); color:var(--danger);">
+                <i data-lucide="printer"></i>
             </div>
             <div class="benefit-title">Print-Ready Export</div>
             <p class="benefit-desc">One-click PDF export with clean academic formatting, university branding header, and generation timestamp.</p>
@@ -523,32 +580,36 @@
 <!-- ===================================================================
      BOTTOM CTA
      =================================================================== -->
-<div class="page-hero anim-fade-up delay-300" style="text-align:center;">
-    <div class="hero-badge" style="display:inline-flex; margin-bottom:1rem;">
-        <i class="fas fa-graduation-cap" style="font-size:0.65rem;"></i>
-        Built for Colleges &amp; Universities
-    </div>
-    <h2 class="hero-title" style="font-size:1.75rem;">Ready to Automate Your Scheduling?</h2>
-    <p class="hero-subtitle" style="margin-bottom:1.5rem;">
-        Join institutions already using AI-powered timetable generation. No setup fees. Start in minutes.
-    </p>
-    {% if not session.get('school_id') %}
-    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; position:relative; z-index:1;">
-        <a href="{{ url_for('auth.register') }}" class="btn btn-lg" style="background:white; color:var(--primary); font-weight:700;">
-            <i class="fas fa-university"></i>
-            Register Your Institution
+<div class="bottom-cta anim-fade-up delay-300" style="margin-bottom: var(--space-4);">
+    <div style="position:relative; z-index:1;">
+        <div class="hero-badge" style="display:inline-flex; margin-bottom:1rem;">
+            <i data-lucide="building-2" style="width:11px;height:11px;"></i>
+            Built for Colleges &amp; Universities
+        </div>
+        <h2 style="font-family:'Outfit',sans-serif; font-size:clamp(1.5rem,3vw,2.25rem); font-weight:800; color:var(--text-primary); letter-spacing:-0.02em; margin-bottom:0.75rem;">
+            Ready to Automate Your Scheduling?
+        </h2>
+        <p style="font-size:1rem; color:var(--text-secondary); margin-bottom:2rem; max-width:480px; margin-left:auto; margin-right:auto;">
+            Join institutions already using AI-powered timetable generation. No setup fees. Start in minutes.
+        </p>
+        {% if not session.get('school_id') %}
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                <i data-lucide="building-2"></i>
+                Register Your Institution
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-lg btn-secondary">
+                <i data-lucide="log-in"></i>
+                Sign In
+            </a>
+        </div>
+        {% else %}
+        <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-primary btn-lg">
+            <i data-lucide="cpu"></i>
+            Generate New Timetable
         </a>
-        <a href="{{ url_for('auth.login') }}" class="btn btn-lg" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white;">
-            <i class="fas fa-sign-in-alt"></i>
-            Sign In
-        </a>
+        {% endif %}
     </div>
-    {% else %}
-    <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-lg" style="background:white; color:var(--primary); font-weight:700; position:relative; z-index:1;">
-        <i class="fas fa-brain"></i>
-        Generate New Timetable
-    </a>
-    {% endif %}
 </div>
 
 {% endblock %}

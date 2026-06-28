@@ -4,7 +4,7 @@
 
 {% block breadcrumb %}
 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="width:10px;height:10px;stroke-width:2.5;"></i></span>
 <span class="breadcrumb-current">Faculty</span>
 {% endblock %}
 
@@ -16,18 +16,18 @@
     <div class="page-banner-overlay"></div>
     <div class="page-banner-content">
         <div class="page-banner-title">
-            <i class="fas fa-user-tie" style="font-size:1.4rem;"></i>
+            <i data-lucide="user-check" style="width:22px;height:22px;stroke-width:1.75;"></i>
             Faculty Directory
         </div>
         <div class="page-banner-subtitle">Manage all faculty members registered under your institution</div>
         <div style="display:flex; gap:0.75rem; align-items:center; margin-top:1rem; flex-wrap:wrap;">
             <span class="badge" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.2);">
-                <i class="fas fa-users" style="font-size:0.6rem;"></i>
+                <i data-lucide="users" style="width:10px;height:10px;"></i>
                 {{ teachers | length }} Members
             </span>
             <button class="btn btn-sm" onclick="document.getElementById('faculty-form-card').scrollIntoView({behavior:'smooth'})"
                 style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white;">
-                <i class="fas fa-plus"></i>
+                <i data-lucide="plus" style="width:13px;height:13px;"></i>
                 Add Faculty Member
             </button>
         </div>
@@ -42,7 +42,7 @@
         <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border);">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.875rem;">
                 <div style="display:flex; align-items:center; gap:0.6rem;">
-                    <i class="fas fa-users" style="color:var(--primary-light);"></i>
+                    <i data-lucide="users" style="width:16px;height:16px;color:var(--primary);"></i>
                     <span style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem;">Active Faculty</span>
                 </div>
                 <span class="badge badge-primary">{{ teachers | length }} Members</span>
@@ -51,7 +51,7 @@
             <!-- Search bar -->
             <div class="search-bar">
                 <div class="search-input-wrap">
-                    <i class="fas fa-search search-icon"></i>
+                    <i data-lucide="search" class="search-icon" style="width:15px;height:15px;"></i>
                     <input type="text" class="search-input" id="facultySearch" placeholder="Search by name..." autocomplete="off"
                         oninput="filterFaculty(this.value)">
                 </div>
@@ -60,7 +60,7 @@
             <!-- Filter chips -->
             <div class="filter-chips">
                 <div class="filter-chip active" onclick="setFilter(this, 'all')">
-                    <i class="fas fa-th-large"></i> All
+                    <i data-lucide="layout-grid" style="width:11px;height:11px;"></i> All
                 </div>
                 <div class="filter-chip" onclick="setFilter(this, 'a-f')">
                     A–F
@@ -113,18 +113,17 @@
                         <td style="text-align:right; padding-right:1.5rem;">
                             <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
                                 <a href="{{ url_for('management.manage_teachers', edit_id=teacher.teacher_id) }}"
-                                    class="btn btn-secondary btn-sm" title="Edit faculty member" aria-label="Edit {{ teacher.teacher_name }}">
-                                    <i class="fas fa-edit"></i>
+                                    class="table-action-edit" title="Edit faculty member" aria-label="Edit {{ teacher.teacher_name }}">
+                                    <i data-lucide="pencil"></i>
                                 </a>
                                 <form action="{{ url_for('management.manage_teachers') }}" method="POST"
                                     style="display:inline;"
                                     onsubmit="return confirm('Removing this faculty member will also remove their assigned subjects. Proceed?')">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="teacher_id" value="{{ teacher.teacher_id }}">
-                                    <button type="submit" class="btn btn-sm"
-                                        style="background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2); color:var(--danger);"
+                                    <button type="submit" class="table-action-delete"
                                         title="Remove faculty member" aria-label="Remove {{ teacher.teacher_name }}">
-                                        <i class="fas fa-trash-alt"></i>
+                                        <i data-lucide="trash-2"></i>
                                     </button>
                                 </form>
                             </div>
@@ -134,8 +133,8 @@
                     <tr>
                         <td colspan="4" style="text-align:center; padding:4rem; color:var(--text-faint);">
                             <div style="display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
-                                <div style="width:56px; height:56px; background:var(--bg-muted); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:var(--text-faint);">
-                                    <i class="fas fa-user-slash"></i>
+                                <div style="width:56px; height:56px; background:var(--bg-muted); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:var(--text-faint);">
+                                    <i data-lucide="user-x" style="width:24px;height:24px;"></i>
                                 </div>
                                 <span style="font-size:0.875rem; font-weight:500;">No faculty members added yet.</span>
                                 <span style="font-size:0.78rem;">Use the form on the right to add your first faculty member.</span>
@@ -152,11 +151,11 @@
     <div class="card" id="faculty-form-card" style="position:sticky; top:calc(var(--topbar-height) + 1.5rem);">
         <!-- Card header -->
         <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
-            <div style="width:36px; height:36px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
-                <i class="{{ 'fas fa-user-edit' if edit_teacher else 'fas fa-user-plus' }}"></i>
+            <div style="width:36px; height:36px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; flex-shrink:0;">
+                <i data-lucide="{{ 'user-cog' if edit_teacher else 'user-plus' }}" style="width:17px;height:17px;stroke:white;"></i>
             </div>
             <div>
-                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem; color:var(--text-main);">
+                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem; color:var(--text-primary);">
                     {{ 'Edit Faculty Member' if edit_teacher else 'Add New Faculty' }}
                 </div>
                 <div style="font-size:0.72rem; color:var(--text-muted);">All fields are required</div>
@@ -175,7 +174,7 @@
             <div class="form-group">
                 <label for="teacher_name">Full Name</label>
                 <div class="input-group">
-                    <i class="input-icon fas fa-user"></i>
+                    <span class="input-icon"><i data-lucide="user" style="width:15px;height:15px;"></i></span>
                     <input type="text" id="teacher_name" name="teacher_name" required
                         placeholder="e.g. Dr. Rajesh Kumar"
                         value="{{ edit_teacher.teacher_name if edit_teacher else '' }}">
@@ -184,13 +183,13 @@
             </div>
 
             <button type="submit" class="btn btn-primary w-full" style="margin-top:0.5rem;">
-                <i class="{{ 'fas fa-save' if edit_teacher else 'fas fa-plus' }}"></i>
+                <i data-lucide="{{ 'save' if edit_teacher else 'user-plus' }}" style="width:15px;height:15px;"></i>
                 {{ 'Save Changes' if edit_teacher else 'Add Faculty Member' }}
             </button>
 
             {% if edit_teacher %}
             <a href="{{ url_for('management.manage_teachers') }}" class="btn btn-secondary w-full" style="margin-top:0.5rem;">
-                <i class="fas fa-times"></i> Cancel Edit
+                <i data-lucide="x" style="width:15px;height:15px;"></i> Cancel Edit
             </a>
             {% endif %}
         </form>

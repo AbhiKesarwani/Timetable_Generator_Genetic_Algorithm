@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -10,8 +10,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     {% block head %}{% endblock %}
@@ -25,7 +25,7 @@
         <!-- Brand -->
         <a href="/" class="sidebar-brand">
             <div class="sidebar-crest">
-                <i class="fas fa-graduation-cap"></i>
+                <i data-lucide="graduation-cap"></i>
             </div>
             <div class="sidebar-brand-text">
                 <span class="sidebar-brand-name">Academic Portal</span>
@@ -41,8 +41,8 @@
             </div>
             <div class="sidebar-profile-info">
                 <div class="sidebar-profile-name">{{ session.get('school_name', 'Institution') }}</div>
-                <div class="sidebar-profile-role" style="display:flex; align-items:center; gap:0.3rem;">
-                    <span style="width:5px; height:5px; border-radius:50%; background:#4ade80; display:inline-block; flex-shrink:0;"></span>
+                <div class="sidebar-profile-role">
+                    <span class="status-dot" style="width:5px;height:5px;animation:pulseGlow 2s infinite;background:var(--success);border-radius:50%;flex-shrink:0;"></span>
                     Administrator
                 </div>
             </div>
@@ -56,11 +56,11 @@
             <div class="nav-group">
                 <span class="nav-label">Main</span>
                 <a href="/" class="nav-item" id="nav-home">
-                    <i class="fas fa-home nav-icon"></i>
+                    <span class="nav-icon"><i data-lucide="home"></i></span>
                     <span>Home</span>
                 </a>
                 <a href="{{ url_for('timetable_view.view_timetable') }}" class="nav-item" id="nav-view">
-                    <i class="fas fa-calendar-week nav-icon"></i>
+                    <span class="nav-icon"><i data-lucide="calendar-days"></i></span>
                     <span>View Timetable</span>
                 </a>
             </div>
@@ -70,19 +70,19 @@
             <div class="nav-group">
                 <span class="nav-label">Academic Management</span>
                 <a href="{{ url_for('main.dashboard') }}" class="nav-item" id="nav-dashboard">
-                    <i class="fas fa-chart-bar nav-icon"></i>
+                    <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
                     <span>Dashboard</span>
                 </a>
                 <a href="{{ url_for('management.manage_teachers') }}" class="nav-item" id="nav-faculty">
-                    <i class="fas fa-user-tie nav-icon"></i>
+                    <span class="nav-icon"><i data-lucide="user-check"></i></span>
                     <span>Faculty</span>
                 </a>
                 <a href="{{ url_for('management.manage_subjects') }}" class="nav-item" id="nav-curriculum">
-                    <i class="fas fa-book-open nav-icon"></i>
+                    <span class="nav-icon"><i data-lucide="book-open"></i></span>
                     <span>Curriculum</span>
                 </a>
                 <a href="{{ url_for('management.manage_timings') }}" class="nav-item" id="nav-timings">
-                    <i class="fas fa-clock nav-icon"></i>
+                    <span class="nav-icon"><i data-lucide="clock"></i></span>
                     <span>Schedule Config</span>
                 </a>
             </div>
@@ -91,11 +91,11 @@
             <div class="nav-group">
                 <span class="nav-label">Scheduling</span>
                 <a href="{{ url_for('generation.generate_setup') }}" class="nav-item" id="nav-generate">
-                    <i class="fas fa-brain nav-icon"></i>
+                    <span class="nav-icon"><i data-lucide="cpu"></i></span>
                     <span>AI Generator</span>
                 </a>
                 <a href="{{ url_for('faculty.faculty_timetable_page') }}" class="nav-item" id="nav-faculty-tt">
-                    <i class="fas fa-id-card nav-icon"></i>
+                    <span class="nav-icon"><i data-lucide="id-card"></i></span>
                     <span>Faculty Timetable</span>
                 </a>
             </div>
@@ -106,24 +106,23 @@
         <!-- Footer -->
         <div class="sidebar-footer">
             {% if session.get('school_id') %}
-            <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color: rgba(248, 113, 113, 0.85); margin-bottom: 0;">
-                <i class="fas fa-sign-out-alt nav-icon"></i>
+            <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color: rgba(248,113,113,0.9); margin-bottom:0;">
+                <span class="nav-icon"><i data-lucide="log-out"></i></span>
                 <span>Sign Out</span>
             </a>
             {% else %}
-            <a href="{{ url_for('auth.login') }}" class="nav-item" style="margin-bottom: 0.25rem;">
-                <i class="fas fa-sign-in-alt nav-icon"></i>
+            <a href="{{ url_for('auth.login') }}" class="nav-item" style="margin-bottom:2px;">
+                <span class="nav-icon"><i data-lucide="log-in"></i></span>
                 <span>Login</span>
             </a>
-            <a href="{{ url_for('auth.register') }}" class="nav-item" style="margin-bottom: 0;">
-                <i class="fas fa-university nav-icon"></i>
+            <a href="{{ url_for('auth.register') }}" class="nav-item" style="margin-bottom:0;">
+                <span class="nav-icon"><i data-lucide="building-2"></i></span>
                 <span>Register Institution</span>
             </a>
             {% endif %}
-            <div class="sidebar-semester-chip" style="margin-top: 0.5rem;">Academic Year 2025–26</div>
-            <!-- AI Engine status -->
-            <div style="margin-top:0.5rem; display:flex; align-items:center; justify-content:center; gap:0.4rem; font-size:0.62rem; color:rgba(74,222,128,0.8);">
-                <span style="width:5px; height:5px; border-radius:50%; background:#4ade80; flex-shrink:0; animation:pulse-ring 2s infinite;"></span>
+            <div class="sidebar-semester-chip">Academic Year 2025–26</div>
+            <div class="ai-engine-status">
+                <span class="status-dot"></span>
                 AI Engine Online
             </div>
         </div>
@@ -140,7 +139,7 @@
             <!-- Left: Hamburger + Breadcrumb -->
             <div class="flex items-center gap-3" style="flex:1; min-width:0;">
                 <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false">
-                    <i class="fas fa-bars"></i>
+                    <i data-lucide="menu"></i>
                 </button>
                 <nav class="breadcrumb" aria-label="Breadcrumb">
                     {% block breadcrumb %}{% endblock %}
@@ -150,19 +149,19 @@
             <!-- Right: Actions -->
             <div class="topbar-actions">
                 <!-- Academic Year chip -->
-                <div class="topbar-chip" style="display:none;" id="acYearChip">
-                    <i class="fas fa-calendar-alt" style="font-size:0.7rem;"></i>
+                <div class="topbar-chip" id="acYearChip" style="display:none;">
+                    <i data-lucide="calendar" style="width:11px;height:11px;"></i>
                     <span>AY 2025–26</span>
                 </div>
 
                 <!-- Notification Bell -->
                 <button class="topbar-icon-btn" title="Notifications" aria-label="Notifications">
-                    <i class="fas fa-bell"></i>
+                    <i data-lucide="bell"></i>
                 </button>
 
                 <!-- Theme Toggle -->
-                <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
-                    <i class="fas fa-moon" id="themeIcon"></i>
+                <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                    <i data-lucide="sun" id="themeIcon"></i>
                 </button>
 
                 <!-- User Avatar -->
@@ -183,10 +182,10 @@
             <div class="flash-container" role="alert">
                 {% for category, message in messages %}
                 <div class="flash-message {{ 'success' if category == 'success' else 'error' if category == 'error' else 'info' }}">
-                    <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                    <i data-lucide="{% if category == 'success' %}check-circle{% elif category == 'error' %}alert-circle{% else %}info{% endif %}"></i>
                     <span>{{ message }}</span>
-                    <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;margin-left:auto;color:inherit;opacity:0.7;font-size:1rem;" aria-label="Dismiss">
-                        <i class="fas fa-times"></i>
+                    <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;margin-left:auto;color:inherit;opacity:0.7;display:flex;align-items:center;" aria-label="Dismiss">
+                        <i data-lucide="x" style="width:14px;height:14px;"></i>
                     </button>
                 </div>
                 {% endfor %}
@@ -199,25 +198,25 @@
 
         <!-- Footer -->
         <footer class="site-footer" role="contentinfo">
-            <span class="footer-brand">
-                <i class="fas fa-graduation-cap" style="margin-right:0.4rem; color: var(--primary-light);"></i>
-                Academic Timetable Portal
-            </span>
-            <span>AI-Powered Scheduling · Genetic Algorithm Engine · &copy; 2026</span>
-            <span style="display:flex; align-items:center; gap:0.4rem;">
-                Made with <span style="color:#ef4444; font-size:0.8rem;">❤️</span> by Abhinav
-            </span>
+            <div class="footer-brand">
+                <i data-lucide="graduation-cap"></i>
+                <span>Academic Timetable Portal</span>
+            </div>
+            <span style="color:var(--text-muted);">Made with <span style="color:#EF4444;">❤️</span> by Abhinav</span>
         </footer>
     </div>
 
     <!-- ==================== SCRIPTS ==================== -->
     <script>
+        // Init Lucide icons
+        lucide.createIcons();
+
         // ---- Theme Management ----
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon   = document.getElementById('themeIcon');
         const html        = document.documentElement;
 
-        const savedTheme  = localStorage.getItem('theme') || 'light';
+        const savedTheme  = localStorage.getItem('theme') || 'dark';
         html.setAttribute('data-theme', savedTheme);
         applyThemeIcon(savedTheme);
 
@@ -230,18 +229,29 @@
         });
 
         function applyThemeIcon(theme) {
-            themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            // Replace icon data-lucide attribute and re-create
+            const iconEl = document.getElementById('themeIcon');
+            iconEl.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+            lucide.createIcons();
         }
 
-        // ---- Mobile Sidebar Toggle ----
+        // ---- Sidebar Toggle (Desktop: expand/collapse; Mobile: drawer) ----
         const hamburgerBtn   = document.getElementById('hamburgerBtn');
         const sidebar        = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const mainWrapper    = document.getElementById('mainWrapper');
 
-        // iOS Safari scroll lock: body overflow:hidden alone doesn't work on iOS.
-        // We use the position:fixed trick with scroll position preservation.
+        const isDesktop = () => window.innerWidth >= 768;
+
+        // Restore desktop sidebar state
+        const sidebarExpanded = localStorage.getItem('sidebarExpanded') !== 'false';
+        if (isDesktop() && sidebarExpanded) {
+            sidebar.classList.add('expanded');
+            mainWrapper.classList.add('sidebar-expanded');
+        }
+
+        // iOS Safari scroll lock
         let _scrollY = 0;
-
         function lockScroll() {
             _scrollY = window.scrollY;
             document.body.style.position  = 'fixed';
@@ -257,42 +267,50 @@
             window.scrollTo(0, _scrollY);
         }
 
-        function openSidebar() {
-            sidebar.classList.add('mobile-open');
+        function openMobile() {
+            sidebar.classList.add('mobile-open', 'expanded');
             sidebarOverlay.classList.add('active');
             hamburgerBtn.setAttribute('aria-expanded', 'true');
             lockScroll();
         }
-        function closeSidebar() {
-            sidebar.classList.remove('mobile-open');
+        function closeMobile() {
+            sidebar.classList.remove('mobile-open', 'expanded');
             sidebarOverlay.classList.remove('active');
             hamburgerBtn.setAttribute('aria-expanded', 'false');
             unlockScroll();
         }
+        function toggleDesktop() {
+            const isExpanded = sidebar.classList.toggle('expanded');
+            mainWrapper.classList.toggle('sidebar-expanded', isExpanded);
+            localStorage.setItem('sidebarExpanded', isExpanded);
+            hamburgerBtn.setAttribute('aria-expanded', isExpanded.toString());
+        }
 
         hamburgerBtn.addEventListener('click', () => {
-            sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+            if (isDesktop()) {
+                toggleDesktop();
+            } else {
+                sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
+            }
         });
 
-        // Use both click and touchstart for faster iOS response
-        sidebarOverlay.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeMobile);
         sidebarOverlay.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            closeSidebar();
+            closeMobile();
         }, { passive: false });
 
-        // Close sidebar on Escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeSidebar();
+            if (e.key === 'Escape') {
+                if (!isDesktop()) closeMobile();
+            }
         });
 
-        // Close sidebar when any nav link is tapped on mobile
         sidebar.querySelectorAll('.nav-item').forEach(link => {
             link.addEventListener('click', () => {
-                if (window.innerWidth < 768) closeSidebar();
+                if (!isDesktop()) closeMobile();
             });
         });
-
 
         // ---- Active Nav Link ----
         const currentPath = window.location.pathname;
@@ -305,12 +323,12 @@
             }
         });
 
-        // Show academic year chip on larger screens
+        // Show AY chip on larger screens
         if (window.innerWidth >= 900) {
             document.getElementById('acYearChip').style.display = 'flex';
         }
 
-        // ---- Auto-dismiss flash messages after 5 seconds ----
+        // ---- Auto-dismiss flash messages after 5s ----
         document.querySelectorAll('.flash-message').forEach(msg => {
             setTimeout(() => {
                 msg.style.opacity = '0';

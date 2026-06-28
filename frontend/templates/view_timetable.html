@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 
-{% block title %}View Timetable — Timetable Portal{% endblock %}
+{% block title %}View Timetable — Academic Timetable Portal{% endblock %}
 
 {% block breadcrumb %}
 <a href="/">Home</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="width:10px;height:10px;stroke-width:2.5;"></i></span>
 <span class="breadcrumb-current">View Timetable</span>
 {% endblock %}
 
@@ -15,12 +15,30 @@
         .hamburger-btn, .sidebar-overlay, .topbar-actions,
         .site-footer, .view-form-section { display: none !important; }
         body { display: block; background: white; }
-        .main-wrapper { margin: 0 !important; }
+        .main-wrapper { margin: 0 !important; max-width: 100% !important; }
         .content-container { padding: 0.5rem !important; animation: none !important; }
         #timetableContainer { display: block !important; margin-top: 0 !important; }
         table { border: 1px solid #999 !important; }
         th, td { border: 1px solid #aaa !important; color: black !important; background: white !important; padding: 0.4rem !important; }
-        .subject-block { background: white !important; border: 1px solid #ccc !important; color: black !important; }
+        .subject-block { background: white !important; border: 1px solid #ccc !important; color: black !important; border-left: 3px solid #999 !important; }
+        .subject-block-name, .subject-block-label { color: black !important; }
+        .timetable-header-row th { background: #f0f0f0 !important; color: black !important; }
+        .timetable-time-cell { background: #f0f0f0 !important; color: black !important; }
+    }
+
+    /* Input group icons (Lucide version) */
+    .input-group .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+    }
+    .input-group .input-icon svg, .input-group .input-icon i {
+        width: 15px; height: 15px; stroke-width: 1.75;
     }
 </style>
 {% endblock %}
@@ -30,26 +48,26 @@
 <!-- Page Header -->
 <div style="text-align:center; margin-bottom:var(--space-8);" class="anim-fade-up">
     <div class="landing-hero-badge" style="display:inline-flex; margin-bottom:1rem;">
-        <i class="fas fa-calendar-week" style="font-size:0.7rem;"></i>
+        <i data-lucide="users" style="width:12px;height:12px;"></i>
         Student / Faculty Access
     </div>
     <h1 class="page-title" style="font-size:clamp(1.75rem,4vw,2.5rem); text-align:center;">
-        View Academic Timetable 📅
+        View Academic Timetable
     </h1>
-    <p class="page-subtitle" style="text-align:center; max-width:550px; margin:0 auto;">
+    <p class="page-subtitle" style="text-align:center; max-width:550px; margin:0.75rem auto 0;">
         Select your institution, batch, and semester to view the latest published schedule.
     </p>
 </div>
 
 <!-- Selection Form -->
 <div class="card view-form-section anim-fade-up delay-100" style="max-width:680px; margin:0 auto var(--space-8);">
-    <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
-        <div style="width:36px; height:36px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
-            <i class="fas fa-search"></i>
+    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+        <div style="width:40px; height:40px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; flex-shrink:0; box-shadow:0 4px 14px rgba(79,107,255,0.3);">
+            <i data-lucide="search" style="width:18px;height:18px;stroke-width:2;"></i>
         </div>
         <div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">Find Your Schedule</div>
-            <div style="font-size:0.72rem; color:var(--text-muted);">Cascading filters — select in order</div>
+            <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem; color:var(--text-primary);">Find Your Schedule</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary); margin-top:1px;">Cascading filters — select in order</div>
         </div>
     </div>
 
@@ -59,7 +77,7 @@
         <div class="form-group" style="margin-bottom:0;">
             <label for="username">Institution Name</label>
             <div class="input-group">
-                <i class="input-icon fas fa-university"></i>
+                <span class="input-icon"><i data-lucide="building-2"></i></span>
                 <select id="username" name="username" required>
                     <option value="">Select your institution...</option>
                 </select>
@@ -70,7 +88,7 @@
             <div class="form-group" style="margin-bottom:0;">
                 <label for="class_name">Batch / Class</label>
                 <div class="input-group">
-                    <i class="input-icon fas fa-users"></i>
+                    <span class="input-icon"><i data-lucide="users"></i></span>
                     <select id="class_name" name="class_name" required disabled>
                         <option value="">Choose batch...</option>
                     </select>
@@ -79,7 +97,7 @@
             <div class="form-group" style="margin-bottom:0;">
                 <label for="semester">Semester</label>
                 <div class="input-group">
-                    <i class="input-icon fas fa-list-ol"></i>
+                    <span class="input-icon"><i data-lucide="list-ordered"></i></span>
                     <select id="semester" name="semester" required disabled>
                         <option value="">Choose sem...</option>
                     </select>
@@ -88,28 +106,28 @@
         </div>
 
         <button type="submit" class="btn btn-primary" style="margin-top:0.25rem; padding:0.875rem;" id="findBtn" disabled>
-            <i class="fas fa-search"></i>
+            <i data-lucide="search"></i>
             Find My Timetable
         </button>
 
     </form>
 </div>
 
-<!-- Timetable Display -->
+<!-- Timetable Display (JS populated) -->
 <div id="timetableContainer" style="display:none; max-width:1100px; margin:0 auto;">
 
     <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap; gap:1rem;">
         <div>
-            <h2 id="resultTitle" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.25rem; font-weight:700; color:var(--text-main);">
+            <h2 id="resultTitle" style="font-family:'Outfit',sans-serif; font-size:1.25rem; font-weight:700; color:var(--text-primary);">
                 Schedule
             </h2>
-            <p style="font-size:0.78rem; color:var(--text-faint); margin-top:0.2rem;">
-                <i class="fas fa-check-circle" style="color:var(--success);"></i>
+            <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.25rem; display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="check-circle" style="width:13px;height:13px;color:var(--success);stroke-width:2;"></i>
                 Published · AI Generated
             </p>
         </div>
         <button onclick="window.print()" class="btn btn-secondary btn-sm">
-            <i class="fas fa-print"></i> Print Schedule
+            <i data-lucide="printer"></i> Print Schedule
         </button>
     </div>
 
@@ -118,7 +136,7 @@
             <table style="border-collapse:collapse;">
                 <thead>
                     <tr class="timetable-header-row">
-                        <th style="background:linear-gradient(135deg,#0F172A,#1E293B); color:rgba(148,163,184,0.7); min-width:100px; padding:0.875rem 1rem; font-size:0.7rem; letter-spacing:0.1em; border-right:2px solid rgba(255,255,255,0.08); text-align:left;">TIME</th>
+                        <th style="background:var(--bg-base); color:var(--text-muted); min-width:100px; padding:0.875rem 1rem; font-size:0.66rem; letter-spacing:0.1em; border-right:2px solid var(--border-strong); text-align:left;">TIME</th>
                         <th>MON</th>
                         <th>TUE</th>
                         <th>WED</th>
@@ -135,15 +153,15 @@
     </div>
 
     <!-- Legend -->
-    <div class="card" style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; padding:0.875rem 1.5rem; margin-top:0;">
-        <span style="font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em;">Legend</span>
-        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.78rem;">
-            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--primary-light); background:rgba(37,99,235,0.1);"></div>
-            <span style="color:var(--text-muted);">Lecture</span>
+    <div class="card" style="display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; padding:0.875rem 1.25rem; margin-top:var(--space-4);">
+        <span style="font-size:0.68rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em;">Legend</span>
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.75rem;">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--primary); background:rgba(79,107,255,0.08);"></div>
+            <span style="color:var(--text-secondary);">Lecture</span>
         </div>
-        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.78rem;">
-            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--accent); background:rgba(217,119,6,0.1);"></div>
-            <span style="color:var(--text-muted);">Recess Break</span>
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.75rem;">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--warning); background:rgba(245,158,11,0.08);"></div>
+            <span style="color:var(--text-secondary);">Recess Break</span>
         </div>
     </div>
 </div>
@@ -265,11 +283,11 @@
                     if (slot.type === 'break') {
                         row.className = 'timetable-break-row';
                         row.innerHTML = `
-                            <td class="timetable-time-cell" style="color:var(--accent);">${slot.time.substring(0, 5)}</td>
+                            <td class="timetable-time-cell" style="color:var(--warning);">${slot.time.substring(0, 5)}</td>
                             <td colspan="6">
                                 <div class="break-label" style="justify-content:center;">
                                     <div class="break-line"></div>
-                                    <i class="fas fa-coffee" style="font-size:0.75rem;"></i>
+                                    <i data-lucide="coffee" style="width:12px;height:12px;"></i>
                                     Recess Break
                                     <div class="break-line"></div>
                                 </div>
@@ -290,7 +308,7 @@
 
                             if (subject) {
                                 let subjectName = subject;
-                                let facultyName = "Faculty Not Assigned";
+                                let facultyName = "Not Assigned";
                                 if (subject.includes(" | ")) {
                                     const parts = subject.split(" | ");
                                     subjectName = parts[0];
@@ -308,7 +326,7 @@
                                         <div class="subject-block-label">${facultyName}</div>
                                     </div>`;
                             } else {
-                                cell.innerHTML = '<div class="empty-cell"><i class="fas fa-minus" style="font-size:0.55rem;"></i></div>';
+                                cell.innerHTML = '<div class="empty-cell"><i data-lucide="minus" style="width:10px;height:10px;stroke-width:2;"></i></div>';
                             }
                             row.appendChild(cell);
                         });
@@ -316,6 +334,9 @@
 
                     timetableBody.appendChild(row);
                 });
+
+                // Re-init Lucide for dynamically added icons
+                lucide.createIcons();
 
                 document.getElementById("timetableContainer").style.display = "block";
                 document.getElementById("timetableContainer").scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -326,7 +347,8 @@
             })
             .finally(() => {
                 btn.disabled  = false;
-                btn.innerHTML = '<i class="fas fa-search"></i> Find My Timetable';
+                btn.innerHTML = '<i data-lucide="search"></i> Find My Timetable';
+                lucide.createIcons();
             });
     });
 </script>
