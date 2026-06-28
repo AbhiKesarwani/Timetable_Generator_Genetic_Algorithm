@@ -61,7 +61,11 @@
                 </a>
                 <a href="{{ url_for('timetable_view.view_timetable') }}" class="nav-item" id="nav-view">
                     <span class="nav-icon"><i data-lucide="calendar-days"></i></span>
-                    <span>View Timetable</span>
+                    <span>View Student Timetable</span>
+                </a>
+                <a href="{{ url_for('faculty.public_faculty_timetable_page') }}" class="nav-item" id="nav-view-faculty">
+                    <span class="nav-icon"><i data-lucide="id-card"></i></span>
+                    <span>View Faculty Timetable</span>
                 </a>
             </div>
 
@@ -93,10 +97,6 @@
                 <a href="{{ url_for('generation.generate_setup') }}" class="nav-item" id="nav-generate">
                     <span class="nav-icon"><i data-lucide="cpu"></i></span>
                     <span>AI Generator</span>
-                </a>
-                <a href="{{ url_for('faculty.faculty_timetable_page') }}" class="nav-item" id="nav-faculty-tt">
-                    <span class="nav-icon"><i data-lucide="id-card"></i></span>
-                    <span>Faculty Timetable</span>
                 </a>
             </div>
             {% endif %}

@@ -248,3 +248,189 @@ def get_faculty_workload():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PUBLIC Routes — No login required (read-only, mirrors student View Timetable)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@faculty_bp.route('/view-faculty-timetable')
+def public_faculty_timetable_page():
+    """Public faculty timetable viewer — no authentication required."""
+    return render_template('view_faculty_timetable.html')
+
+
+@faculty_bp.route('/api/public/teachers')
+def public_get_teachers():
+    """
+    Returns a list of teacher names for a given school username.
+    Public endpoint — never exposes teacher_id or school_id.
+
+    Query params:
+      username (str) — institution admin username
+    """
+    username = request.args.get('username', '').strip()
+    if not username:
+        return jsonify({"error": "username is required"}), 400
+
+    try:
+        db = connect_db()
+        cursor = db.cursor(dictionary=True)
+
+        # Resolve school_id from username
+        cursor.execute(
+            "SELECT school_id FROM schools WHERE username = %s",
+            (username,)
+        )
+        school_row = cursor.fetchone()
+        if not school_row:
+            db.close()
+            return jsonify({"error": "Institution not found"}), 404
+
+        school_id = school_row['school_id']
+
+        # Return teacher names only — no IDs exposed
+        cursor.execute(
+            """
+            SELECT DISTINCT t.teacher_name
+            FROM teacher t
+            JOIN timetable tt ON tt.teacher_id = t.teacher_id
+            WHERE t.school_id = %s
+            ORDER BY t.teacher_name
+            """,
+            (school_id,)
+        )
+        teachers = [row['teacher_name'] for row in cursor.fetchall()]
+        db.close()
+        return jsonify(teachers)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@faculty_bp.route('/api/public/faculty_timetable')
+def public_get_faculty_timetable():
+    """
+    Returns timetable grid data for a named teacher at a given institution.
+    Public endpoint — school_id resolved internally, never sent to client.
+
+    Query params:
+      username     (str) — institution admin username
+      teacher_name (str) — exact teacher name
+    """
+    username = request.args.get('username', '').strip()
+    teacher_name = request.args.get('teacher_name', '').strip()
+
+    if not username or not teacher_name:
+        return jsonify({"error": "username and teacher_name are required"}), 400
+
+    try:
+        db = connect_db()
+        cursor = db.cursor(dictionary=True)
+
+        # Resolve school from username
+        cursor.execute(
+            "SELECT school_id FROM schools WHERE username = %s",
+            (username,)
+        )
+        school_row = cursor.fetchone()
+        if not school_row:
+            db.close()
+            return jsonify({"error": "Institution not found"}), 404
+
+        school_id = school_row['school_id']
+
+        # Resolve teacher_id by name within this school (use first match)
+        cursor.execute(
+            "SELECT teacher_id FROM teacher WHERE teacher_name = %s AND school_id = %s LIMIT 1",
+            (teacher_name, school_id)
+        )
+        teacher_row = cursor.fetchone()
+        if not teacher_row:
+            db.close()
+            return jsonify({"error": "Faculty member not found"}), 404
+
+        teacher_id = teacher_row['teacher_id']
+
+        # Fetch timetable entries
+        query = """
+            SELECT
+                s.subject_name,
+                c.class_name,
+                s.semester,
+                tt.day,
+                ts.timeslot
+            FROM timetable tt
+            JOIN subject   s  ON tt.subject_id  = s.subject_id
+            JOIN class     c  ON tt.class_id    = c.class_id
+            JOIN timeslot  ts ON tt.time_id     = ts.time_id
+            WHERE tt.teacher_id = %s AND tt.school_id = %s
+            ORDER BY tt.day, ts.timeslot
+        """
+        cursor.execute(query, (teacher_id, school_id))
+        rows = cursor.fetchall()
+
+        # Fetch school time config for visual_slots
+        cursor.execute(
+            "SELECT start_time, end_time, lecture_duration, break_start_time, break_duration "
+            "FROM schools WHERE school_id = %s",
+            (school_id,)
+        )
+        school_cfg = cursor.fetchone()
+        db.close()
+
+        # Build timetable dict
+        timetable_dict = {}
+        for row in rows:
+            timeslot_val = row['timeslot']
+            if isinstance(timeslot_val, timedelta):
+                ts_sec = int(timeslot_val.total_seconds())
+                timeslot_str = f"{ts_sec//3600:02}:{(ts_sec%3600)//60:02}:{ts_sec%60:02}"
+            else:
+                timeslot_str = str(timeslot_val)
+                if len(timeslot_str) == 7:
+                    timeslot_str = "0" + timeslot_str
+
+            key = f"{row['day']}_{timeslot_str}"
+            timetable_dict[key] = {
+                "subject":    row['subject_name'],
+                "class_name": row['class_name'],
+                "semester":   row['semester'],
+                "display":    f"{row['subject_name']} | {row['class_name']} | Sem {row['semester']}"
+            }
+
+        # Build visual_slots from school config
+        def fmt_td(td):
+            if not td:
+                return None
+            if not isinstance(td, timedelta):
+                return str(td)
+            sec = int(td.total_seconds())
+            return f"{sec//3600:02}:{(sec%3600)//60:02}:{sec%60:02}"
+
+        visual_slots = []
+        if school_cfg:
+            time_config = {
+                'start_time':        fmt_td(school_cfg['start_time']),
+                'end_time':          fmt_td(school_cfg['end_time']),
+                'lecture_duration':  school_cfg['lecture_duration'],
+                'break_start':       fmt_td(school_cfg['break_start_time']),
+                'break_duration':    school_cfg['break_duration'],
+            }
+            visual_slots = get_daily_slots(time_config, include_break=True)
+
+        if not visual_slots:
+            # Fallback: derive from timetable keys
+            slot_times = sorted(set(k.split('_')[1] for k in timetable_dict))
+            visual_slots = [{'time': t, 'type': 'lecture'} for t in slot_times]
+
+        return jsonify({
+            "teacher_name": teacher_name,
+            "timetable":    timetable_dict,
+            "visual_slots": visual_slots,
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500

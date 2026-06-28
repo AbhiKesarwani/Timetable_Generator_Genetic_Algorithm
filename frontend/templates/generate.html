@@ -21,11 +21,116 @@
     </p>
 </div>
 
-<!-- Info banner -->
-<div style="display:flex; align-items:center; gap:0.75rem; padding:0.875rem 1.25rem; background:rgba(30,58,138,0.07); border:1px solid rgba(30,58,138,0.15); border-radius:var(--radius); margin-bottom:var(--space-6); font-size:0.82rem; color:var(--primary-light);" class="anim-fade-up delay-100">
-    <i data-lucide="info" style="flex-shrink:0; width:16px;height:16px;"></i>
-    <span>Select a batch and semester, fetch the subjects, optionally set subject priorities, then click <strong>Generate Timetable</strong>.</span>
+<!-- Existing Published Timetables -->
+<div class="anim-fade-up delay-100" style="margin-bottom:var(--space-6);">
+    <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem;">
+        <div style="width:32px; height:32px; background:rgba(34,197,94,0.12); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:var(--success); flex-shrink:0;">
+            <i data-lucide="calendar-check" style="width:16px;height:16px;stroke-width:2;"></i>
+        </div>
+        <div>
+            <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem; color:var(--text-primary);">Existing Published Timetables</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">{{ school_name }}</div>
+        </div>
+    </div>
+
+    {% if existing_timetables %}
+    <!-- Timetable cards list -->
+    <div id="timetableCardList" style="display:flex; flex-direction:column; gap:0.75rem;">
+        {% for tt in existing_timetables %}
+        <div class="card timetable-list-card"
+             id="tt-card-{{ tt.class_id }}-{{ tt.semester }}"
+             data-class-id="{{ tt.class_id }}"
+             data-semester="{{ tt.semester }}"
+             data-class-name="{{ tt.class_name }}"
+             style="padding:1.1rem 1.25rem; border-color:rgba(34,197,94,0.18); background:rgba(34,197,94,0.03); position:relative; overflow:hidden;">
+            <!-- Top accent -->
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--success),rgba(34,197,94,0.3));"></div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+                <!-- Left info -->
+                <div style="display:flex; align-items:center; gap:0.75rem; min-width:0;">
+                    <div style="width:38px; height:38px; border-radius:var(--radius-sm); background:rgba(34,197,94,0.1); color:var(--success); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <i data-lucide="calendar-days" style="width:17px;height:17px;stroke-width:2;"></i>
+                    </div>
+                    <div style="min-width:0;">
+                        <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                            {{ tt.class_name }} &mdash; Semester {{ tt.semester }}
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; margin-top:0.2rem; flex-wrap:wrap;">
+                            <span class="badge badge-green" style="font-size:0.67rem;">Published</span>
+                            <span style="font-size:0.72rem; color:var(--text-muted);">
+                                <i data-lucide="book-open" style="width:11px;height:11px;display:inline;vertical-align:middle;margin-right:2px;"></i>
+                                {{ tt.lecture_count }} lecture{{ 's' if tt.lecture_count != 1 else '' }} scheduled
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right actions -->
+                <div style="display:flex; gap:0.5rem; flex-shrink:0; flex-wrap:wrap;">
+                    <a href="{{ url_for('timetable_view.view_timetable') }}" class="btn btn-secondary btn-sm">
+                        <i data-lucide="eye" style="width:13px;height:13px;"></i>
+                        View Timetable
+                    </a>
+                    <button type="button" class="btn btn-danger btn-sm"
+                            onclick="openClassDeleteModal('{{ tt.class_id }}', '{{ tt.semester }}', '{{ tt.class_name }}')">
+                        <i data-lucide="trash-2" style="width:13px;height:13px;"></i>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Empty state -->
+    <div id="noTimetablesEmptyState" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2.5rem 1rem; border:1px dashed var(--border); border-radius:var(--radius-md); text-align:center; background:var(--bg-muted);">
+        <div style="font-size:2.25rem; margin-bottom:0.75rem; opacity:0.6;">📅</div>
+        <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.35rem;">No published timetables found.</div>
+        <div style="font-size:0.78rem; color:var(--text-faint);">Generate a timetable below to get started.</div>
+    </div>
+    {% endif %}
 </div>
+
+<!-- Per-class Delete Confirmation Modal -->
+<div id="classDeleteModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:1rem;">
+    <div style="background:var(--bg-surface); border-radius:var(--radius-md); max-width:460px; width:100%; padding:2rem; box-shadow:0 25px 60px rgba(0,0,0,0.4); border:1px solid var(--border); animation:fadeInUp 0.2s ease both;">
+        <!-- Icon + Title -->
+        <div style="display:flex; align-items:center; gap:0.875rem; margin-bottom:1.25rem;">
+            <div style="width:48px; height:48px; border-radius:var(--radius); background:rgba(239,68,68,0.1); color:var(--danger); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <i data-lucide="trash-2" style="width:22px;height:22px;stroke-width:2;"></i>
+            </div>
+            <div>
+                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:1.05rem; color:var(--text-primary);">Delete Timetable?</div>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">This action is irreversible.</div>
+            </div>
+        </div>
+        <!-- Body -->
+        <div style="font-size:0.82rem; color:var(--text-secondary); line-height:1.65; margin-bottom:0.875rem;">
+            You are about to permanently delete the timetable for<br>
+            <strong id="deleteModalClassName" style="color:var(--text-primary); font-size:0.95rem;"></strong>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:0.5rem; padding:0.75rem 1rem; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); border-radius:var(--radius-sm); font-size:0.78rem; color:var(--danger); margin-bottom:1.5rem;">
+            <i data-lucide="alert-triangle" style="width:14px;height:14px;flex-shrink:0;margin-top:1px;"></i>
+            <span>Only this timetable will be removed. Subjects, faculty, classes and configuration will remain unchanged.</span>
+        </div>
+        <!-- Actions -->
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeClassDeleteModal()">Cancel</button>
+            <button type="button" class="btn btn-danger btn-sm" id="confirmDeleteBtn" onclick="confirmClassDelete()">
+                <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+                Delete Timetable
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div id="deleteToast" style="display:none; position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); z-index:10000; background:rgba(34,197,94,0.95); color:#fff; padding:0.7rem 1.25rem; border-radius:999px; font-size:0.82rem; font-weight:600; box-shadow:0 8px 30px rgba(0,0,0,0.3); display:none; align-items:center; gap:0.5rem; white-space:nowrap; backdrop-filter:blur(8px);">
+    <i data-lucide="check-circle" style="width:15px;height:15px;flex-shrink:0;"></i>
+    <span id="deleteToastMsg">Timetable deleted successfully.</span>
+</div>
+
 
 <div class="grid grid-cols-3 anim-fade-up delay-150" style="align-items:flex-start;">
 
@@ -125,6 +230,102 @@
 
 {% block scripts %}
 <script>
+    /* ── Per-class Delete modal ──────────────────────────────────────── */
+    let _deleteClassId  = null;
+    let _deleteSemester = null;
+
+    function openClassDeleteModal(classId, semester, className) {
+        _deleteClassId  = classId;
+        _deleteSemester = semester;
+        document.getElementById('deleteModalClassName').textContent =
+            className + ' Semester ' + semester;
+        const m = document.getElementById('classDeleteModal');
+        m.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeClassDeleteModal() {
+        const m = document.getElementById('classDeleteModal');
+        m.style.display = 'none';
+        document.body.style.overflow = '';
+        _deleteClassId  = null;
+        _deleteSemester = null;
+    }
+
+    async function confirmClassDelete() {
+        if (!_deleteClassId) return;
+        const btn = document.getElementById('confirmDeleteBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner spinner-dark" style="width:14px;height:14px;"></div> Deleting...';
+
+        try {
+            const res  = await fetch('/api/delete_class_timetable', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ class_id: _deleteClassId })
+            });
+            const data = await res.json();
+
+            if (!data.success) {
+                alert('Error: ' + (data.error || 'Unknown error'));
+                return;
+            }
+
+            // Remove the card from the DOM
+            const card = document.getElementById(
+                'tt-card-' + _deleteClassId + '-' + _deleteSemester
+            );
+            if (card) {
+                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                card.style.opacity    = '0';
+                card.style.transform  = 'translateX(20px)';
+                setTimeout(() => {
+                    card.remove();
+                    // If no cards remain, show empty state
+                    const list = document.getElementById('timetableCardList');
+                    if (list && list.children.length === 0) {
+                        list.innerHTML = `
+                            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2.5rem 1rem; border:1px dashed var(--border); border-radius:var(--radius-md); text-align:center; background:var(--bg-muted);">
+                                <div style="font-size:2.25rem; margin-bottom:0.75rem; opacity:0.6;">📅</div>
+                                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.35rem;">No published timetables found.</div>
+                                <div style="font-size:0.78rem; color:var(--text-faint);">Generate a timetable below to get started.</div>
+                            </div>`;
+                    }
+                }, 300);
+            }
+
+            closeClassDeleteModal();
+            showDeleteToast('✓ Timetable deleted successfully.');
+
+        } catch (err) {
+            alert('Network error. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="trash-2" style="width:14px;height:14px;"></i> Delete Timetable';
+            lucide.createIcons();
+        }
+    }
+
+    function showDeleteToast(msg) {
+        const toast = document.getElementById('deleteToast');
+        document.getElementById('deleteToastMsg').textContent = msg;
+        toast.style.display = 'flex';
+        toast.style.opacity  = '1';
+        lucide.createIcons();
+        setTimeout(() => {
+            toast.style.transition = 'opacity 0.5s ease';
+            toast.style.opacity    = '0';
+            setTimeout(() => { toast.style.display = 'none'; toast.style.opacity = '1'; }, 500);
+        }, 3500);
+    }
+
+    document.getElementById('classDeleteModal').addEventListener('click', function(e) {
+        if (e.target === this) closeClassDeleteModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeClassDeleteModal();
+    });
+
     // All JavaScript logic preserved exactly from original
     const loadBtn     = document.getElementById('loadSubjects');
     const generateBtn = document.getElementById('generateBtn');

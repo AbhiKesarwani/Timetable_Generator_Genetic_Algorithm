@@ -1,0 +1,434 @@
+{% extends "layout.html" %}
+
+{% block title %}View Faculty Timetable — Academic Timetable Portal{% endblock %}
+
+{% block breadcrumb %}
+<a href="/">Home</a>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="width:10px;height:10px;stroke-width:2.5;"></i></span>
+<span class="breadcrumb-current">View Faculty Timetable</span>
+{% endblock %}
+
+{% block head %}
+<style>
+    @media print {
+        .sidebar, .top-bar, .btn, .breadcrumb, .flash-container,
+        .hamburger-btn, .sidebar-overlay, .topbar-actions,
+        .site-footer, .vft-form-section { display: none !important; }
+        body { display: block; background: white; }
+        .main-wrapper { margin: 0 !important; max-width: 100% !important; }
+        .content-container { padding: 0.5rem !important; animation: none !important; }
+        #vftTimetableContainer { display: block !important; margin-top: 0 !important; }
+        table { border: 1px solid #999 !important; }
+        th, td { border: 1px solid #aaa !important; color: black !important; background: white !important; padding: 0.4rem !important; }
+        .vft-cell-block { background: white !important; border: 1px solid #ccc !important; color: black !important; border-left: 3px solid #999 !important; }
+        .vft-cell-subject, .vft-cell-class, .vft-cell-sem { color: black !important; }
+        .vft-header-row th { background: #f0f0f0 !important; color: black !important; }
+        .vft-time-cell { background: #f0f0f0 !important; color: black !important; }
+    }
+
+    /* Shared input group icon positioning */
+    .input-group .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+    }
+    .input-group .input-icon svg, .input-group .input-icon i {
+        width: 15px; height: 15px; stroke-width: 1.75;
+    }
+
+    /* Faculty timetable cell styles */
+    .vft-cell-block {
+        border-radius: var(--radius-sm);
+        padding: 0.4rem 0.5rem;
+        font-size: 0.72rem;
+        line-height: 1.4;
+        text-align: left;
+        border-left: 3px solid;
+    }
+    .vft-cell-block.color-0 { border-left-color: var(--primary-light); background: rgba(37,99,235,0.08); color: var(--primary-light); }
+    .vft-cell-block.color-1 { border-left-color: var(--secondary);     background: rgba(99,102,241,0.08); color: var(--secondary); }
+    .vft-cell-block.color-2 { border-left-color: var(--success);       background: rgba(34,197,94,0.08);  color: var(--success); }
+    .vft-cell-block.color-3 { border-left-color: var(--accent);        background: rgba(245,158,11,0.08); color: var(--accent); }
+    .vft-cell-block.color-4 { border-left-color: var(--danger);        background: rgba(239,68,68,0.08);  color: var(--danger); }
+    .vft-cell-block.color-5 { border-left-color: var(--info);          background: rgba(6,182,212,0.08);  color: var(--info); }
+
+    .vft-cell-subject { font-weight: 700; }
+    .vft-cell-class   { font-size: 0.68rem; opacity: 0.85; margin-top: 0.15rem; }
+    .vft-cell-sem     { font-size: 0.65rem; opacity: 0.65; }
+
+    .vft-break-row td {
+        background: rgba(217,119,6,0.04) !important;
+        border-color: rgba(217,119,6,0.12) !important;
+    }
+    .vft-break-label {
+        display: flex; align-items: center; justify-content: center;
+        gap: 0.5rem; font-size: 0.72rem; color: var(--accent);
+        font-style: italic;
+    }
+    .vft-empty-cell {
+        display: flex; align-items: center; justify-content: center;
+        color: var(--text-faint); font-size: 0.6rem;
+    }
+
+    .vft-timetable-table {
+        min-width: 700px;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .vft-header-row th {
+        background: var(--bg-base);
+        color: var(--text-muted);
+        font-size: 0.66rem;
+        letter-spacing: 0.1em;
+        padding: 0.875rem 1rem;
+        text-align: center;
+        white-space: nowrap;
+        border-right: 1px solid var(--border);
+    }
+    .vft-header-row th:first-child {
+        text-align: left;
+        border-right: 2px solid var(--border-strong);
+        min-width: 100px;
+    }
+    .vft-timetable-table td {
+        padding: 0.625rem 0.5rem;
+        vertical-align: middle;
+        text-align: center;
+        border: 1px solid var(--border);
+        min-width: 130px;
+    }
+    .vft-time-cell {
+        text-align: left !important;
+        background: var(--bg-muted);
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.625rem 1rem !important;
+        border-right: 2px solid var(--border) !important;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+        .vft-grid-2 { grid-template-columns: 1fr !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div style="text-align:center; margin-bottom:var(--space-8);" class="anim-fade-up">
+    <div class="landing-hero-badge" style="display:inline-flex; margin-bottom:1rem;">
+        <i data-lucide="id-card" style="width:12px;height:12px;"></i>
+        Faculty Public Access
+    </div>
+    <h1 class="page-title" style="font-size:clamp(1.75rem,4vw,2.5rem); text-align:center;">
+        View Faculty Timetable
+    </h1>
+    <p class="page-subtitle" style="text-align:center; max-width:550px; margin:0.75rem auto 0;">
+        Select your institution and faculty member to view the latest published timetable.
+    </p>
+</div>
+
+<!-- Selection Form -->
+<div class="card vft-form-section anim-fade-up delay-100" style="max-width:680px; margin:0 auto var(--space-8);">
+    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+        <div style="width:40px; height:40px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; flex-shrink:0; box-shadow:0 4px 14px rgba(79,107,255,0.3);">
+            <i data-lucide="user-check" style="width:18px;height:18px;stroke-width:2;"></i>
+        </div>
+        <div>
+            <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem; color:var(--text-primary);">Find Faculty Schedule</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary); margin-top:1px;">Select institution first, then faculty member</div>
+        </div>
+    </div>
+
+    <form id="vftForm" style="display:flex; flex-direction:column; gap:1rem;">
+
+        <div class="form-group" style="margin-bottom:0;">
+            <label for="vftSchool">Institution</label>
+            <div class="input-group">
+                <span class="input-icon"><i data-lucide="building-2"></i></span>
+                <select id="vftSchool" name="username" required>
+                    <option value="">Select your institution...</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+            <label for="vftFaculty">Faculty Member</label>
+            <div class="input-group">
+                <span class="input-icon"><i data-lucide="user"></i></span>
+                <select id="vftFaculty" name="teacher_name" required disabled>
+                    <option value="">Select institution first...</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top:0.25rem; padding:0.875rem;" id="vftFindBtn" disabled>
+            <i data-lucide="search"></i>
+            View Timetable
+        </button>
+
+    </form>
+</div>
+
+<!-- Loading state -->
+<div id="vftLoadingState" style="display:none; text-align:center; padding:3rem 0;">
+    <div class="spinner" style="width:36px; height:36px; margin:0 auto 1rem;"></div>
+    <p style="color:var(--text-muted); font-size:0.875rem;">Loading faculty schedule...</p>
+</div>
+
+<!-- Empty / no timetable state -->
+<div id="vftEmptyState" style="display:none; text-align:center; padding:3rem 0;">
+    <div style="font-size:3rem; margin-bottom:1rem;">📭</div>
+    <h3 style="color:var(--text-muted); font-size:1rem; font-weight:600;">No Timetable Published</h3>
+    <p style="color:var(--text-faint); font-size:0.82rem; margin-top:0.5rem;">
+        No timetable has been published for this faculty.
+    </p>
+</div>
+
+<!-- Timetable Display (populated by JS) -->
+<div id="vftTimetableContainer" style="display:none; max-width:1200px; margin:0 auto;">
+
+    <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap; gap:1rem;">
+        <div>
+            <h2 id="vftResultTitle" style="font-family:'Outfit',sans-serif; font-size:1.25rem; font-weight:700; color:var(--text-primary);">
+                Faculty Schedule
+            </h2>
+            <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.25rem; display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="check-circle" style="width:13px;height:13px;color:var(--success);stroke-width:2;"></i>
+                Published · AI Generated
+            </p>
+        </div>
+        <button onclick="window.print()" class="btn btn-secondary btn-sm">
+            <i data-lucide="printer"></i> Print Schedule
+        </button>
+    </div>
+
+    <div class="card" style="overflow-x:auto; -webkit-overflow-scrolling:touch; padding:0;">
+        <div style="overflow-x:auto;">
+            <table class="vft-timetable-table">
+                <thead>
+                    <tr class="vft-header-row">
+                        <th>TIME</th>
+                        <th>MON</th>
+                        <th>TUE</th>
+                        <th>WED</th>
+                        <th>THU</th>
+                        <th>FRI</th>
+                        <th>SAT</th>
+                    </tr>
+                </thead>
+                <tbody id="vftTimetableBody">
+                    <!-- JS Populated -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="card" style="display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; padding:0.875rem 1.25rem; margin-top:var(--space-4);">
+        <span style="font-size:0.68rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em;">Legend</span>
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.75rem;">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--primary); background:rgba(79,107,255,0.08);"></div>
+            <span style="color:var(--text-secondary);">Lecture</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.75rem;">
+            <div style="width:12px; height:12px; border-radius:3px; border-left:3px solid var(--warning); background:rgba(245,158,11,0.08);"></div>
+            <span style="color:var(--text-secondary);">Recess Break</span>
+        </div>
+        <div style="margin-left:auto; font-size:0.72rem; color:var(--text-faint);">
+            Each cell shows: Subject · Batch · Semester
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const vftSchoolSel = document.getElementById('vftSchool');
+    const vftFacultySel = document.getElementById('vftFaculty');
+    const vftFindBtn    = document.getElementById('vftFindBtn');
+    const vftForm       = document.getElementById('vftForm');
+
+    const vftLoading    = document.getElementById('vftLoadingState');
+    const vftEmpty      = document.getElementById('vftEmptyState');
+    const vftContainer  = document.getElementById('vftTimetableContainer');
+    const vftBody       = document.getElementById('vftTimetableBody');
+    const vftTitle      = document.getElementById('vftResultTitle');
+
+    const DAYS   = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const COLORS = ['color-0','color-1','color-2','color-3','color-4','color-5'];
+
+    const subjectColorMap = {};
+    let colorIdx = 0;
+
+    function getSubjectColor(name) {
+        if (!(name in subjectColorMap)) {
+            subjectColorMap[name] = colorIdx % COLORS.length;
+            colorIdx++;
+        }
+        return COLORS[subjectColorMap[name]];
+    }
+
+    // 1. Load institutions on page load
+    async function initSchools() {
+        try {
+            const res     = await fetch('/api/schools');
+            const schools = await res.json();
+            schools.forEach(s => {
+                const opt       = document.createElement('option');
+                opt.value       = s.username;
+                opt.textContent = s.school_name;
+                vftSchoolSel.appendChild(opt);
+            });
+        } catch (e) { console.error('Error loading schools', e); }
+    }
+    initSchools();
+
+    // 2. Institution → Faculty
+    vftSchoolSel.addEventListener('change', async () => {
+        const username = vftSchoolSel.value;
+        vftFacultySel.innerHTML = '<option value="">Select faculty member...</option>';
+        vftFacultySel.disabled  = true;
+        vftFindBtn.disabled     = true;
+
+        // Hide timetable when institution changes
+        vftContainer.style.display = 'none';
+        vftEmpty.style.display     = 'none';
+
+        if (!username) return;
+
+        try {
+            const res      = await fetch(`/api/public/teachers?username=${encodeURIComponent(username)}`);
+            const teachers = await res.json();
+            if (res.ok && Array.isArray(teachers)) {
+                teachers.forEach(name => {
+                    const opt       = document.createElement('option');
+                    opt.value       = name;
+                    opt.textContent = name;
+                    vftFacultySel.appendChild(opt);
+                });
+                vftFacultySel.disabled = (teachers.length === 0);
+            }
+        } catch (e) { console.error('Error loading faculty', e); }
+    });
+
+    // 3. Enable Find button when faculty selected
+    vftFacultySel.addEventListener('change', () => {
+        vftFindBtn.disabled = !vftFacultySel.value;
+    });
+
+    // 4. Form submit
+    vftForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username    = vftSchoolSel.value;
+        const teacherName = vftFacultySel.value;
+
+        if (!username || !teacherName) return;
+
+        vftFindBtn.disabled    = true;
+        vftFindBtn.innerHTML   = '<div class="spinner"></div> Loading...';
+        vftContainer.style.display = 'none';
+        vftEmpty.style.display     = 'none';
+        vftLoading.style.display   = 'block';
+
+        try {
+            const res  = await fetch(
+                `/api/public/faculty_timetable?username=${encodeURIComponent(username)}&teacher_name=${encodeURIComponent(teacherName)}`
+            );
+            const data = await res.json();
+
+            vftLoading.style.display = 'none';
+
+            if (data.error || !data.timetable) {
+                vftEmpty.style.display = 'block';
+                return;
+            }
+
+            const hasEntries = Object.keys(data.timetable).length > 0;
+            if (!hasEntries) {
+                vftEmpty.style.display = 'block';
+                return;
+            }
+
+            renderVftTimetable(data, teacherName);
+            vftContainer.style.display = 'block';
+            vftContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        } catch (err) {
+            vftLoading.style.display = 'none';
+            vftEmpty.style.display   = 'block';
+            console.error('Error fetching faculty timetable', err);
+        } finally {
+            vftFindBtn.disabled  = false;
+            vftFindBtn.innerHTML = '<i data-lucide="search"></i> View Timetable';
+            lucide.createIcons();
+        }
+    });
+
+    function renderVftTimetable(data, teacherName) {
+        vftBody.innerHTML = '';
+
+        // Reset color map for new faculty
+        Object.keys(subjectColorMap).forEach(k => delete subjectColorMap[k]);
+        colorIdx = 0;
+
+        vftTitle.textContent = teacherName + ' — Weekly Schedule';
+
+        const timetable   = data.timetable;
+        const visualSlots = data.visual_slots;
+
+        visualSlots.forEach(slot => {
+            const row = document.createElement('tr');
+
+            if (slot.type === 'break') {
+                row.className = 'vft-break-row';
+                row.innerHTML = `
+                    <td class="vft-time-cell" style="color:var(--accent);">${slot.time.substring(0,5)}</td>
+                    <td colspan="6">
+                        <div class="vft-break-label">
+                            <i data-lucide="coffee" style="width:12px;height:12px;"></i>
+                            Recess Break
+                        </div>
+                    </td>`;
+            } else {
+                const timeCell = document.createElement('td');
+                timeCell.className   = 'vft-time-cell';
+                timeCell.textContent = slot.time.substring(0, 5);
+                row.appendChild(timeCell);
+
+                DAYS.forEach(day => {
+                    const cell  = document.createElement('td');
+                    const key   = `${day}_${slot.time}`;
+                    const entry = timetable[key];
+
+                    if (entry && typeof entry === 'object') {
+                        const colorClass = getSubjectColor(entry.subject);
+                        cell.innerHTML = `
+                            <div class="vft-cell-block ${colorClass}">
+                                <div class="vft-cell-subject">${entry.subject}</div>
+                                <div class="vft-cell-class">${entry.class_name}</div>
+                                <div class="vft-cell-sem">Sem ${entry.semester}</div>
+                            </div>`;
+                    } else {
+                        cell.innerHTML = '<div class="vft-empty-cell"><i data-lucide="minus" style="width:10px;height:10px;stroke-width:2;"></i></div>';
+                    }
+                    row.appendChild(cell);
+                });
+            }
+
+            vftBody.appendChild(row);
+        });
+
+        lucide.createIcons();
+    }
+</script>
+{% endblock %}

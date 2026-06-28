@@ -30,12 +30,92 @@ def save_priorities():
 @generation_bp.route('/generate_setup')
 @login_required
 def generate_setup():
+    school_id = session['school_id']
     db = connect_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM class WHERE school_id = %s", (session['school_id'],))
+
+    # Fetch available batches
+    cursor.execute("SELECT * FROM class WHERE school_id = %s", (school_id,))
     classes = cursor.fetchall()
+
+    # Fetch one row per class/semester that has timetable entries
+    cursor.execute("""
+        SELECT
+            c.class_id,
+            c.class_name,
+            sub.semester,
+            COUNT(tt.timetable_id) AS lecture_count
+        FROM timetable tt
+        JOIN class c   ON tt.class_id    = c.class_id
+        JOIN subject sub ON tt.subject_id = sub.subject_id
+        WHERE tt.school_id = %s
+        GROUP BY c.class_id, c.class_name, sub.semester
+        ORDER BY sub.semester, c.class_name
+    """, (school_id,))
+    existing_timetables = cursor.fetchall()
+
     db.close()
-    return render_template('generate.html', classes=classes)
+
+    return render_template(
+        'generate.html',
+        classes=classes,
+        existing_timetables=existing_timetables,
+        school_name=session.get('school_name', 'Your Institution'),
+    )
+
+
+@generation_bp.route('/api/delete_timetable', methods=['POST'])
+@login_required
+def delete_timetable():
+    """
+    Delete ALL timetable entries for the logged-in institution only.
+    Never touches teachers, subjects, classes, or timing configuration.
+    """
+    school_id = session['school_id']
+    try:
+        db = connect_db()
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM timetable WHERE school_id = %s", (school_id,))
+        db.commit()
+        deleted = cursor.rowcount
+        db.close()
+        flash(
+            f"Timetable deleted successfully. {deleted} schedule entr{'y' if deleted == 1 else 'ies'} removed.",
+            "success"
+        )
+    except Exception as e:
+        flash(f"Failed to delete timetable: {str(e)}", "error")
+    return redirect(url_for('generation.generate_setup'))
+
+
+@generation_bp.route('/api/delete_class_timetable', methods=['POST'])
+@login_required
+def delete_class_timetable():
+    """
+    Delete timetable entries for ONE specific class only.
+    Scoped by school_id AND class_id — never touches other classes,
+    and never deletes teachers, subjects, or configuration.
+    """
+    school_id = session['school_id']
+    data = request.get_json(silent=True) or {}
+    class_id = data.get('class_id')
+
+    if not class_id:
+        return jsonify({"error": "class_id is required"}), 400
+
+    try:
+        db = connect_db()
+        cursor = db.cursor()
+        cursor.execute(
+            "DELETE FROM timetable WHERE school_id = %s AND class_id = %s",
+            (school_id, int(class_id))
+        )
+        db.commit()
+        deleted = cursor.rowcount
+        db.close()
+        return jsonify({"success": True, "deleted": deleted})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @generation_bp.route('/generate', methods=['POST'])
