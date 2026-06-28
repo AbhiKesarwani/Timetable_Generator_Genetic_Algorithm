@@ -113,7 +113,7 @@
                         <td style="text-align:right; padding-right:1.5rem;">
                             <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
                                 <a href="{{ url_for('management.manage_teachers', edit_id=teacher.teacher_id) }}"
-                                    class="table-action-edit" title="Edit faculty member" aria-label="Edit {{ teacher.teacher_name }}">
+                                    class="btn-action btn-action-edit" title="Edit faculty member" aria-label="Edit {{ teacher.teacher_name }}">
                                     <i data-lucide="pencil"></i>
                                 </a>
                                 <form action="{{ url_for('management.manage_teachers') }}" method="POST"
@@ -121,7 +121,7 @@
                                     onsubmit="return confirm('Removing this faculty member will also remove their assigned subjects. Proceed?')">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="teacher_id" value="{{ teacher.teacher_id }}">
-                                    <button type="submit" class="table-action-delete"
+                                    <button type="submit" class="btn-action btn-action-delete"
                                         title="Remove faculty member" aria-label="Remove {{ teacher.teacher_name }}">
                                         <i data-lucide="trash-2"></i>
                                     </button>

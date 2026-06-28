@@ -3169,3 +3169,283 @@ textarea::placeholder {
 .empty-cell {
     opacity: 0.08;
 }
+
+/* ============================================================
+   UI/UX POLISH — PREMIUM SAAS REDESIGN STYLES
+   ============================================================ */
+
+/* 1. Card & Grid Micro-interactions */
+.card {
+    transition: box-shadow var(--transition), border-color var(--transition), transform var(--transition) !important;
+}
+.card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(79, 107, 255, 0.3) !important;
+    transform: translateY(-3px) !important;
+}
+
+/* 2. Quick Actions Grid & Cards */
+.dash-qa-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+.dash-qa-btn {
+    flex: 1 1 calc(50% - 0.375rem);
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+.dash-qa-btn:hover {
+    background: var(--bg-surface-hover);
+    border-color: rgba(79, 107, 255, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+.dash-qa-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.dash-qa-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+.dash-qa-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    text-align: left;
+}
+.dash-qa-arrow {
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+    width: 16px;
+    height: 16px;
+}
+.dash-qa-btn:hover .dash-qa-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+.dash-qa-icon {
+    width: 36px; height: 36px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform var(--transition-fast);
+}
+.dash-qa-btn:hover .dash-qa-icon { transform: scale(1.1); }
+.dash-qa-icon svg, .dash-qa-icon i { width: 16px; height: 16px; stroke-width: 1.75; }
+.dash-qa-blue  { background: rgba(79, 107, 255, 0.12);  color: var(--primary);      }
+.dash-qa-ind   { background: rgba(139,92,246,0.12);  color: var(--secondary);    }
+.dash-qa-amber { background: rgba(245,158,11,0.12);  color: var(--warning);      }
+.dash-qa-green { background: rgba(34,197,94,0.12);   color: var(--success);      }
+.dash-qa-cyan  { background: rgba(6,182,212,0.12);   color: var(--accent-cyan);  }
+
+/* 3. Table Action Buttons (Edit/Delete) */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px; /* Rounded-square glass */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0;
+}
+.btn-action svg, .btn-action i {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+}
+.btn-action-edit:hover {
+    background: rgba(79, 107, 255, 0.1);
+    border-color: rgba(79, 107, 255, 0.3);
+    color: var(--primary);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(79, 107, 255, 0.25);
+}
+.btn-action-delete:hover {
+    background: rgba(244, 63, 94, 0.1);
+    border-color: rgba(244, 63, 94, 0.3);
+    color: var(--danger);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
+}
+
+/* 4. Onboarding Stepper */
+.dash-stepper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+.dash-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    position: relative;
+}
+.dash-step-connector {
+    position: absolute;
+    top: 18px;
+    left: 45px;
+    right: -10px;
+    height: 2px;
+    background: rgba(255,255,255,0.05);
+    z-index: 0;
+}
+.dash-step.done .dash-step-connector {
+    background: var(--success);
+    opacity: 0.5;
+}
+.dash-step:last-child .dash-step-connector {
+    display: none;
+}
+.dash-step-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-surface-hover);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    z-index: 1;
+    position: relative;
+    box-shadow: 0 0 0 4px var(--bg-surface);
+}
+.dash-step.done .dash-step-icon-wrap {
+    background: rgba(34,197,94,0.1);
+    border-color: rgba(34,197,94,0.3);
+    color: var(--success);
+}
+.dash-step.current .dash-step-icon-wrap {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 0 0 4px var(--bg-surface), 0 0 12px rgba(79,107,255,0.4);
+}
+.dash-step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 1;
+}
+.dash-step-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.dash-step.pending .dash-step-title {
+    color: var(--text-muted);
+}
+.dash-step-status {
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.dash-step.done .dash-step-status { color: var(--success); }
+.dash-step.current .dash-step-status { color: var(--primary); font-weight: 500; }
+.dash-step.pending .dash-step-status { color: var(--text-faint); }
+
+@media (max-width: 768px) {
+    .dash-stepper {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .dash-step {
+        flex-direction: row;
+        width: 100%;
+        align-items: center;
+    }
+    .dash-step-connector {
+        top: 36px;
+        left: 17px;
+        width: 2px;
+        height: calc(100% - 10px);
+        bottom: -15px;
+    }
+}
+
+/* 5. Schedule Configuration section icon badges */
+.section-icon-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.35rem;
+    flex-shrink: 0;
+}
+.section-icon-badge svg, .section-icon-badge i {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+}
+.section-icon-badge.blue {
+    background: linear-gradient(135deg, rgba(79, 107, 255, 0.15), rgba(79, 107, 255, 0.04));
+    border: 1px solid rgba(79, 107, 255, 0.25);
+    color: var(--primary);
+}
+.section-icon-badge.amber {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.04));
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    color: var(--warning);
+}
+.section-icon-badge.purple {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.04));
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    color: var(--secondary);
+}
+.section-icon-badge.danger {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.04));
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: var(--danger);
+}
+
+/* 6. Table Row Micro-interactions */
+tbody tr {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+tbody tr:hover {
+    transform: translateY(-2px) scale(1.005);
+    box-shadow: 0 4px 12px rgba(79, 107, 255, 0.15);
+    position: relative;
+    z-index: 10;
+}
+tbody tr:hover td {
+    background: var(--primary-dim) !important;
+    border-top: 1px solid rgba(79, 107, 255, 0.3);
+    border-bottom: 1px solid rgba(79, 107, 255, 0.3);
+}
+
+/* Tighten layout card padding */
+.card {
+    padding: var(--space-5) !important;
+}

@@ -4,9 +4,9 @@
 
 {% block breadcrumb %}
 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="font-size:0.6rem;"></i></span>
 <a href="{{ url_for('generation.generate_setup') }}">AI Generator</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="font-size:0.6rem;"></i></span>
 <span class="breadcrumb-current">Manual Adjustments</span>
 {% endblock %}
 
@@ -17,9 +17,9 @@
 
     <!-- Icon -->
     <div style="width:80px; height:80px; background:rgba(30,58,138,0.08); border:2px solid rgba(30,58,138,0.15); border-radius:var(--radius-2xl); display:flex; align-items:center; justify-content:center; font-size:2rem; color:var(--primary-light); margin:0 auto 2rem; position:relative;">
-        <i class="fas fa-edit"></i>
+        <i data-lucide="pencil"></i>
         <div style="position:absolute; top:-6px; right:-6px; width:22px; height:22px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.65rem; color:white;">
-            <i class="fas fa-question"></i>
+            <i data-lucide="help-circle"></i>
         </div>
     </div>
 
@@ -31,17 +31,17 @@
 
     <!-- Info note -->
     <div style="display:flex; align-items:flex-start; gap:0.5rem; text-align:left; background:rgba(217,119,6,0.06); border:1px solid rgba(217,119,6,0.2); border-radius:var(--radius); padding:0.875rem 1rem; margin-bottom:2rem; font-size:0.8rem; color:var(--accent);">
-        <i class="fas fa-exclamation-triangle" style="flex-shrink:0; margin-top:0.1rem;"></i>
+        <i data-lucide="alert-triangle" style="flex-shrink:0; margin-top:0.1rem;"></i>
         <span>Note: Conflict checking is disabled during manual edits. Please review assignments carefully.</span>
     </div>
 
     <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
         <button class="btn btn-primary" style="padding:0.875rem 2rem;" onclick="confirmProceed()">
-            <i class="fas fa-tools"></i>
+            <i data-lucide="wrench"></i>
             Yes, Modify Schedule
         </button>
         <button class="btn btn-secondary" style="padding:0.875rem 2rem;" onclick="skipModifications()">
-            <i class="fas fa-check-double"></i>
+            <i data-lucide="check-circle-2"></i>
             No, Looks Good
         </button>
     </div>
@@ -53,13 +53,13 @@
     <div class="flex items-center justify-between mb-8" style="flex-wrap:wrap; gap:1rem;">
         <div>
             <h1 class="page-title" style="margin-bottom:0.35rem;">
-                <i class="fas fa-edit" style="color:var(--primary-light); margin-right:0.5rem; font-size:1.4rem;"></i>
+                <i data-lucide="pencil" style="color:var(--primary-light); margin-right:0.5rem; font-size:1.4rem;"></i>
                 Edit Schedule
             </h1>
             <p class="page-subtitle">Reassign subject entries to different days and time slots.</p>
         </div>
         <button type="button" class="btn btn-secondary" onclick="skipModifications()">
-            <i class="fas fa-times"></i> Cancel Changes
+            <i data-lucide="x"></i> Cancel Changes
         </button>
     </div>
 
@@ -69,7 +69,7 @@
             <!-- Card header -->
             <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
                 <div style="display:flex; align-items:center; gap:0.6rem;">
-                    <i class="fas fa-table" style="color:var(--primary-light);"></i>
+                    <i data-lucide="table" style="color:var(--primary-light);"></i>
                     <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">Schedule Entries</span>
                 </div>
                 <span class="badge badge-primary">{{ timetable | length }} Entries</span>
@@ -91,7 +91,7 @@
                             <td style="padding-left:1.5rem;">
                                 <input type="hidden" name="subject[]" value="{{ entry.subject }}">
                                 <span class="subject-chip {{ colors[loop.index0 % 6] }}">
-                                    <i class="fas fa-book" style="font-size:0.65rem;"></i>
+                                    <i data-lucide="book-open" style="font-size:0.65rem;"></i>
                                     {{ entry.subject }}
                                 </span>
                             </td>
@@ -119,11 +119,11 @@
         <!-- Save Row -->
         <div style="display:flex; justify-content:flex-end; align-items:center; gap:1rem; margin-top:1.5rem; flex-wrap:wrap;">
             <p style="font-size:0.78rem; color:var(--text-faint);">
-                <i class="fas fa-info-circle"></i>
+                <i data-lucide="info"></i>
                 Changes will be saved and you'll be redirected to the final timetable.
             </p>
             <button type="submit" class="btn btn-primary" id="saveBtn" style="padding:0.875rem 2.5rem;">
-                <i class="fas fa-save"></i>
+                <i data-lucide="save"></i>
                 Save &amp; View Results
             </button>
         </div>
@@ -173,13 +173,13 @@
                 } else {
                     alert("⚠️ " + (data.error || "Unknown error"));
                     saveBtn.disabled  = false;
-                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save &amp; View Results';
+                    saveBtn.innerHTML = '<i data-lucide="save"></i> Save &amp; View Results';
                 }
             })
             .catch(error => {
                 alert("⚠️ Error saving timetable. Please try again.");
                 saveBtn.disabled  = false;
-                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save &amp; View Results';
+                saveBtn.innerHTML = '<i data-lucide="save"></i> Save &amp; View Results';
             });
     });
 </script>

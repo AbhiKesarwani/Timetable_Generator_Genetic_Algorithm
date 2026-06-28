@@ -85,6 +85,8 @@
     <!-- Background campus image -->
     <div class="campus-hero-bg" style="background-image:url('{{ url_for('static', filename='images/campus_hero.png') }}');"></div>
     <div class="campus-hero-overlay"></div>
+    <!-- Animated glow orb (slow, GPU-accelerated) -->
+    <div class="campus-hero-glow-orb" aria-hidden="true"></div>
 
     <!-- Floating ambient particles (GPU-accelerated, reduced-motion safe) -->
     <span class="hero-particle" style="--duration:11s; --delay:0s;   --size:5px; --color:rgba(79,107,255,0.5);   top:18%; left:16%;"></span>
@@ -107,7 +109,7 @@
             </h1>
             <p class="campus-hero-subtitle">
                 Generate conflict-free academic schedules using Genetic Algorithms and AI optimization.
-                Built for real colleges and universities — in seconds, not hours.
+                Built for colleges, institutions, and academic departments — in seconds, not hours.
             </p>
             <div class="campus-hero-cta">
                 {% if session.get('school_id') %}
@@ -584,7 +586,7 @@
                 <i data-lucide="printer"></i>
             </div>
             <div class="benefit-title">Print-Ready Export</div>
-            <p class="benefit-desc">One-click PDF export with clean academic formatting, university branding header, and generation timestamp.</p>
+            <p class="benefit-desc">One-click PDF export with clean academic formatting, institution branding header, and generation timestamp.</p>
         </div>
     </div>
 </div>
@@ -596,7 +598,7 @@
     <div style="position:relative; z-index:1;">
         <div class="hero-badge" style="display:inline-flex; margin-bottom:1rem;">
             <i data-lucide="building-2" style="width:11px;height:11px;"></i>
-            Built for Colleges &amp; Universities
+            Built for Colleges &amp; Institutions
         </div>
         <h2 style="font-family:'Outfit',sans-serif; font-size:clamp(1.5rem,3vw,2.25rem); font-weight:800; color:var(--text-primary); letter-spacing:-0.02em; margin-bottom:0.75rem;">
             Ready to Automate Your Scheduling?

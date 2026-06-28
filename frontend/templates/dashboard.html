@@ -8,173 +8,504 @@
 <span class="breadcrumb-current">Dashboard</span>
 {% endblock %}
 
+{% block head %}
+<style>
+/* ============================================================
+   DASHBOARD PREMIUM REDESIGN
+   Two-column bento layout - Neutral stepper - Stripe/Linear inspired
+   ============================================================ */
+
+.db-root {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Welcome Strip */
+.db-welcome {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.35s ease both;
+}
+.db-welcome::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--grad-primary);
+}
+.db-welcome-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.db-welcome-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+}
+.db-welcome-dt {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.db-welcome-dt svg, .db-welcome-dt i { width: 13px; height: 13px; color: var(--text-muted); }
+.db-welcome-actions { display: flex; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
+
+/* Stats Row */
+.db-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.4s ease both;
+    animation-delay: 0.06s;
+}
+.db-stat {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow var(--transition), border-color var(--transition), transform var(--transition);
+    min-width: 0;
+}
+.db-stat:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border-hover); }
+.db-stat-icon {
+    width: 38px; height: 38px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.db-stat-icon svg, .db-stat-icon i { width: 18px; height: 18px; stroke-width: 1.75; }
+.db-stat-icon-blue  { background: rgba(79,107,255,0.12); color: var(--primary); }
+.db-stat-icon-green { background: rgba(34,197,94,0.12);  color: var(--success); }
+.db-stat-icon-amber { background: rgba(245,158,11,0.12); color: var(--warning); }
+.db-stat-num {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.1rem; font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1; letter-spacing: -0.03em;
+}
+.db-stat-label {
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-top: 2px;
+}
+.db-stat-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.72rem; font-weight: 600; color: var(--text-muted);
+}
+.db-stat-status svg, .db-stat-status i { width: 11px; height: 11px; }
+.db-stat-status.ok { color: var(--success); }
+
+/* Section Label */
+.db-section-label {
+    font-size: 0.65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+}
+.db-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Quick Actions */
+.db-qa-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.4s ease both;
+    animation-delay: 0.12s;
+}
+.db-qa-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    text-decoration: none; color: inherit;
+    display: flex; align-items: flex-start; gap: 14px;
+    transition: box-shadow var(--transition), border-color var(--transition), transform var(--transition);
+    position: relative; overflow: hidden; min-width: 0;
+}
+.db-qa-card::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: transparent; transition: background var(--transition);
+}
+.db-qa-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border-hover); }
+.db-qa-card:hover::after { background: var(--grad-primary); }
+.db-qa-card:hover .db-qa-arrow { transform: translateX(3px); color: var(--primary); }
+.db-qa-icon {
+    width: 40px; height: 40px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.db-qa-icon svg, .db-qa-icon i { width: 18px; height: 18px; stroke-width: 1.75; }
+.db-qa-icon-blue  { background: rgba(79,107,255,0.1);  color: var(--primary); }
+.db-qa-icon-ind   { background: rgba(139,92,246,0.1);  color: var(--secondary); }
+.db-qa-icon-amber { background: rgba(245,158,11,0.1);  color: var(--warning); }
+.db-qa-icon-green { background: rgba(34,197,94,0.1);   color: var(--success); }
+.db-qa-icon-cyan  { background: rgba(6,182,212,0.1);   color: #06B6D4; }
+.db-qa-body { flex: 1; min-width: 0; }
+.db-qa-title { font-family: 'Outfit', sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+.db-qa-desc { font-size: 0.76rem; color: var(--text-secondary); line-height: 1.5; }
+.db-qa-arrow {
+    color: var(--text-muted);
+    transition: transform var(--transition-fast), color var(--transition-fast);
+    flex-shrink: 0; align-self: center;
+}
+.db-qa-arrow svg, .db-qa-arrow i { width: 14px; height: 14px; }
+.db-qa-card.db-qa-wide { grid-column: 1 / -1; }
+
+/* Setup Progress Stepper */
+.db-progress-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.4s ease both;
+    animation-delay: 0.18s;
+}
+.db-stepper { display: flex; align-items: flex-start; margin-top: 20px; }
+.db-step {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+    position: relative; min-width: 0;
+}
+.db-step:not(:last-child)::after {
+    content: '';
+    position: absolute; top: 17px;
+    left: calc(50% + 18px); right: calc(-50% + 18px);
+    height: 1px; background: var(--border);
+}
+.db-step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1; flex-shrink: 0;
+}
+.db-step-name { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-top: 8px; }
+.db-step-meta { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+.db-step.active .db-step-num,
+.db-step.done   .db-step-num { border-color: var(--border-strong); background: var(--bg-elevated); color: var(--text-primary); }
+.db-step.active .db-step-name { color: var(--text-primary); }
+.db-step.done::after { background: var(--border-strong); }
+
+/* Right Column */
+.db-right { display: flex; flex-direction: column; gap: 16px; animation: fadeInUp 0.4s ease both; animation-delay: 0.09s; }
+
+/* Institution Card */
+.db-inst-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px 22px; }
+.db-inst-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+.db-inst-row:last-child { border-bottom: none; }
+.db-inst-key { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; flex-shrink: 0; }
+.db-inst-val { font-size: 0.78rem; color: var(--text-primary); font-weight: 600; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px; }
+
+/* AI Engine Card */
+.db-ai-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+.db-ai-header { display: flex; align-items: center; gap: 12px; }
+.db-ai-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--primary-dim); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.db-ai-icon svg, .db-ai-icon i { width: 18px; height: 18px; stroke-width: 1.75; }
+.db-ai-title { font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.db-ai-subtitle { font-size: 0.7rem; color: var(--text-muted); }
+.db-ai-body { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; }
+
+/* Danger Zone */
+.db-danger {
+    border: 1px solid rgba(239,68,68,0.2);
+    background: rgba(239,68,68,0.04);
+    border-radius: var(--radius-md);
+    padding: 18px 22px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    animation: fadeInUp 0.4s ease both; animation-delay: 0.22s;
+}
+
+/* Responsive */
+@media (max-width: 1100px) { .db-root { grid-template-columns: 1fr 280px; } }
+@media (max-width: 900px)  { .db-root { grid-template-columns: 1fr; } }
+@media (max-width: 768px) {
+    .db-stats { grid-template-columns: 1fr; gap: 10px; }
+    .db-qa-grid { grid-template-columns: 1fr; }
+    .db-qa-card.db-qa-wide { grid-column: 1; }
+    .db-welcome { padding: 20px; }
+    .db-welcome-inner { flex-direction: column; align-items: flex-start; }
+    .db-welcome-actions { width: 100%; }
+    .db-welcome-actions .btn { flex: 1; justify-content: center; }
+    .db-stepper { flex-wrap: wrap; gap: 12px; }
+    .db-step { flex-basis: calc(50% - 6px); }
+    .db-step:not(:last-child)::after { display: none; }
+    .db-danger { flex-direction: column; align-items: flex-start; }
+    .db-progress-card { padding: 18px; }
+}
+@media (max-width: 480px) {
+    .db-stats { grid-template-columns: 1fr; }
+    .db-step { flex-basis: 100%; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
-<!-- Welcome Panel -->
-<div class="welcome-panel anim-fade-up">
-    <div style="display:flex; align-items:center; gap:1rem; flex:1; min-width:0;">
-        <div class="welcome-avatar" aria-hidden="true">
-            {{ session.get('school_name', 'A')[0] | upper }}
-        </div>
-        <div class="welcome-text" style="min-width:0;">
-            <h2 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:'Outfit',sans-serif; font-size:1.1rem; font-weight:700; color:var(--text-primary);">Welcome back, {{ session.get('school_name', 'Administrator') }}</h2>
-            <p style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.2rem;">Today is a great day to generate your next conflict-free timetable.</p>
-        </div>
-    </div>
-    <div style="display:flex; align-items:center; gap:0.75rem; flex-shrink:0; flex-wrap:wrap;">
-        <div class="ai-status-badge">
-            <div class="ai-status-dot"></div>
-            AI Engine Ready
-        </div>
-        <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-primary btn-sm">
-            <i data-lucide="cpu"></i> Generate Now
-        </a>
-    </div>
-</div>
-
-<!-- Stats Row -->
-<div class="grid grid-cols-3 anim-fade-up delay-100" style="margin-bottom:var(--space-8);">
-
-    <div class="card card-gradient card-gradient-blue stat-card" style="cursor:default;">
-        <div class="stat-icon stat-icon-white">
-            <i data-lucide="layers"></i>
-        </div>
-        <div class="stat-info">
-            <div class="stat-label">Active Batches</div>
-            <div class="stat-value" data-target="{{ class_count }}">{{ class_count }}</div>
-        </div>
-    </div>
-
-    <div class="card stat-card" style="cursor:default;">
-        <div class="stat-icon stat-icon-green">
-            <i data-lucide="user-check"></i>
-        </div>
-        <div class="stat-info">
-            <div class="stat-label">Faculty Members</div>
-            <div class="stat-value" data-target="{{ staff_count }}">{{ staff_count }}</div>
-        </div>
-    </div>
-
-    <div class="card stat-card" style="cursor:default;">
-        <div class="stat-icon stat-icon-gold">
-            <i data-lucide="calendar-check"></i>
-        </div>
-        <div class="stat-info">
-            <div class="stat-label">Generated Timetables</div>
-            <div class="stat-value" data-target="{{ timetable_count }}">{{ timetable_count }}</div>
-        </div>
-    </div>
-
-</div>
-
-<!-- Management Section Header -->
-<div class="flex items-center justify-between mb-4 anim-fade-up delay-150">
-    <h2 style="font-family:'Outfit',sans-serif; font-size:1.25rem; font-weight:700; color:var(--text-primary);">
-        Academic Management
-    </h2>
-    <span class="badge badge-primary">Quick Access</span>
-</div>
-
-<!-- Management Cards -->
-<div class="grid grid-cols-2 anim-fade-up delay-150" style="margin-bottom:var(--space-8);">
-
-    <a href="{{ url_for('management.manage_teachers') }}" class="feature-card card" style="text-decoration:none;">
-        <div class="feature-icon feature-icon-blue">
-            <i data-lucide="user-check"></i>
-        </div>
-        <div class="feature-content">
-            <div class="feature-title">Faculty Directory</div>
-            <div class="feature-desc">Add, edit and manage faculty members and their assignments across departments.</div>
-        </div>
-        <span class="feature-arrow"><i data-lucide="chevron-right"></i></span>
-    </a>
-
-    <a href="{{ url_for('management.manage_subjects') }}" class="feature-card card" style="text-decoration:none;">
-        <div class="feature-icon feature-icon-ind">
-            <i data-lucide="book-open"></i>
-        </div>
-        <div class="feature-content">
-            <div class="feature-title">Curriculum Management</div>
-            <div class="feature-desc">Define subjects, assign faculty to batches, and configure credit hours per semester.</div>
-        </div>
-        <span class="feature-arrow"><i data-lucide="chevron-right"></i></span>
-    </a>
-
-    <a href="{{ url_for('management.manage_timings') }}" class="feature-card card" style="text-decoration:none;">
-        <div class="feature-icon feature-icon-gold">
-            <i data-lucide="clock"></i>
-        </div>
-        <div class="feature-content">
-            <div class="feature-title">Schedule Configuration</div>
-            <div class="feature-desc">Set college hours, lecture durations, and break periods to match your academic calendar.</div>
-        </div>
-        <span class="feature-arrow"><i data-lucide="chevron-right"></i></span>
-    </a>
-
-    <a href="{{ url_for('generation.generate_setup') }}" class="feature-card card" style="text-decoration:none; border-color:rgba(79,107,255,0.25); background:rgba(79,107,255,0.04);">
-        <div class="feature-icon feature-icon-filled">
-            <i data-lucide="cpu"></i>
-        </div>
-        <div class="feature-content">
-            <div class="feature-title" style="color:var(--primary);">AI Timetable Generator</div>
-            <div class="feature-desc">Run the Genetic Algorithm engine to generate a conflict-free, optimized schedule instantly.</div>
-        </div>
-        <span class="feature-arrow" style="color:var(--primary);"><i data-lucide="chevron-right"></i></span>
-    </a>
-
-    <a href="{{ url_for('faculty.faculty_timetable_page') }}" class="feature-card card" style="text-decoration:none;">
-        <div class="feature-icon feature-icon-ind">
-            <i data-lucide="id-card"></i>
-        </div>
-        <div class="feature-content">
-            <div class="feature-title">Faculty Timetable</div>
-            <div class="feature-desc">View individual faculty schedules, workload analytics and weekly teaching loads per faculty.</div>
-        </div>
-        <span class="feature-arrow"><i data-lucide="chevron-right"></i></span>
-    </a>
-
-</div>
-
-<!-- AI Engine Status Card -->
-<div class="card anim-fade-up delay-200" style="margin-bottom:var(--space-6); padding:1.25rem 1.5rem;">
-    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
-        <div style="display:flex; align-items:center; gap:0.875rem;">
-            <div style="width:44px; height:44px; background:var(--primary-dim); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:var(--primary); flex-shrink:0;">
-                <i data-lucide="cpu" style="width:20px;height:20px;stroke-width:1.75;"></i>
-            </div>
-            <div>
-                <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.9rem; color:var(--text-primary);">AI Scheduling Engine</div>
-                <div style="font-size:0.75rem; color:var(--text-secondary);">Genetic Algorithm · Conflict-Free · Multi-constraint Optimization</div>
+<!-- WELCOME STRIP -->
+<div class="db-welcome">
+    <div class="db-welcome-inner">
+        <div>
+            <div class="db-welcome-name">Welcome back, {{ session.get('school_name', 'Administrator') }}</div>
+            <div class="db-welcome-dt">
+                <i data-lucide="clock-3"></i>
+                <span id="dashDateTime">Loading...</span>
             </div>
         </div>
-        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
-            <div class="ai-status-badge">
-                <div class="ai-status-dot"></div>
-                Online &amp; Ready
-            </div>
+        <div class="db-welcome-actions">
+            <a href="{{ url_for('timetable_view.view_timetable') }}" class="btn btn-secondary btn-sm">
+                <i data-lucide="calendar-days"></i> View Timetable
+            </a>
             <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-primary btn-sm">
-                <i data-lucide="zap"></i> Launch Generator
+                <i data-lucide="cpu"></i> Generate
             </a>
         </div>
     </div>
 </div>
 
-<!-- Danger Zone -->
-<div class="danger-zone anim-fade-up delay-300">
-    <div>
-        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.35rem;">
-            <i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--danger);stroke-width:2;"></i>
-            <span style="font-weight:700; color:var(--danger); font-size:0.9rem;">Danger Zone</span>
+<!-- STATS ROW -->
+<div class="db-stats">
+
+    <div class="db-stat">
+        <div class="db-stat-icon db-stat-icon-blue"><i data-lucide="layers"></i></div>
+        <div>
+            <div class="db-stat-num" data-target="{{ class_count }}">{{ class_count }}</div>
+            <div class="db-stat-label">Active Batches</div>
         </div>
-        <p style="font-size:0.82rem; color:var(--text-secondary);">
-            Permanently remove all institution data and account access. This action cannot be undone.
-        </p>
+        <div class="db-stat-status {% if class_count > 0 %}ok{% endif %}">
+            <i data-lucide="{% if class_count > 0 %}check-circle{% else %}plus-circle{% endif %}"></i>
+            {% if class_count > 0 %}Configured{% else %}Add batches{% endif %}
+        </div>
     </div>
-    <button class="btn btn-danger btn-sm"
-        onclick="if(confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) { document.getElementById('delete-account-form').submit(); }">
-        <i data-lucide="trash-2"></i> Delete Account
-    </button>
+
+    <div class="db-stat">
+        <div class="db-stat-icon db-stat-icon-green"><i data-lucide="user-check"></i></div>
+        <div>
+            <div class="db-stat-num" data-target="{{ staff_count }}">{{ staff_count }}</div>
+            <div class="db-stat-label">Faculty Members</div>
+        </div>
+        <div class="db-stat-status {% if staff_count > 0 %}ok{% endif %}">
+            <i data-lucide="{% if staff_count > 0 %}check-circle{% else %}plus-circle{% endif %}"></i>
+            {% if staff_count > 0 %}Registered{% else %}Add faculty{% endif %}
+        </div>
+    </div>
+
+    <div class="db-stat">
+        <div class="db-stat-icon db-stat-icon-amber"><i data-lucide="calendar-check"></i></div>
+        <div>
+            <div class="db-stat-num" data-target="{{ timetable_count }}">{{ timetable_count }}</div>
+            <div class="db-stat-label">Generated Timetables</div>
+        </div>
+        <div class="db-stat-status {% if timetable_count > 0 %}ok{% endif %}">
+            <i data-lucide="{% if timetable_count > 0 %}check-circle{% else %}zap{% endif %}"></i>
+            {% if timetable_count > 0 %}Published{% else %}Run generator{% endif %}
+        </div>
+    </div>
+
 </div>
+
+<!-- TWO-COLUMN BENTO -->
+<div class="db-root">
+
+    <!-- LEFT COLUMN -->
+    <div>
+
+        <div class="db-section-label">Quick Actions</div>
+        <div class="db-qa-grid">
+
+            <a href="{{ url_for('management.manage_teachers') }}" class="db-qa-card">
+                <div class="db-qa-icon db-qa-icon-blue"><i data-lucide="user-check"></i></div>
+                <div class="db-qa-body">
+                    <div class="db-qa-title">Faculty</div>
+                    <div class="db-qa-desc">Manage faculty members and assignments.</div>
+                </div>
+                <div class="db-qa-arrow"><i data-lucide="arrow-right"></i></div>
+            </a>
+
+            <a href="{{ url_for('management.manage_subjects') }}" class="db-qa-card">
+                <div class="db-qa-icon db-qa-icon-ind"><i data-lucide="book-open"></i></div>
+                <div class="db-qa-body">
+                    <div class="db-qa-title">Curriculum</div>
+                    <div class="db-qa-desc">Manage subjects, credits and semesters.</div>
+                </div>
+                <div class="db-qa-arrow"><i data-lucide="arrow-right"></i></div>
+            </a>
+
+            <a href="{{ url_for('management.manage_timings') }}" class="db-qa-card">
+                <div class="db-qa-icon db-qa-icon-amber"><i data-lucide="clock"></i></div>
+                <div class="db-qa-body">
+                    <div class="db-qa-title">Schedule</div>
+                    <div class="db-qa-desc">Configure lecture timings and breaks.</div>
+                </div>
+                <div class="db-qa-arrow"><i data-lucide="arrow-right"></i></div>
+            </a>
+
+            <a href="{{ url_for('generation.generate_setup') }}" class="db-qa-card">
+                <div class="db-qa-icon db-qa-icon-green"><i data-lucide="cpu"></i></div>
+                <div class="db-qa-body">
+                    <div class="db-qa-title">Generate</div>
+                    <div class="db-qa-desc">Generate optimized conflict-free timetables.</div>
+                </div>
+                <div class="db-qa-arrow"><i data-lucide="arrow-right"></i></div>
+            </a>
+
+            <a href="{{ url_for('faculty.faculty_timetable_page') }}" class="db-qa-card db-qa-wide">
+                <div class="db-qa-icon db-qa-icon-cyan"><i data-lucide="id-card"></i></div>
+                <div class="db-qa-body">
+                    <div class="db-qa-title">Faculty Timetable</div>
+                    <div class="db-qa-desc">View weekly faculty schedules.</div>
+                </div>
+                <div class="db-qa-arrow"><i data-lucide="arrow-right"></i></div>
+            </a>
+
+        </div>
+
+        <div class="db-section-label" style="margin-top:4px;">Setup Progress</div>
+        <div class="db-progress-card">
+            <div class="db-stepper">
+
+                <div class="db-step {% if staff_count > 0 %}done{% else %}active{% endif %}">
+                    <div class="db-step-num">1</div>
+                    <div class="db-step-name">Faculty</div>
+                    <div class="db-step-meta">
+                        {% if staff_count > 0 %}{{ staff_count }} Registered
+                        {% else %}<a href="{{ url_for('management.manage_teachers') }}" style="color:var(--primary);text-decoration:none;">Add now</a>{% endif %}
+                    </div>
+                </div>
+
+                <div class="db-step {% if class_count > 0 and subject_count > 0 %}done{% elif staff_count > 0 %}active{% endif %}">
+                    <div class="db-step-num">2</div>
+                    <div class="db-step-name">Curriculum</div>
+                    <div class="db-step-meta">
+                        {% if class_count > 0 and subject_count > 0 %}{{ subject_count }} Subjects
+                        {% elif staff_count > 0 %}<a href="{{ url_for('management.manage_subjects') }}" style="color:var(--primary);text-decoration:none;">Configure</a>
+                        {% else %}Waiting{% endif %}
+                    </div>
+                </div>
+
+                <div class="db-step {% if has_config %}done{% elif class_count > 0 and subject_count > 0 %}active{% endif %}">
+                    <div class="db-step-num">3</div>
+                    <div class="db-step-name">Schedule</div>
+                    <div class="db-step-meta">
+                        {% if has_config %}Configured
+                        {% elif class_count > 0 and subject_count > 0 %}<a href="{{ url_for('management.manage_timings') }}" style="color:var(--primary);text-decoration:none;">Set timings</a>
+                        {% else %}Waiting{% endif %}
+                    </div>
+                </div>
+
+                <div class="db-step {% if timetable_count > 0 %}done{% elif has_config %}active{% endif %}">
+                    <div class="db-step-num">4</div>
+                    <div class="db-step-name">Generate</div>
+                    <div class="db-step-meta">
+                        {% if timetable_count > 0 %}Completed
+                        {% elif has_config %}<a href="{{ url_for('generation.generate_setup') }}" style="color:var(--primary);text-decoration:none;">Ready</a>
+                        {% else %}Waiting{% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="db-danger">
+            <div>
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+                    <i data-lucide="alert-triangle" style="width:15px;height:15px;color:var(--danger);stroke-width:2;"></i>
+                    <span style="font-weight:700;color:var(--danger);font-size:0.85rem;">Danger Zone</span>
+                </div>
+                <p style="font-size:0.78rem;color:var(--text-secondary);">
+                    Permanently remove all institution data and account access. This cannot be undone.
+                </p>
+            </div>
+            <button class="btn btn-danger btn-sm"
+                onclick="if(confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) { document.getElementById('delete-account-form').submit(); }">
+                <i data-lucide="trash-2"></i> Delete Account
+            </button>
+        </div>
+
+    </div>
+    <!-- /LEFT COLUMN -->
+
+    <!-- RIGHT COLUMN -->
+    <div class="db-right">
+
+        <div class="db-section-label">Institution</div>
+        <div class="db-inst-card">
+            <div class="db-inst-row">
+                <span class="db-inst-key">Name</span>
+                <span class="db-inst-val">{{ session.get('school_name', 'Your Institution') }}</span>
+            </div>
+            <div class="db-inst-row">
+                <span class="db-inst-key">Role</span>
+                <span class="db-inst-val" style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--success);flex-shrink:0;animation:pulseGlow 2s infinite;"></span>
+                    Administrator
+                </span>
+            </div>
+            <div class="db-inst-row">
+                <span class="db-inst-key">Academic Year</span>
+                <span class="db-inst-val">AY 2025&#x2013;26</span>
+            </div>
+            <div class="db-inst-row">
+                <span class="db-inst-key">Status</span>
+                <span class="db-inst-val">
+                    <span class="badge badge-primary" style="font-size:0.6rem;padding:0.18rem 0.55rem;">Academic Plan</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="db-section-label">AI Engine</div>
+        <div class="db-ai-card">
+            <div class="db-ai-header">
+                <div class="db-ai-icon"><i data-lucide="cpu"></i></div>
+                <div>
+                    <div class="db-ai-title">Genetic Algorithm</div>
+                    <div class="db-ai-subtitle">Multi-constraint optimizer</div>
+                </div>
+            </div>
+            <div class="db-ai-body">
+                Generates conflict-free timetables using evolutionary computation.
+                Zero scheduling conflicts guaranteed.
+            </div>
+            <div>
+                <div class="ai-status-badge">
+                    <div class="ai-status-dot"></div>
+                    Online &amp; Ready
+                </div>
+            </div>
+            <a href="{{ url_for('generation.generate_setup') }}" class="btn btn-primary" style="width:100%;justify-content:center;">
+                <i data-lucide="zap"></i> Launch Generator
+            </a>
+        </div>
+
+    </div>
+    <!-- /RIGHT COLUMN -->
+
+</div>
+<!-- /TWO-COLUMN BENTO -->
 
 <form id="delete-account-form" action="{{ url_for('auth.delete_account') }}" method="POST" style="display:none;"></form>
 
@@ -182,32 +513,38 @@
 
 {% block scripts %}
 <script>
-/* ---- Dashboard stat counter animation ---- */
-(function() {
-    function easeOutExpo(t) {
-        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-    }
-    function animateCount(el) {
-        const target = parseInt(el.getAttribute('data-target'), 10);
-        if (isNaN(target) || target === 0) return;
-        const duration = 900;
-        const start    = performance.now();
-        const startVal = 0;
-        function step(now) {
-            const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const val = Math.round(startVal + (target - startVal) * easeOutExpo(progress));
-            el.textContent = val;
-            if (progress < 1) requestAnimationFrame(step);
+    /* Live Date/Time - updates every 30 seconds */
+    (function () {
+        var el = document.getElementById('dashDateTime');
+        if (!el) return;
+        var DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        function pad(n) { return ('0' + n).slice(-2); }
+        function render() {
+            var n = new Date();
+            el.textContent = DAYS[n.getDay()] + ', ' + n.getDate() + ' ' + MONTHS[n.getMonth()] + ' ' + n.getFullYear()
+                + ' · ' + pad(n.getHours()) + ':' + pad(n.getMinutes());
         }
-        requestAnimationFrame(step);
-    }
-    // Only animate if user hasn't set reduced motion
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.querySelectorAll('.stat-value[data-target]').forEach(el => {
-            animateCount(el);
-        });
-    }
-})();
+        render();
+        setInterval(render, 30000);
+    })();
+
+    /* Stat counter animation */
+    (function () {
+        function easeOutExpo(t) { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+        function animateCount(el) {
+            var target = parseInt(el.getAttribute('data-target'), 10);
+            if (isNaN(target) || target === 0) return;
+            var start = performance.now(), dur = 900;
+            (function step(now) {
+                var p = Math.min((now - start) / dur, 1);
+                el.textContent = Math.round(target * easeOutExpo(p));
+                if (p < 1) requestAnimationFrame(step);
+            })(start);
+        }
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.querySelectorAll('.db-stat-num[data-target]').forEach(animateCount);
+        }
+    })();
 </script>
 {% endblock %}

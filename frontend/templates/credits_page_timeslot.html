@@ -4,7 +4,7 @@
 
 {% block breadcrumb %}
 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="font-size:0.6rem;"></i></span>
 <span class="breadcrumb-current">Assign Credits</span>
 {% endblock %}
 
@@ -12,7 +12,7 @@
 
 <div class="page-header anim-fade-up">
     <h1 class="page-title">
-        <i class="fas fa-star" style="color:var(--accent); margin-right:0.5rem; font-size:1.4rem;"></i>
+        <i data-lucide="star" style="color:var(--accent); margin-right:0.5rem; font-size:1.4rem;"></i>
         Step 2: Assign Subject Credits
     </h1>
     <p class="page-subtitle">Set the credit hours (lectures per week) for each subject in the selected batch and semester.</p>
@@ -21,7 +21,7 @@
 <div class="card anim-fade-up delay-100" style="max-width:680px;">
     <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
         <div style="width:36px; height:36px; background:var(--grad-accent); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
-            <i class="fas fa-list-ol"></i>
+            <i data-lucide="list-ordered"></i>
         </div>
         <div>
             <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">Credit Assignment</div>
@@ -33,7 +33,7 @@
         <div id="creditInputs" style="display:flex; flex-direction:column; gap:0.75rem;"></div>
         <div style="margin-top:1.5rem;">
             <button type="submit" class="btn btn-primary w-full">
-                <i class="fas fa-brain"></i>
+                <i data-lucide="brain"></i>
                 Generate Timetable
             </button>
         </div>
@@ -66,7 +66,7 @@
                     let inputField = `
                         <div style="display:flex; align-items:center; gap:0.75rem; padding:0.875rem 1rem; background:var(--bg-main); border:1px solid var(--border); border-radius:var(--radius);">
                             <span class="subject-chip ${colorClass}" style="flex:1; min-width:0;">
-                                <i class="fas fa-book" style="font-size:0.65rem;"></i>
+                                <i data-lucide="book" style="font-size:0.65rem;"></i>
                                 ${subject}
                             </span>
                             <div style="display:flex; align-items:center; gap:0.5rem; flex-shrink:0;">

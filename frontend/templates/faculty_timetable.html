@@ -4,7 +4,7 @@
 
 {% block breadcrumb %}
 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="font-size:0.6rem;"></i></span>
 <span class="breadcrumb-current">Faculty Timetable</span>
 {% endblock %}
 
@@ -158,7 +158,7 @@
 <!-- Page Header -->
 <div class="page-header anim-fade-up">
     <h1 class="page-title">
-        <i class="fas fa-id-card" style="color:var(--primary-light); margin-right:0.5rem; font-size:1.5rem;"></i>
+        <i data-lucide="id-card" style="color:var(--primary-light); margin-right:0.5rem; font-size:1.5rem;"></i>
         Faculty Timetable
     </h1>
     <p class="page-subtitle">
@@ -170,7 +170,7 @@
 <div class="card faculty-select-card anim-fade-up delay-100">
     <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
         <div style="width:36px; height:36px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
-            <i class="fas fa-user-tie"></i>
+            <i data-lucide="user-check"></i>
         </div>
         <div>
             <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">Select Faculty Member</div>
@@ -181,7 +181,7 @@
     <div class="form-group" style="margin-bottom:0;">
         <label for="teacherSelect">Faculty Member</label>
         <div class="input-group">
-            <i class="input-icon fas fa-user-tie"></i>
+            <i class="input-icon" data-lucide="user-check"></i>
             <select id="teacherSelect">
                 <option value="">— Select a faculty member —</option>
                 {% for t in teachers %}
@@ -215,13 +215,13 @@
         <div>
             <h2 id="facultyNameHeading" style="font-family:'Outfit',sans-serif; font-size:1.2rem; font-weight:700; color:var(--text-main);"></h2>
             <p style="font-size:0.75rem; color:var(--text-faint); margin-top:0.2rem;">
-                <i class="fas fa-check-circle" style="color:var(--success);"></i>
+                <i data-lucide="check-circle" style="color:var(--success);"></i>
                 Faculty Schedule — Academic Year 2025–26
             </p>
         </div>
         <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
             <button onclick="window.print()" class="btn btn-secondary btn-sm">
-                <i class="fas fa-print"></i> Print
+                <i data-lucide="print"></i> Print
             </button>
         </div>
     </div>
@@ -233,7 +233,7 @@
         <div class="card workload-summary-card" id="workloadCard">
             <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
                 <div style="width:32px; height:32px; background:rgba(99,102,241,0.1); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:var(--secondary); font-size:0.85rem;">
-                    <i class="fas fa-chart-bar"></i>
+                    <i data-lucide="chart-bar"></i>
                 </div>
                 <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.9rem; color:var(--text-main);">
                     Workload Summary
@@ -243,7 +243,7 @@
             <!-- Total lectures badge -->
             <div style="text-align:center; margin-bottom:1.5rem;">
                 <span class="total-badge" id="totalLecturesBadge">
-                    <i class="fas fa-book-open" style="font-size:0.65rem;"></i>
+                    <i data-lucide="book-open" style="font-size:0.65rem;"></i>
                     <span id="totalLecturesCount">0</span> Weekly Lectures
                 </span>
             </div>
@@ -256,7 +256,7 @@
         <div class="card faculty-grid-section">
             <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
                 <div style="width:32px; height:32px; background:rgba(37,99,235,0.1); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:var(--primary-light); font-size:0.85rem;">
-                    <i class="fas fa-calendar-week"></i>
+                    <i data-lucide="calendar-week"></i>
                 </div>
                 <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.9rem; color:var(--text-main);">
                     Weekly Schedule
@@ -378,7 +378,7 @@
                     <td style="color:var(--accent); font-size:0.75rem; font-weight:600; padding:0.5rem 1rem;">${slot.time.substring(0,5)}</td>
                     <td colspan="6">
                         <div class="break-label-faculty">
-                            <i class="fas fa-coffee" style="font-size:0.65rem;"></i>
+                            <i data-lucide="coffee" style="font-size:0.65rem;"></i>
                             Recess Break
                         </div>
                     </td>
@@ -403,7 +403,7 @@
                             </div>
                         `;
                     } else {
-                        cell.innerHTML = '<div class="empty-faculty-cell"><i class="fas fa-minus" style="font-size:0.5rem;"></i></div>';
+                        cell.innerHTML = '<div class="empty-faculty-cell"><i data-lucide="minus" style="font-size:0.5rem;"></i></div>';
                     }
                     row.appendChild(cell);
                 });

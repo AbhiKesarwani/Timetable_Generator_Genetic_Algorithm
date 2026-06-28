@@ -33,7 +33,7 @@
 
 {% block breadcrumb %}
 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="font-size:0.6rem;"></i></span>
 <span class="breadcrumb-current">Schedule Config</span>
 {% endblock %}
 
@@ -42,7 +42,7 @@
 <!-- Page Header -->
 <div class="page-header anim-fade-up">
     <h1 class="page-title">
-        <i class="fas fa-clock" style="color:var(--accent); margin-right:0.5rem; font-size:1.5rem;"></i>
+        <i data-lucide="calendar-clock" style="color:var(--accent); margin-right:0.5rem; width:24px; height:24px;"></i>
         Schedule Configuration
     </h1>
     <p class="page-subtitle">Configure your institution's daily schedule, lecture durations, and break periods.</p>
@@ -54,7 +54,7 @@
     <div class="card">
         <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
             <div style="width:36px; height:36px; background:linear-gradient(135deg,#D97706,#F59E0B); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
-                <i class="fas fa-sliders-h"></i>
+                <i data-lucide="calendar-cog"></i>
             </div>
             <div>
                 <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">Academic Schedule Setup</div>
@@ -67,14 +67,14 @@
 
             <!-- Section: Daily Timing -->
             <div class="form-section-title">
-                <i class="fas fa-sun" style="color:var(--accent);"></i>
-                Daily Timing
+                <span class="section-icon-badge blue"><i data-lucide="building-2"></i></span>
+                Institution Timing
             </div>
 
             <div class="form-group">
                 <label>College Start Time</label>
                 <div class="input-group">
-                    <i class="input-icon fas fa-sun"></i>
+                    <i class="input-icon" data-lucide="sun"></i>
                     <input type="time" name="start_time" required
                         value="{{ config['start_time'][:5] if config and config['start_time'] else '08:00' }}">
                 </div>
@@ -83,15 +83,15 @@
 
             <!-- Section: Lecture Settings -->
             <div class="form-section-title" style="margin-top:1.5rem;">
-                <i class="fas fa-chalkboard-teacher" style="color:var(--primary-light);"></i>
-                Lecture Settings
+                <span class="section-icon-badge purple"><i data-lucide="clock"></i></span>
+                Lecture Duration
             </div>
 
             <div class="grid grid-cols-2" style="gap:1rem;">
                 <div class="form-group">
                     <label>Lecture Duration (min)</label>
                     <div class="input-group">
-                        <i class="input-icon fas fa-hourglass-half"></i>
+                        <i class="input-icon" data-lucide="hourglass"></i>
                         <input type="number" name="lecture_duration" required min="15" max="180"
                             value="{{ config['lecture_duration'] if config else 60 }}">
                     </div>
@@ -100,7 +100,7 @@
                 <div class="form-group">
                     <label>Lectures per Day</label>
                     <div class="input-group">
-                        <i class="input-icon fas fa-list-ol"></i>
+                        <i class="input-icon" data-lucide="list-ordered"></i>
                         <input type="number" name="num_lectures" required min="1" max="15"
                             value="{{ config['num_lectures'] if config else 6 }}">
                     </div>
@@ -110,15 +110,15 @@
 
             <!-- Section: Break Settings -->
             <div class="form-section-title" style="margin-top:1.5rem;">
-                <i class="fas fa-coffee" style="color:var(--warning);"></i>
-                Break Period
+                <span class="section-icon-badge amber"><i data-lucide="coffee"></i></span>
+                Break Configuration
             </div>
 
             <div class="grid grid-cols-2" style="gap:1rem;">
                 <div class="form-group">
                     <label>Break After Lecture #</label>
                     <div class="input-group">
-                        <i class="input-icon fas fa-step-forward"></i>
+                        <i class="input-icon" data-lucide="step-forward"></i>
                         <input type="number" name="break_after" required min="0" max="10"
                             value="{{ config['break_after'] if config else 3 }}">
                     </div>
@@ -127,7 +127,7 @@
                 <div class="form-group">
                     <label>Break Duration (min)</label>
                     <div class="input-group">
-                        <i class="input-icon fas fa-pause-circle"></i>
+                        <i class="input-icon" data-lucide="pause-circle"></i>
                         <input type="number" name="break_duration" required min="0" max="120"
                             value="{{ config['break_duration'] if config else 30 }}">
                     </div>
@@ -137,7 +137,7 @@
 
             <!-- Section: Holiday / Off Days -->
             <div class="form-section-title" style="margin-top:1.5rem;">
-                <i class="fas fa-calendar-times" style="color:var(--danger);"></i>
+                <span class="section-icon-badge danger"><i data-lucide="calendar-off"></i></span>
                 Holiday &amp; Off Days
             </div>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.875rem; line-height:1.6;">
@@ -187,12 +187,12 @@
 
             </div>
             <div style="font-size:0.72rem; color:var(--text-faint); display:flex; align-items:center; gap:0.35rem; margin-bottom:1.25rem;">
-                <i class="fas fa-info-circle" style="color:var(--primary-light);"></i>
+                <i data-lucide="info" style="color:var(--primary-light); width:18px; height:18px;"></i>
                 Checked days will be excluded from all future timetable generations.
             </div>
 
             <button type="submit" class="btn btn-primary w-full" style="margin-top:0.5rem;">
-                <i class="fas fa-check-double"></i>
+                <i data-lucide="check-circle-2" style="width:18px; height:18px;"></i>
                 Save Schedule &amp; Holiday Configuration
             </button>
         </form>
@@ -202,7 +202,7 @@
     <div class="card" style="background:var(--glass-bg); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);">
         <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
             <div style="width:36px; height:36px; background:var(--grad-primary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
-                <i class="fas fa-eye"></i>
+                <i data-lucide="calendar"></i>
             </div>
             <div>
                 <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">Daily Schedule Preview</div>
@@ -215,11 +215,11 @@
         <!-- Summary Chips -->
         <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.5rem;">
             <span class="badge badge-primary" style="font-size:0.72rem;">
-                <i class="fas fa-play" style="font-size:0.55rem;"></i>
+                <i data-lucide="play" style="width:12px; height:12px;"></i>
                 Starts: {{ config['start_time'] }}
             </span>
             <span class="badge badge-green" style="font-size:0.72rem;">
-                <i class="fas fa-flag-checkered" style="font-size:0.55rem;"></i>
+                <i data-lucide="flag" style="width:12px; height:12px;"></i>
                 Ends: {{ config['end_time'] }}
             </span>
             <span class="badge badge-gray" style="font-size:0.72rem;">
@@ -228,7 +228,10 @@
         </div>
 
         <!-- Timeline visualization -->
-        <div class="divider-label">Daily Timeline</div>
+        <div class="divider-label">
+            <i data-lucide="layout-grid" style="width:14px; height:14px;"></i>
+            Time Slots
+        </div>
         <div style="display:flex; flex-direction:column; gap:0.5rem;">
             {% for i in range(1, (config['num_lectures'] | int) + 1) %}
             <div class="timeline-slot">
@@ -240,7 +243,7 @@
             {% if i == (config['break_after'] | int) and (config['break_after'] | int) < (config['num_lectures'] | int) %}
             <div class="timeline-slot timeline-break">
                 <div class="timeline-num" style="background:var(--grad-accent);">
-                    <i class="fas fa-coffee" style="font-size:0.65rem;"></i>
+                    <i data-lucide="coffee" style="width:14px; height:14px;"></i>
                 </div>
                 <div class="timeline-label">Recess Break</div>
                 <span class="timeline-duration" style="color:var(--accent); background:rgba(217,119,6,0.1);">
@@ -255,7 +258,7 @@
         {% else %}
         <div style="text-align:center; padding:3rem 1.5rem; color:var(--text-faint);">
             <div style="width:56px; height:56px; background:var(--bg-muted); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:var(--text-faint); margin:0 auto 1rem;">
-                <i class="fas fa-calendar-times"></i>
+                <i data-lucide="calendar-off"></i>
             </div>
             <div style="font-size:0.875rem; font-weight:500; margin-bottom:0.4rem;">No configuration saved yet</div>
             <div style="font-size:0.78rem;">Save your schedule configuration to see the timeline preview.</div>

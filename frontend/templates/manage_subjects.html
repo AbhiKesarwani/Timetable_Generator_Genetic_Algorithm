@@ -4,7 +4,7 @@
 
 {% block breadcrumb %}
 <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-<span class="breadcrumb-sep"><i class="fas fa-chevron-right" style="font-size:0.6rem;"></i></span>
+<span class="breadcrumb-sep"><i data-lucide="chevron-right" style="font-size:0.6rem;"></i></span>
 <span class="breadcrumb-current">Curriculum</span>
 {% endblock %}
 
@@ -16,17 +16,17 @@
     <div class="page-banner-overlay"></div>
     <div class="page-banner-content">
         <div class="page-banner-title">
-            <i class="fas fa-book-open" style="font-size:1.4rem;"></i>
+            <i data-lucide="book-open" style="font-size:1.4rem;"></i>
             Curriculum Management
         </div>
         <div class="page-banner-subtitle">Manage academic batches and assign subjects with faculty and credit hours</div>
         <div style="display:flex; gap:0.75rem; align-items:center; margin-top:1rem; flex-wrap:wrap;">
             <span class="badge" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.2);">
-                <i class="fas fa-layer-group" style="font-size:0.6rem;"></i>
+                <i data-lucide="layers" style="font-size:0.6rem;"></i>
                 {{ classes | length }} Batches
             </span>
             <span class="badge" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.2);">
-                <i class="fas fa-book" style="font-size:0.6rem;"></i>
+                <i data-lucide="book" style="font-size:0.6rem;"></i>
                 {{ subjects | length }} Subjects
             </span>
         </div>
@@ -40,7 +40,7 @@
     <div class="card" style="padding:0; overflow:hidden;">
         <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
             <div style="display:flex; align-items:center; gap:0.6rem;">
-                <i class="fas fa-layer-group" style="color:var(--primary-light);"></i>
+                <i data-lucide="layers" style="color:var(--primary-light);"></i>
                 <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">Academic Batches</span>
             </div>
             <span class="badge badge-primary">{{ classes | length }} Batches</span>
@@ -85,7 +85,7 @@
                         <td style="padding-left:1.5rem;">
                             <div style="display:flex; align-items:center; gap:0.6rem;">
                                 <div style="width:28px; height:28px; background:rgba(30,58,138,0.1); border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--primary-light); font-size:0.7rem;">
-                                    <i class="fas fa-users"></i>
+                                    <i data-lucide="users"></i>
                                 </div>
                                 <span style="font-weight:600; font-size:0.875rem;">{{ cls.class_name }}</span>
                             </div>
@@ -93,18 +93,16 @@
                         <td style="text-align:right; padding-right:1.5rem;">
                             <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
                                 <a href="{{ url_for('management.manage_subjects', edit_class_id=cls.class_id) }}"
-                                    class="btn btn-secondary btn-sm" title="Edit batch" aria-label="Edit {{ cls.class_name }}">
-                                    <i class="fas fa-edit"></i>
+                                    class="btn-action btn-action-edit" title="Edit batch" aria-label="Edit {{ cls.class_name }}">
+                                    <i data-lucide="pencil"></i>
                                 </a>
                                 <form action="{{ url_for('management.manage_subjects') }}" method="POST" style="display:inline;"
                                     onsubmit="return confirm('Deleting this batch will also remove all its assigned subjects. Proceed?')">
                                     <input type="hidden" name="action" value="delete_class">
                                     <input type="hidden" name="class_id" value="{{ cls.class_id }}">
-                                    <button type="submit" class="btn btn-sm"
-                                        style="background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2); color:var(--danger);"
-                                        title="Delete batch" aria-label="Delete {{ cls.class_name }}">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    <button type="submit" class="btn-action btn-action-delete" title="Delete batch" aria-label="Delete {{ cls.class_name }}">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
                                 </form>
                             </div>
                         </td>
@@ -125,7 +123,7 @@
     <div class="card" style="position:sticky; top:calc(var(--topbar-height) + 1.5rem);">
         <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
             <div style="width:36px; height:36px; background:linear-gradient(135deg,#4F46E5,#7C3AED); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
-                <i class="{{ 'fas fa-edit' if edit_subject else 'fas fa-plus' }}"></i>
+                <i data-lucide="{{ 'pencil' if edit_subject else 'book-plus' }}" style="width:18px;height:18px;stroke-width:2;"></i>
             </div>
             <div>
                 <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">
@@ -147,7 +145,7 @@
             <div class="form-group">
                 <label>Subject Name</label>
                 <div class="input-group">
-                    <i class="input-icon fas fa-book"></i>
+                    <i class="input-icon" data-lucide="book"></i>
                     <input type="text" name="subject_name" placeholder="e.g. Advanced Mathematics" required
                         value="{{ edit_subject.subject_name if edit_subject else '' }}">
                 </div>
@@ -182,7 +180,7 @@
                 <div class="form-group">
                     <label>Semester</label>
                     <div class="input-group">
-                        <i class="input-icon fas fa-list-ol"></i>
+                        <i class="input-icon" data-lucide="list-ordered"></i>
                         <input type="number" name="semester" placeholder="e.g. 1" required min="1"
                             value="{{ edit_subject.semester if edit_subject else '1' }}">
                     </div>
@@ -190,7 +188,7 @@
                 <div class="form-group">
                     <label>Weekly Credits</label>
                     <div class="input-group">
-                        <i class="input-icon fas fa-star"></i>
+                        <i class="input-icon" data-lucide="star"></i>
                         <input type="number" name="credits" placeholder="e.g. 4" required min="1"
                             value="{{ edit_subject.credits if edit_subject else '4' }}">
                     </div>
@@ -198,12 +196,12 @@
             </div>
 
             <button type="submit" class="btn btn-primary w-full">
-                <i class="fas fa-save"></i>
+                <i data-lucide="save"></i>
                 {{ 'Update Subject' if edit_subject else 'Save Subject' }}
             </button>
             {% if edit_subject %}
             <a href="{{ url_for('management.manage_subjects') }}" class="btn btn-secondary w-full" style="margin-top:0.5rem;">
-                <i class="fas fa-times"></i> Cancel Edit
+                <i data-lucide="x"></i> Cancel Edit
             </a>
             {% endif %}
         </form>
@@ -215,7 +213,7 @@
 <div class="card anim-fade-up delay-200" style="padding:0; overflow:hidden;">
     <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
         <div style="display:flex; align-items:center; gap:0.6rem;">
-            <i class="fas fa-table" style="color:var(--secondary);"></i>
+            <i data-lucide="table" style="color:var(--secondary);"></i>
             <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.95rem;">Curriculum Overview</span>
         </div>
         <span class="badge badge-ind">{{ subjects | length }} Subjects</span>
@@ -239,13 +237,13 @@
                 <tr>
                     <td style="padding-left:1.5rem;">
                         <span class="subject-chip {{ colors[loop.index0 % 6] }}">
-                            <i class="fas fa-book" style="font-size:0.65rem;"></i>
+                            <i data-lucide="book" style="font-size:0.65rem;"></i>
                             {{ s.subject_name }}
                         </span>
                     </td>
                     <td>
                         <span class="badge badge-primary">
-                            <i class="fas fa-users" style="font-size:0.6rem;"></i>
+                            <i data-lucide="users" style="font-size:0.6rem;"></i>
                             {{ s.class_name }}
                         </span>
                     </td>
@@ -262,23 +260,21 @@
                     </td>
                     <td>
                         <span class="badge badge-gold">
-                            <i class="fas fa-star" style="font-size:0.55rem;"></i>
+                            <i data-lucide="star" style="font-size:0.55rem;"></i>
                             {{ s.credits }} cr
                         </span>
                     </td>
                     <td style="text-align:right; padding-right:1.5rem;">
                         <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
                             <a href="{{ url_for('management.manage_subjects', edit_subject_id=s.subject_id) }}"
-                                class="btn btn-secondary btn-sm" title="Edit subject" aria-label="Edit {{ s.subject_name }}">
-                                <i class="fas fa-edit"></i>
+                                class="btn-action btn-action-edit" title="Edit subject" aria-label="Edit {{ s.subject_name }}">
+                                <i data-lucide="pencil"></i>
                             </a>
                             <form action="{{ url_for('management.manage_subjects') }}" method="POST" style="display:inline;">
                                 <input type="hidden" name="action" value="delete_subject">
                                 <input type="hidden" name="subject_id" value="{{ s.subject_id }}">
-                                <button type="submit" class="btn btn-sm"
-                                    style="background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2); color:var(--danger);"
-                                    title="Delete subject" aria-label="Delete {{ s.subject_name }}">
-                                    <i class="fas fa-trash-alt"></i>
+                                <button type="submit" class="btn-action btn-action-delete" title="Delete subject" aria-label="Delete {{ s.subject_name }}">
+                                    <i data-lucide="trash-2"></i>
                                 </button>
                             </form>
                         </div>
@@ -289,7 +285,7 @@
                     <td colspan="6" style="text-align:center; padding:4rem; color:var(--text-faint);">
                         <div style="display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
                             <div style="width:56px; height:56px; background:var(--bg-muted); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:var(--text-faint);">
-                                <i class="fas fa-book-open"></i>
+                                <i data-lucide="book-open"></i>
                             </div>
                             <span style="font-size:0.875rem; font-weight:500;">No subjects assigned yet.</span>
                             <span style="font-size:0.78rem;">Create a batch first, then add subjects using the form above.</span>

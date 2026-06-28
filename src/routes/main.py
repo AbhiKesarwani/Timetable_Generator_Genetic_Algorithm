@@ -27,9 +27,19 @@ def dashboard():
     cursor.execute("SELECT COUNT(DISTINCT class_id) FROM timetable WHERE school_id = %s", (school_id,))
     timetable_count = cursor.fetchone()[0]
 
+    # Count Subjects
+    cursor.execute("SELECT COUNT(*) FROM subject WHERE school_id = %s", (school_id,))
+    subject_count = cursor.fetchone()[0]
+
+    # Check if schedule timings have been configured
+    cursor.execute("SELECT COUNT(*) FROM allocated_timeslots WHERE school_id = %s", (school_id,))
+    has_config = cursor.fetchone()[0] > 0
+
     db.close()
 
     return render_template('dashboard.html', 
                           class_count=class_count, 
                           staff_count=staff_count, 
-                          timetable_count=timetable_count)
+                          timetable_count=timetable_count,
+                          subject_count=subject_count,
+                          has_config=has_config)
