@@ -416,7 +416,7 @@
         });
     }
 
-    // Current lecture highlight (only on weekdays during college hours)
+    // Current lecture highlight (only on weekdays during institution hours)
     if (todayColIdx !== undefined && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         const now = new Date();
         const nowMins = now.getHours() * 60 + now.getMinutes();
