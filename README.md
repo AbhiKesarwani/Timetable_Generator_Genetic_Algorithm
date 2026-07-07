@@ -7,7 +7,7 @@ The system minimizes manual scheduling effort by considering faculty availabilit
 ## 🌐 Live Demo
 
 🚀 **Application:** https://timetable-generator-genetic-algorit.vercel.app/  
-**Demo Video:** https://www.linkedin.com/posts/abhinav-kesarwani_python-flask-mysql-ugcPost-7477801957777264640-dwY-/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEIUa9IB1N78githf0Fv8-dUSg7-hw3D9hI
+    **Demo Video:** https://www.linkedin.com/posts/abhinav-kesarwani_python-flask-mysql-ugcPost-7477801957777264640-dwY-/ utm_source=share&utm_medium=member_desktop&rcm=ACoAAEIUa9IB1N78githf0Fv8-dUSg7-hw3D9hI
 
 ---
 
